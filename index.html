@@ -1,38 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Mars Crypto Conflict - Telegram Mini App</title>
+    <title>Mars Game - Вид сверху</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="telegram-web-app-theme-color" content="#8B4513">
     <style>
-        /* ОСНОВНЫЕ СТИЛИ (те же что и раньше, но адаптированные для мобильных) */
         body {
             margin: 0;
             padding: 0;
             background: #0a0a1a;
             color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial;
             display: flex;
             flex-direction: column;
             height: 100vh;
             overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
         }
         
-        /* TELEGRAM HEADER SPACER */
-        #tg-header-spacer {
-            height: 0px; /* Telegram сам управляет header */
-            transition: height 0.3s;
-        }
-        
-        #game-container {
-            display: flex;
-            flex: 1;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        
-        /* ТЕЛЕГРАММ ПАНЕЛЬ АВТОРИЗАЦИИ */
+        /* TELEGRAM AUTH PANEL */
         #tg-auth-panel {
             position: fixed;
             top: 0;
@@ -49,57 +35,6 @@
             text-align: center;
         }
         
-        #tg-user-info {
-            display: none;
-            background: rgba(139, 69, 19, 0.3);
-            padding: 10px 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .tg-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid gold;
-        }
-        
-        /* АДАПТИВНАЯ ПРАВАЯ ПАНЕЛЬ ДЛЯ МОБИЛЬНЫХ */
-        @media (max-width: 768px) {
-            #game-container {
-                flex-direction: column;
-            }
-            
-            #mars-surface {
-                flex: 2;
-                min-height: 60vh;
-            }
-            
-            #right-panel {
-                flex: 1;
-                min-width: 100%;
-                max-height: 40vh;
-                padding: 10px;
-            }
-            
-            .building-btn, .action-btn {
-                padding: 10px;
-                font-size: 13px;
-            }
-            
-            .stat {
-                padding: 8px;
-                margin: 4px 0;
-            }
-            
-            .value {
-                font-size: 18px;
-            }
-        }
-        
-        /* ТЕЛЕГРАММ КНОПКИ */
         .tg-btn {
             background: linear-gradient(135deg, #0088cc, #00aced);
             color: white;
@@ -119,16 +54,251 @@
             box-shadow: 0 6px 20px rgba(0, 136, 204, 0.4);
         }
         
-        /* ОСТАЛЬНЫЕ СТИЛИ ОСТАЮТСЯ ТАКИМИ ЖЕ, КАК В ПРЕДЫДУЩЕЙ ВЕРСИИ */
-        /* ... */
+        #game-container {
+            display: none;
+            flex: 1;
+        }
         
+        /* ЛЕВАЯ ПАНЕЛЬ: ПОВЕРХНОСТЬ МАРСА */
+        #mars-surface {
+            flex: 3;
+            background: linear-gradient(135deg, #8B4513, #A0522D, #D2691E);
+            position: relative;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+        
+        .rock {
+            position: absolute;
+            background: #696969;
+            border-radius: 50%;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        .building {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 3px solid white;
+            border-radius: 8px;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .building:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 0 15px white;
+        }
+        
+        .building.base {
+            background: rgba(70, 130, 180, 0.9);
+        }
+        
+        .building.mining {
+            background: rgba(139, 69, 19, 0.9);
+        }
+        
+        .building.power {
+            background: rgba(255, 215, 0, 0.9);
+        }
+        
+        .building-level {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: gold;
+            color: black;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            border: 2px solid white;
+        }
+        
+        /* ПРАВАЯ ПАНЕЛЬ: ИНТЕРФЕЙС */
+        #right-panel {
+            flex: 1;
+            background: rgba(20, 15, 10, 0.95);
+            padding: 15px;
+            border-left: 4px solid #8B4513;
+            min-width: 350px;
+            width: 380px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        h1 {
+            color: #FF4500;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+        
+        .stat {
+            background: rgba(139, 69, 19, 0.3);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border: 1px solid #D2691E;
+        }
+        
+        .value {
+            color: gold;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .building-btn {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .building-btn:hover {
+            background: linear-gradient(135deg, #A0522D, #D2691E);
+            transform: translateY(-2px);
+        }
+        
+        .building-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .action-btn {
+            width: 100%;
+            padding: 14px;
+            margin: 8px 0;
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: linear-gradient(135deg, #3CB371, #66CDAA);
+            transform: scale(1.05);
+        }
+        
+        #message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .message-success {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #00FF00;
+            color: #00FF00;
+        }
+        
+        .message-error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #FF0000;
+            color: #FF0000;
+        }
+        
+        #building-list {
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+        }
+        
+        .building-item {
+            background: rgba(70, 130, 180, 0.2);
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 6px;
+            border-left: 4px solid #467CBE;
+            font-size: 13px;
+        }
+        
+        /* TELEGRAM GAME HEADER */
+        #tg-game-header {
+            display: none;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(139, 69, 19, 0.2);
+            border-radius: 10px;
+        }
+        
+        #tg-footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #333;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        /* СКРОЛЛБАР */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #8B4513;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D2691E;
+        }
+        
+        @media (max-width: 768px) {
+            #game-container {
+                flex-direction: column;
+            }
+            
+            #mars-surface {
+                flex: 2;
+                min-height: 60vh;
+            }
+            
+            #right-panel {
+                flex: 1;
+                min-width: 100%;
+                max-height: 40vh;
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- TELEGRAM HEADER SPACER -->
-    <div id="tg-header-spacer"></div>
-    
-    <!-- TELEGRAM AUTH PANEL (показывается только если не в Telegram) -->
+    <!-- TELEGRAM AUTH PANEL -->
     <div id="tg-auth-panel">
         <div style="font-size: 48px; margin-bottom: 20px;">🚀</div>
         <h1 style="color: #FF4500; margin-bottom: 10px;">Mars Crypto Conflict</h1>
@@ -136,8 +306,8 @@
             Космическая стратегия на блокчейне BSC. Добывайте ресурсы, стройте базы, торгуйте с другими колонистами!
         </p>
         
-        <div id="tg-user-info">
-            <img id="tg-user-avatar" src="" class="tg-avatar" alt="Аватар">
+        <div id="tg-user-info" style="display: none; background: rgba(139, 69, 19, 0.3); padding: 15px; border-radius: 10px; margin-bottom: 20px; align-items: center; gap: 10px;">
+            <img id="tg-user-avatar" src="" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid gold;">
             <div>
                 <div id="tg-user-name" style="font-weight: bold;"></div>
                 <div id="tg-user-id" style="font-size: 12px; color: #aaa;"></div>
@@ -155,23 +325,24 @@
         <div style="margin-top: 30px; font-size: 12px; color: #666;">
             Для лучшего опыта используйте Telegram Mini App
         </div>
+        <div style="font-size: 12px; color: #888; margin-top: 10px;">
+            Бот: @MarsCC_Bot
+        </div>
     </div>
     
-    <!-- ОСНОВНОЙ ИГРОВОЙ ИНТЕРФЕЙС (скрыт по умолчанию) -->
-    <div id="game-container" style="display: none;">
+    <!-- ОСНОВНОЙ ИГРОВОЙ ИНТЕРФЕЙС -->
+    <div id="game-container">
         <!-- ЛЕВАЯ ПАНЕЛЬ: ПОВЕРХНОСТЬ МАРСА -->
-        <div id="mars-surface">
-            <!-- Камни и здания будут добавляться сюда -->
-        </div>
+        <div id="mars-surface"></div>
         
         <!-- ПРАВАЯ ПАНЕЛЬ: ИНТЕРФЕЙС -->
         <div id="right-panel">
-            <!-- ВЕРХНЯЯ ПАНЕЛЬ С ИНФО ИГРОКА TELEGRAM -->
-            <div id="tg-game-header" style="display: none; margin-bottom: 15px; padding: 10px; background: rgba(139, 69, 19, 0.2); border-radius: 10px;">
+            <!-- TELEGRAM USER HEADER -->
+            <div id="tg-game-header">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <img id="tg-game-avatar" src="" style="width: 35px; height: 35px; border-radius: 50%; border: 2px solid gold;">
+                    <img id="tg-game-avatar" src="" style="width: 35px; height: 35px; border-radius: 50%; border: 2px solid gold; background: #333;">
                     <div style="flex: 1;">
-                        <div style="font-weight: bold; font-size: 14px;" id="tg-game-name"></div>
+                        <div style="font-weight: bold; font-size: 14px;" id="tg-game-name">Игрок</div>
                         <div style="font-size: 11px; color: #aaa;" id="tg-game-status">Добыча активна</div>
                     </div>
                     <button onclick="showTelegramMenu()" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">
@@ -182,7 +353,6 @@
             
             <h1>🚀 Mars Crypto Conflict</h1>
             
-            <!-- ОСТАЛЬНЫЙ ИНТЕРФЕЙС ИГРЫ (ваш существующий код) -->
             <div class="stat">
                 <div>💰 Баланс:</div>
                 <div class="value" id="balance">500.00</div>
@@ -231,77 +401,111 @@
                 <div id="buildings-container"></div>
             </div>
             
-            <!-- ДОБАВЛЯЕМ ПУСТОТУ ДЛЯ СКРОЛЛА -->
             <div style="height: 50px;"></div>
             
             <div id="message"></div>
             
-            <!-- TELEGRAM ФУТЕР -->
-            <div id="tg-footer" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; text-align: center; font-size: 12px; color: #888;">
+            <!-- TELEGRAM FOOTER -->
+            <div id="tg-footer">
                 <div>Игра работает через Telegram Mini App</div>
                 <div style="margin-top: 5px;">
                     <button onclick="shareGame()" style="background: #0088cc; color: white; border: none; border-radius: 15px; padding: 8px 15px; font-size: 12px; cursor: pointer;">
                         📢 Пригласить друзей
                     </button>
                 </div>
+                <div style="margin-top: 10px; font-size: 10px; color: #666;">
+                    Бот: @MarsCC_Bot
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- TELEGRAM WEB APP SDK -->
+    <!-- TELEGRAM SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <script>
         // ============================
-        // TELEGRAM WEB APP ИНИЦИАЛИЗАЦИЯ
+        // TELEGRAM ИНТЕГРАЦИЯ
         // ============================
         let TelegramWebApp = null;
         let tgUser = null;
         let isTelegram = false;
         
-        // Проверяем, запущены ли мы в Telegram
+        // Запуск в Telegram
+        function launchInTelegram() {
+            const botUsername = 'MarsCC_Bot'; // ПРАВИЛЬНОЕ ИМЯ БОТА
+            const gameUrl = window.location.href;
+            
+            // Правильный формат ссылки для Telegram Web App
+            const telegramUrl = `https://t.me/${botUsername}?startapp=${encodeURIComponent(gameUrl)}`;
+            
+            console.log('Opening Telegram URL:', telegramUrl);
+            
+            if (window.Telegram && window.Telegram.WebApp) {
+                // Если уже в Telegram Web App
+                window.Telegram.WebApp.openLink(telegramUrl);
+            } else {
+                // Если в обычном браузере
+                window.open(telegramUrl, '_blank');
+            }
+            
+            showMessage('Открываем в @MarsCC_Bot...', 'success');
+        }
+        
+        // Продолжить без Telegram
+        function continueWithoutTelegram() {
+            document.getElementById('tg-auth-panel').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+            document.getElementById('tg-footer').style.display = 'none';
+            document.getElementById('tg-game-header').style.display = 'none';
+            
+            initGame();
+            showMessage('🚀 Режим браузера активирован', 'success');
+        }
+        
+        // Обнаружение Telegram
         function detectTelegram() {
             try {
                 if (window.Telegram && window.Telegram.WebApp) {
                     TelegramWebApp = window.Telegram.WebApp;
                     isTelegram = true;
                     
-                    // Инициализируем Telegram Web App
+                    // Инициализация
                     TelegramWebApp.ready();
-                    TelegramWebApp.expand(); // Раскрываем на весь экран
-                    
-                    // Настраиваем цвета под нашу игру
+                    TelegramWebApp.expand();
                     TelegramWebApp.setHeaderColor('#8B4513');
                     TelegramWebApp.setBackgroundColor('#0a0a1a');
                     
-                    // Получаем данные пользователя
+                    // Получаем пользователя
                     if (TelegramWebApp.initDataUnsafe && TelegramWebApp.initDataUnsafe.user) {
                         tgUser = TelegramWebApp.initDataUnsafe.user;
-                        console.log('Telegram user detected:', tgUser);
                         showTelegramUser();
-                        hideAuthPanel();
-                        showGame();
-                    } else {
-                        console.log('No Telegram user data');
-                        // Показываем стандартную авторизацию
                     }
                     
-                    // Настраиваем кнопку меню
-                    setupTelegramMenu();
+                    // Настраиваем кнопки
+                    setupTelegramButtons();
+                    
+                    // Скрываем панель авторизации и показываем игру
+                    document.getElementById('tg-auth-panel').style.display = 'none';
+                    document.getElementById('game-container').style.display = 'flex';
+                    
+                    initGame();
+                    
+                    showMessage(`👋 Добро пожаловать, ${tgUser?.first_name || 'Игрок'}!`, 'success');
                     
                     return true;
                 }
             } catch (error) {
-                console.error('Telegram Web App error:', error);
+                console.log('Not in Telegram:', error);
             }
             return false;
         }
         
-        // Показываем информацию о пользователе Telegram
+        // Показать пользователя Telegram
         function showTelegramUser() {
             if (!tgUser) return;
             
-            // Обновляем аватар и имя в панели авторизации
+            // В панели авторизации
             if (tgUser.photo_url) {
                 document.getElementById('tg-user-avatar').src = tgUser.photo_url;
             }
@@ -310,66 +514,26 @@
             document.getElementById('tg-user-id').textContent = 'ID: ' + tgUser.id;
             document.getElementById('tg-user-info').style.display = 'flex';
             
-            // Обновляем аватар и имя в игровом интерфейсе
+            // В игровом интерфейсе
             if (tgUser.photo_url) {
                 document.getElementById('tg-game-avatar').src = tgUser.photo_url;
             }
             document.getElementById('tg-game-name').textContent = 
                 tgUser.first_name + (tgUser.username ? ' (@' + tgUser.username + ')' : '');
-            document.getElementById('tg-game-header').style.display = 'block';
+            document.getElementById('tg-game-header').style.display = 'flex';
         }
         
-        // Скрываем панель авторизации
-        function hideAuthPanel() {
-            document.getElementById('tg-auth-panel').style.display = 'none';
-        }
-        
-        // Показываем игровой интерфейс
-        function showGame() {
-            document.getElementById('game-container').style.display = 'flex';
-            
-            // Если в Telegram, показываем Telegram футер
-            if (isTelegram) {
-                document.getElementById('tg-footer').style.display = 'block';
-            } else {
-                document.getElementById('tg-footer').style.display = 'none';
-                document.getElementById('tg-game-header').style.display = 'none';
-            }
-            
-            // Запускаем игру
-            initGame();
-        }
-        
-        // Запуск в Telegram
-        function launchInTelegram() {
-            const botUsername = 'MarsCС_Ище'; // Замените на username вашего бота
-            const appUrl = window.location.href;
-            const telegramUrl = `https://t.me/${botUsername}?startapp=${encodeURIComponent(appUrl)}`;
-            
-            window.open(telegramUrl, '_blank');
-            
-            // Показываем инструкцию
-            showMessage('Откройте ссылку в Telegram для запуска игры', 'success');
-        }
-        
-        // Продолжить без Telegram
-        function continueWithoutTelegram() {
-            hideAuthPanel();
-            showGame();
-            showMessage('🚀 Режим браузера активирован. Некоторые функции могут быть недоступны.', 'success');
-        }
-        
-        // Настройка меню Telegram
-        function setupTelegramMenu() {
+        // Настройка кнопок Telegram
+        function setupTelegramButtons() {
             if (!TelegramWebApp) return;
             
-            // Основные кнопки меню
-            TelegramWebApp.MainButton.setText('📊 Мой профиль');
+            TelegramWebApp.MainButton.setText('📊 Профиль');
             TelegramWebApp.MainButton.onClick(showProfile);
             TelegramWebApp.MainButton.show();
             
-            // Back Button
-            TelegramWebApp.BackButton.onClick(goBack);
+            TelegramWebApp.BackButton.onClick(function() {
+                showMessage('Используйте меню игры', 'success');
+            });
         }
         
         function showTelegramMenu() {
@@ -407,80 +571,36 @@ ID: ${tgUser.id}
         }
         
         function shareGame() {
+            const botUsername = 'MarsCC_Bot';
+            const gameUrl = window.location.href;
             const shareText = encodeURIComponent(
                 `🚀 Присоединяйся к Mars Crypto Conflict!\n` +
                 `Космическая стратегия на блокчейне BSC\n` +
                 `Добывай ресурсы, строй базы, торгуй с другими колонистами!`
             );
             
-            const shareUrl = isTelegram ? 
-                `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${shareText}` :
-                `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${shareText}`;
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(`https://t.me/${botUsername}?startapp=${encodeURIComponent(gameUrl)}`)}&text=${shareText}`;
             
-            window.open(shareUrl, '_blank');
+            if (isTelegram && TelegramWebApp) {
+                TelegramWebApp.openLink(shareUrl);
+            } else {
+                window.open(shareUrl, '_blank');
+            }
             
-            showMessage('Ссылка для приглашения скопирована!', 'success');
+            showMessage('Ссылка для приглашения готова!', 'success');
         }
         
         function showSupport() {
-            const supportUrl = 'https://t.me/MarsCryptoSupport'; // Замените на ваш канал поддержки
-            window.open(supportUrl, '_blank');
-        }
-        
-        function goBack() {
-            // Логика кнопки "Назад"
-            showMessage('Используйте меню игры для навигации', 'success');
-        }
-        
-        // ============================
-        // ИНИЦИАЛИЗАЦИЯ ИГРЫ (ваш существующий код, но в функции)
-        // ============================
-        function initGame() {
-            console.log('🚀 Игра инициализирована! Telegram: ' + isTelegram);
-            
-            // Если в Telegram, логируем пользователя
-            if (tgUser) {
-                console.log('Игрок:', tgUser.first_name, 'ID:', tgUser.id);
-                
-                // Можно сохранить данные пользователя для бэкенда
-                if (isTelegram) {
-                    // Отправляем данные на сервер для регистрации/авторизации
-                    // saveUserToBackend(tgUser.id, tgUser.first_name);
-                }
-            }
-            
-            // Генерируем поверхность Марса
-            generateMarsSurface();
-            
-            // Обновляем интерфейс
-            updateUI();
-            
-            // Запускаем игровые циклы
-            gameState.lastUpdate = Date.now();
-            setInterval(updateMining, 1000);
-            
-            // Приветственное сообщение
-            if (isTelegram && tgUser) {
-                showMessage(`👋 Добро пожаловать на Марс, ${tgUser.first_name}!`, 'success');
+            const supportUrl = 'https://t.me/MarsCryptoSupport';
+            if (isTelegram && TelegramWebApp) {
+                TelegramWebApp.openLink(supportUrl);
             } else {
-                showMessage('🚀 Добро пожаловать на Марс! Постройте базу для начала добычи.', 'success');
+                window.open(supportUrl, '_blank');
             }
         }
         
         // ============================
-        // ОСТАЛЬНЫЕ ФУНКЦИИ ИГРЫ (ваш существующий код)
-        // ============================
-        // ... (весь ваш предыдущий игровой код остается здесь) ...
-        
-        // ВАЖНО: Все функции из предыдущей версии (generateMarsSurface, startBuilding, 
-        // updateMining, updateUI и т.д.) должны быть скопированы сюда
-        
-    </script>
-    
-    <!-- ОСНОВНОЙ ИГРОВОЙ СКРИПТ (вставьте сюда весь ваш предыдущий код игровой логики) -->
-    <script>
-        // ============================
-        // КОНСТАНТЫ ИГРЫ (ИСПРАВЛЕННЫЕ)
+        // ИГРОВАЯ ЛОГИКА
         // ============================
         const CONFIG = {
             MINING_RATE: 0.001,
@@ -507,9 +627,6 @@ ID: ${tgUser.id}
             }
         };
 
-        // ============================
-        // СОСТОЯНИЕ ИГРЫ
-        // ============================
         let gameState = {
             balance: 500.0,
             mined: 0.0,
@@ -524,9 +641,6 @@ ID: ${tgUser.id}
             lastUpdate: Date.now()
         };
 
-        // ============================
-        // ГЕНЕРАЦИЯ ПОВЕРХНОСТИ МАРСА
-        // ============================
         function generateMarsSurface() {
             const surface = document.getElementById('mars-surface');
             surface.innerHTML = '';
@@ -564,11 +678,343 @@ ID: ${tgUser.id}
             renderBuildings();
         }
 
-        // ... (ВСТАВЬТЕ ВЕСЬ ОСТАВШИЙСЯ КОД ИГРЫ ЗДЕСЬ) ...
+        function createBuildingElement(building) {
+            const div = document.createElement('div');
+            div.className = `building ${building.type}`;
+            div.id = `building-${building.id}`;
+            div.style.left = building.x + 'px';
+            div.style.top = building.y + 'px';
+            div.title = `${getBuildingName(building.type)} | Уровень ${building.level + 1}`;
+            
+            const icon = document.createElement('div');
+            if (building.type === 'base') icon.textContent = '🏠';
+            else if (building.type === 'mining') icon.textContent = '⛏️';
+            else if (building.type === 'power') icon.textContent = '⚡';
+            div.appendChild(icon);
+            
+            const name = document.createElement('div');
+            name.style.fontSize = '10px';
+            name.style.marginTop = '5px';
+            name.textContent = getBuildingName(building.type);
+            div.appendChild(name);
+            
+            if (building.level > 0) {
+                const level = document.createElement('div');
+                level.className = 'building-level';
+                level.textContent = building.level;
+                div.appendChild(level);
+            }
+            
+            if (building.type === 'mining') {
+                const powerIndicator = document.createElement('div');
+                powerIndicator.style.position = 'absolute';
+                powerIndicator.style.top = '-5px';
+                powerIndicator.style.left = '-5px';
+                powerIndicator.style.width = '10px';
+                powerIndicator.style.height = '10px';
+                powerIndicator.style.borderRadius = '50%';
+                powerIndicator.style.border = '1px solid white';
+                powerIndicator.style.background = building.hasPower ? '#00FF00' : 'red';
+                div.appendChild(powerIndicator);
+            }
+            
+            return div;
+        }
 
-        // ============================
-        // ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
-        // ============================
+        function renderBuildings() {
+            const surface = document.getElementById('mars-surface');
+            document.querySelectorAll('.building').forEach(el => el.remove());
+            
+            gameState.buildings.forEach(building => {
+                const buildingEl = createBuildingElement(building);
+                surface.appendChild(buildingEl);
+                
+                buildingEl.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    selectBuilding(building.id);
+                });
+            });
+        }
+
+        function startBuilding(type) {
+            const cost = CONFIG.BUILDING_COSTS[type];
+            
+            if (gameState.balance < cost) {
+                showMessage(`❌ Недостаточно MNRT! Нужно: ${cost}`, 'error');
+                return;
+            }
+            
+            if ((type === 'mining' || type === 'power') && !gameState.hasBase) {
+                showMessage('❌ Сначала постройте базу!', 'error');
+                return;
+            }
+            
+            gameState.placingBuilding = type;
+            showMessage(`🏗️ Кликните на поверхность Марса для размещения ${getBuildingName(type)}`, 'success');
+        }
+
+        document.getElementById('mars-surface').addEventListener('click', function(e) {
+            if (!gameState.placingBuilding) return;
+            
+            const surface = this;
+            const rect = surface.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            let canPlace = true;
+            for (const building of gameState.buildings) {
+                const distance = Math.sqrt(
+                    Math.pow(x - building.x, 2) + 
+                    Math.pow(y - building.y, 2)
+                );
+                if (distance < 80) {
+                    canPlace = false;
+                    break;
+                }
+            }
+            
+            if (!canPlace) {
+                showMessage('⚠️ Слишком близко к другому зданию!', 'error');
+                return;
+            }
+            
+            const cost = CONFIG.BUILDING_COSTS[gameState.placingBuilding];
+            gameState.balance -= cost;
+            
+            const building = {
+                id: gameState.nextId++,
+                type: gameState.placingBuilding,
+                x: x,
+                y: y,
+                level: 0,
+                hasPower: true,
+                lastMiningTime: Date.now()
+            };
+            
+            gameState.buildings.push(building);
+            
+            if (gameState.placingBuilding === 'base') {
+                gameState.hasBase = true;
+            }
+            
+            gameState.placingBuilding = null;
+            updateUI();
+            renderBuildings();
+            
+            showMessage(`✅ ${getBuildingName(building.type)} построена!`, 'success');
+        });
+
+        function collectResources() {
+            if (gameState.mined > 0) {
+                const collected = gameState.mined;
+                gameState.balance += collected;
+                gameState.totalMinedAllTime += collected;
+                gameState.mined = 0;
+                
+                showMessage(`💰 Собрано ${collected.toFixed(4)} MNRT!`, 'success');
+                updateUI();
+            } else {
+                showMessage('⛏️ Нет добытых ресурсов для сбора', 'error');
+            }
+        }
+
+        function selectBuilding(buildingId) {
+            showMessage('🏗️ Для улучшения здания используйте правую панель', 'success');
+        }
+
+        function calculateEnergy() {
+            let production = 0;
+            let consumption = 0;
+            
+            gameState.buildings.forEach(building => {
+                if (CONFIG.ENERGY_PRODUCTION[building.type]) {
+                    production += CONFIG.ENERGY_PRODUCTION[building.type];
+                }
+                if (CONFIG.ENERGY_CONSUMPTION[building.type]) {
+                    consumption += CONFIG.ENERGY_CONSUMPTION[building.type];
+                }
+            });
+            
+            gameState.buildings.forEach(building => {
+                if (building.type === 'mining') {
+                    building.hasPower = (production >= consumption);
+                }
+            });
+            
+            gameState.energy = { production, consumption };
+            return { production, consumption };
+        }
+
+        function calculateUpkeep() {
+            let totalUpkeep = 0;
+            gameState.buildings.forEach(building => {
+                totalUpkeep += CONFIG.UPKEEP_COSTS[building.type] || 0;
+            });
+            return totalUpkeep;
+        }
+
+        function updateMining() {
+            const now = Date.now();
+            const elapsedSeconds = (now - gameState.lastUpdate) / 1000;
+            gameState.lastUpdate = now;
+            
+            const energy = calculateEnergy();
+            const upkeepPerSecond = calculateUpkeep();
+            const totalUpkeep = upkeepPerSecond * elapsedSeconds;
+            
+            const activeMiningBuildings = gameState.buildings.filter(b => 
+                b.type === 'mining' && b.hasPower
+            );
+            
+            if (activeMiningBuildings.length === 0) {
+                if (gameState.mined > 0) {
+                    const upkeepFromMined = Math.min(totalUpkeep, gameState.mined);
+                    gameState.mined -= upkeepFromMined;
+                    gameState.upkeepDebt += totalUpkeep - upkeepFromMined;
+                } else {
+                    gameState.upkeepDebt += totalUpkeep;
+                }
+                
+                updateUI();
+                return;
+            }
+            
+            let totalMining = 0;
+            activeMiningBuildings.forEach(building => {
+                const multiplier = 1 + (building.level * 0.2);
+                totalMining += CONFIG.MINING_RATE * multiplier;
+            });
+            
+            const netMiningPerSecond = totalMining - upkeepPerSecond;
+            
+            if (netMiningPerSecond > 0) {
+                const minedThisTick = netMiningPerSecond * elapsedSeconds;
+                
+                if (gameState.supply >= minedThisTick) {
+                    gameState.mined += minedThisTick;
+                    gameState.supply -= minedThisTick;
+                } else if (gameState.supply > 0) {
+                    gameState.mined += gameState.supply;
+                    gameState.supply = 0;
+                }
+            } else {
+                const lossPerSecond = -netMiningPerSecond;
+                const lossThisTick = lossPerSecond * elapsedSeconds;
+                
+                if (gameState.mined >= lossThisTick) {
+                    gameState.mined -= lossThisTick;
+                } else {
+                    const remainingLoss = lossThisTick - gameState.mined;
+                    gameState.mined = 0;
+                    gameState.upkeepDebt += remainingLoss;
+                }
+            }
+            
+            activeMiningBuildings.forEach(building => {
+                const buildingEl = document.getElementById(`building-${building.id}`);
+                if (buildingEl) {
+                    buildingEl.style.boxShadow = '0 0 20px gold';
+                    setTimeout(() => {
+                        buildingEl.style.boxShadow = '';
+                    }, 300);
+                }
+            });
+            
+            updateUI();
+        }
+
+        function getBuildingName(type) {
+            const names = {
+                base: 'База',
+                mining: 'Буровая',
+                power: 'Электростанция'
+            };
+            return names[type] || type;
+        }
+
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = type === 'error' ? 'message-error' : 'message-success';
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 3000);
+        }
+
+        function updateUI() {
+            document.getElementById('balance').textContent = gameState.balance.toFixed(3);
+            document.getElementById('mined').textContent = gameState.mined.toFixed(4);
+            document.getElementById('supply').textContent = gameState.supply.toLocaleString();
+            
+            const energyInfo = calculateEnergy();
+            document.getElementById('energy').textContent = 
+                `${energyInfo.production}/${energyInfo.consumption}`;
+            
+            const energyEl = document.getElementById('energy');
+            energyEl.style.color = energyInfo.production >= energyInfo.consumption ? 
+                '#00FF00' : '#FF5555';
+            
+            document.getElementById('btn-base').disabled = gameState.balance < 100;
+            document.getElementById('btn-mining').disabled = 
+                gameState.balance < 200 || !gameState.hasBase;
+            document.getElementById('btn-power').disabled = 
+                gameState.balance < 200 || !gameState.hasBase;
+            
+            updateBuildingsList();
+        }
+
+        function updateBuildingsList() {
+            const container = document.getElementById('buildings-container');
+            container.innerHTML = '';
+            
+            if (gameState.buildings.length === 0) {
+                container.innerHTML = '<div style="color: #888; text-align: center; padding: 10px;">Нет построенных зданий</div>';
+                return;
+            }
+            
+            gameState.buildings.forEach(building => {
+                const div = document.createElement('div');
+                div.className = 'building-item';
+                
+                let status = '';
+                if (building.type === 'mining') {
+                    status = building.hasPower ? '🟢 Работает' : '🔴 Нет энергии';
+                } else if (building.type === 'power') {
+                    status = '⚡ Производит энергию';
+                } else {
+                    status = '🏠 База доступна';
+                }
+                
+                div.innerHTML = `
+                    <strong>${getBuildingName(building.type)} #${building.id}</strong><br>
+                    <small>
+                        Уровень: ${building.level + 1}<br>
+                        Координаты: X:${Math.floor(building.x)} Y:${Math.floor(building.y)}<br>
+                        ${status}<br>
+                        Расход: ${CONFIG.UPKEEP_COSTS[building.type]} MNRT/сек
+                    </small>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function initGame() {
+            console.log('🚀 Игра инициализирована!');
+            
+            generateMarsSurface();
+            updateUI();
+            
+            gameState.lastUpdate = Date.now();
+            setInterval(updateMining, 1000);
+            
+            if (isTelegram && tgUser) {
+                console.log('Игрок Telegram:', tgUser.first_name, 'ID:', tgUser.id);
+            }
+        }
+
+        // ЗАПУСК ПРИ ЗАГРУЗКЕ
         window.onload = function() {
             console.log('🌌 Mars Crypto Conflict загружен');
             
@@ -579,9 +1025,7 @@ ID: ${tgUser.id}
                 // Не в Telegram - показываем панель авторизации
                 document.getElementById('tg-auth-panel').style.display = 'flex';
             }
-            // Если в Telegram, detectTelegram уже запустит игру
         };
     </script>
 </body>
-
 </html>
