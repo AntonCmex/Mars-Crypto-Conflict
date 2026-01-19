@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mars Crypto Conflict - Telegram Mini App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="telegram-web-app-theme-color" content="#8B4513">
+    <style>
+        /* ОСНОВНЫЕ СТИЛИ (те же что и раньше, но адаптированные для мобильных) */
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0a0a1a;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* TELEGRAM HEADER SPACER */
+        #tg-header-spacer {
+            height: 0px; /* Telegram сам управляет header */
+            transition: height 0.3s;
+        }
+        
+        #game-container {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* ТЕЛЕГРАММ ПАНЕЛЬ АВТОРИЗАЦИИ */
+        #tg-auth-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        #tg-user-info {
+            display: none;
+            background: rgba(139, 69, 19, 0.3);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tg-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid gold;
+        }
+        
+        /* АДАПТИВНАЯ ПРАВАЯ ПАНЕЛЬ ДЛЯ МОБИЛЬНЫХ */
+        @media (max-width: 768px) {
+            #game-container {
+                flex-direction: column;
+            }
+            
+            #mars-surface {
+                flex: 2;
+                min-height: 60vh;
+            }
+            
+            #right-panel {
+                flex: 1;
+                min-width: 100%;
+                max-height: 40vh;
+                padding: 10px;
+            }
+            
+            .building-btn, .action-btn {
+                padding: 10px;
+                font-size: 13px;
+            }
+            
+            .stat {
+                padding: 8px;
+                margin: 4px 0;
+            }
+            
+            .value {
+                font-size: 18px;
+            }
+        }
+        
+        /* ТЕЛЕГРАММ КНОПКИ */
+        .tg-btn {
+            background: linear-gradient(135deg, #0088cc, #00aced);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+        }
+        
+        .tg-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 136, 204, 0.4);
+        }
+        
+        /* ОСТАЛЬНЫЕ СТИЛИ ОСТАЮТСЯ ТАКИМИ ЖЕ, КАК В ПРЕДЫДУЩЕЙ ВЕРСИИ */
+        /* ... */
+        
+    </style>
+</head>
+<body>
+    <!-- TELEGRAM HEADER SPACER -->
+    <div id="tg-header-spacer"></div>
+    
+    <!-- TELEGRAM AUTH PANEL (показывается только если не в Telegram) -->
+    <div id="tg-auth-panel">
+        <div style="font-size: 48px; margin-bottom: 20px;">🚀</div>
+        <h1 style="color: #FF4500; margin-bottom: 10px;">Mars Crypto Conflict</h1>
+        <p style="color: #ccc; margin-bottom: 30px; max-width: 300px;">
+            Космическая стратегия на блокчейне BSC. Добывайте ресурсы, стройте базы, торгуйте с другими колонистами!
+        </p>
+        
+        <div id="tg-user-info">
+            <img id="tg-user-avatar" src="" class="tg-avatar" alt="Аватар">
+            <div>
+                <div id="tg-user-name" style="font-weight: bold;"></div>
+                <div id="tg-user-id" style="font-size: 12px; color: #aaa;"></div>
+            </div>
+        </div>
+        
+        <button class="tg-btn" onclick="launchInTelegram()">
+            ▶️ Играть в Telegram
+        </button>
+        
+        <div style="margin-top: 20px; font-size: 14px; color: #888;">
+            Или <a href="javascript:void(0)" onclick="continueWithoutTelegram()" style="color: #00aced; text-decoration: none;">продолжить в браузере</a>
+        </div>
+        
+        <div style="margin-top: 30px; font-size: 12px; color: #666;">
+            Для лучшего опыта используйте Telegram Mini App
+        </div>
+    </div>
+    
+    <!-- ОСНОВНОЙ ИГРОВОЙ ИНТЕРФЕЙС (скрыт по умолчанию) -->
+    <div id="game-container" style="display: none;">
+        <!-- ЛЕВАЯ ПАНЕЛЬ: ПОВЕРХНОСТЬ МАРСА -->
+        <div id="mars-surface">
+            <!-- Камни и здания будут добавляться сюда -->
+        </div>
+        
+        <!-- ПРАВАЯ ПАНЕЛЬ: ИНТЕРФЕЙС -->
+        <div id="right-panel">
+            <!-- ВЕРХНЯЯ ПАНЕЛЬ С ИНФО ИГРОКА TELEGRAM -->
+            <div id="tg-game-header" style="display: none; margin-bottom: 15px; padding: 10px; background: rgba(139, 69, 19, 0.2); border-radius: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img id="tg-game-avatar" src="" style="width: 35px; height: 35px; border-radius: 50%; border: 2px solid gold;">
+                    <div style="flex: 1;">
+                        <div style="font-weight: bold; font-size: 14px;" id="tg-game-name"></div>
+                        <div style="font-size: 11px; color: #aaa;" id="tg-game-status">Добыча активна</div>
+                    </div>
+                    <button onclick="showTelegramMenu()" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">
+                        ⋮
+                    </button>
+                </div>
+            </div>
+            
+            <h1>🚀 Mars Crypto Conflict</h1>
+            
+            <!-- ОСТАЛЬНЫЙ ИНТЕРФЕЙС ИГРЫ (ваш существующий код) -->
+            <div class="stat">
+                <div>💰 Баланс:</div>
+                <div class="value" id="balance">500.00</div>
+                <div>MNRT</div>
+            </div>
+            
+            <div class="stat">
+                <div>⛏️ Добыто:</div>
+                <div class="value" id="mined">0.0000</div>
+                <div>MNRT</div>
+            </div>
+            
+            <div class="stat">
+                <div>🏦 В сети:</div>
+                <div class="value" id="supply">5,000,000,000</div>
+                <div>MNRT</div>
+            </div>
+            
+            <div class="stat">
+                <div>⚡ Энергия:</div>
+                <div class="value" id="energy">0/0</div>
+                <div>произв./потреб.</div>
+            </div>
+            
+            <button class="building-btn" onclick="startBuilding('base')" id="btn-base">
+                🏠 База командного центра<br>
+                <small>100 MNRT | Требуется для строительства</small>
+            </button>
+            
+            <button class="building-btn" onclick="startBuilding('mining')" id="btn-mining">
+                ⛏️ Буровая установка<br>
+                <small>200 MNRT | Добывает 0.001 MNRT/сек | 2⚡ энергии</small>
+            </button>
+            
+            <button class="building-btn" onclick="startBuilding('power')" id="btn-power">
+                ⚡ Солнечная электростанция<br>
+                <small>200 MNRT | Производит 5⚡ энергии</small>
+            </button>
+            
+            <button class="action-btn" onclick="collectResources()">
+                💰 Собрать добытые ресурсы
+            </button>
+            
+            <div id="building-list">
+                <h3>🏗️ Мои здания:</h3>
+                <div id="buildings-container"></div>
+            </div>
+            
+            <!-- ДОБАВЛЯЕМ ПУСТОТУ ДЛЯ СКРОЛЛА -->
+            <div style="height: 50px;"></div>
+            
+            <div id="message"></div>
+            
+            <!-- TELEGRAM ФУТЕР -->
+            <div id="tg-footer" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; text-align: center; font-size: 12px; color: #888;">
+                <div>Игра работает через Telegram Mini App</div>
+                <div style="margin-top: 5px;">
+                    <button onclick="shareGame()" style="background: #0088cc; color: white; border: none; border-radius: 15px; padding: 8px 15px; font-size: 12px; cursor: pointer;">
+                        📢 Пригласить друзей
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELEGRAM WEB APP SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <script>
+        // ============================
+        // TELEGRAM WEB APP ИНИЦИАЛИЗАЦИЯ
+        // ============================
+        let TelegramWebApp = null;
+        let tgUser = null;
+        let isTelegram = false;
+        
+        // Проверяем, запущены ли мы в Telegram
+        function detectTelegram() {
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    TelegramWebApp = window.Telegram.WebApp;
+                    isTelegram = true;
+                    
+                    // Инициализируем Telegram Web App
+                    TelegramWebApp.ready();
+                    TelegramWebApp.expand(); // Раскрываем на весь экран
+                    
+                    // Настраиваем цвета под нашу игру
+                    TelegramWebApp.setHeaderColor('#8B4513');
+                    TelegramWebApp.setBackgroundColor('#0a0a1a');
+                    
+                    // Получаем данные пользователя
+                    if (TelegramWebApp.initDataUnsafe && TelegramWebApp.initDataUnsafe.user) {
+                        tgUser = TelegramWebApp.initDataUnsafe.user;
+                        console.log('Telegram user detected:', tgUser);
+                        showTelegramUser();
+                        hideAuthPanel();
+                        showGame();
+                    } else {
+                        console.log('No Telegram user data');
+                        // Показываем стандартную авторизацию
+                    }
+                    
+                    // Настраиваем кнопку меню
+                    setupTelegramMenu();
+                    
+                    return true;
+                }
+            } catch (error) {
+                console.error('Telegram Web App error:', error);
+            }
+            return false;
+        }
+        
+        // Показываем информацию о пользователе Telegram
+        function showTelegramUser() {
+            if (!tgUser) return;
+            
+            // Обновляем аватар и имя в панели авторизации
+            if (tgUser.photo_url) {
+                document.getElementById('tg-user-avatar').src = tgUser.photo_url;
+            }
+            document.getElementById('tg-user-name').textContent = 
+                tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : '');
+            document.getElementById('tg-user-id').textContent = 'ID: ' + tgUser.id;
+            document.getElementById('tg-user-info').style.display = 'flex';
+            
+            // Обновляем аватар и имя в игровом интерфейсе
+            if (tgUser.photo_url) {
+                document.getElementById('tg-game-avatar').src = tgUser.photo_url;
+            }
+            document.getElementById('tg-game-name').textContent = 
+                tgUser.first_name + (tgUser.username ? ' (@' + tgUser.username + ')' : '');
+            document.getElementById('tg-game-header').style.display = 'block';
+        }
+        
+        // Скрываем панель авторизации
+        function hideAuthPanel() {
+            document.getElementById('tg-auth-panel').style.display = 'none';
+        }
+        
+        // Показываем игровой интерфейс
+        function showGame() {
+            document.getElementById('game-container').style.display = 'flex';
+            
+            // Если в Telegram, показываем Telegram футер
+            if (isTelegram) {
+                document.getElementById('tg-footer').style.display = 'block';
+            } else {
+                document.getElementById('tg-footer').style.display = 'none';
+                document.getElementById('tg-game-header').style.display = 'none';
+            }
+            
+            // Запускаем игру
+            initGame();
+        }
+        
+        // Запуск в Telegram
+        function launchInTelegram() {
+            const botUsername = 'MarsCryptoConflictBot'; // Замените на username вашего бота
+            const appUrl = window.location.href;
+            const telegramUrl = `https://t.me/${botUsername}?startapp=${encodeURIComponent(appUrl)}`;
+            
+            window.open(telegramUrl, '_blank');
+            
+            // Показываем инструкцию
+            showMessage('Откройте ссылку в Telegram для запуска игры', 'success');
+        }
+        
+        // Продолжить без Telegram
+        function continueWithoutTelegram() {
+            hideAuthPanel();
+            showGame();
+            showMessage('🚀 Режим браузера активирован. Некоторые функции могут быть недоступны.', 'success');
+        }
+        
+        // Настройка меню Telegram
+        function setupTelegramMenu() {
+            if (!TelegramWebApp) return;
+            
+            // Основные кнопки меню
+            TelegramWebApp.MainButton.setText('📊 Мой профиль');
+            TelegramWebApp.MainButton.onClick(showProfile);
+            TelegramWebApp.MainButton.show();
+            
+            // Back Button
+            TelegramWebApp.BackButton.onClick(goBack);
+        }
+        
+        function showTelegramMenu() {
+            if (!TelegramWebApp) return;
+            
+            TelegramWebApp.showPopup({
+                title: 'Меню игры',
+                message: 'Выберите действие:',
+                buttons: [
+                    {id: 'profile', type: 'default', text: '📊 Мой профиль'},
+                    {id: 'share', type: 'default', text: '📢 Пригласить друзей'},
+                    {id: 'support', type: 'default', text: '🆘 Поддержка'},
+                    {type: 'cancel'}
+                ]
+            }, function(buttonId) {
+                if (buttonId === 'profile') showProfile();
+                if (buttonId === 'share') shareGame();
+                if (buttonId === 'support') showSupport();
+            });
+        }
+        
+        function showProfile() {
+            if (!tgUser) return;
+            
+            const profileText = `
+👤 Профиль игрока:
+Имя: ${tgUser.first_name || 'Неизвестно'}
+ID: ${tgUser.id}
+Баланс: ${gameState.balance.toFixed(2)} MNRT
+Добыто всего: ${gameState.totalMinedAllTime.toFixed(4)} MNRT
+Здания: ${gameState.buildings.length} шт.
+            `;
+            
+            showMessage(profileText, 'success');
+        }
+        
+        function shareGame() {
+            const shareText = encodeURIComponent(
+                `🚀 Присоединяйся к Mars Crypto Conflict!\n` +
+                `Космическая стратегия на блокчейне BSC\n` +
+                `Добывай ресурсы, строй базы, торгуй с другими колонистами!`
+            );
+            
+            const shareUrl = isTelegram ? 
+                `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${shareText}` :
+                `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${shareText}`;
+            
+            window.open(shareUrl, '_blank');
+            
+            showMessage('Ссылка для приглашения скопирована!', 'success');
+        }
+        
+        function showSupport() {
+            const supportUrl = 'https://t.me/MarsCryptoSupport'; // Замените на ваш канал поддержки
+            window.open(supportUrl, '_blank');
+        }
+        
+        function goBack() {
+            // Логика кнопки "Назад"
+            showMessage('Используйте меню игры для навигации', 'success');
+        }
+        
+        // ============================
+        // ИНИЦИАЛИЗАЦИЯ ИГРЫ (ваш существующий код, но в функции)
+        // ============================
+        function initGame() {
+            console.log('🚀 Игра инициализирована! Telegram: ' + isTelegram);
+            
+            // Если в Telegram, логируем пользователя
+            if (tgUser) {
+                console.log('Игрок:', tgUser.first_name, 'ID:', tgUser.id);
+                
+                // Можно сохранить данные пользователя для бэкенда
+                if (isTelegram) {
+                    // Отправляем данные на сервер для регистрации/авторизации
+                    // saveUserToBackend(tgUser.id, tgUser.first_name);
+                }
+            }
+            
+            // Генерируем поверхность Марса
+            generateMarsSurface();
+            
+            // Обновляем интерфейс
+            updateUI();
+            
+            // Запускаем игровые циклы
+            gameState.lastUpdate = Date.now();
+            setInterval(updateMining, 1000);
+            
+            // Приветственное сообщение
+            if (isTelegram && tgUser) {
+                showMessage(`👋 Добро пожаловать на Марс, ${tgUser.first_name}!`, 'success');
+            } else {
+                showMessage('🚀 Добро пожаловать на Марс! Постройте базу для начала добычи.', 'success');
+            }
+        }
+        
+        // ============================
+        // ОСТАЛЬНЫЕ ФУНКЦИИ ИГРЫ (ваш существующий код)
+        // ============================
+        // ... (весь ваш предыдущий игровой код остается здесь) ...
+        
+        // ВАЖНО: Все функции из предыдущей версии (generateMarsSurface, startBuilding, 
+        // updateMining, updateUI и т.д.) должны быть скопированы сюда
+        
+    </script>
+    
+    <!-- ОСНОВНОЙ ИГРОВОЙ СКРИПТ (вставьте сюда весь ваш предыдущий код игровой логики) -->
+    <script>
+        // ============================
+        // КОНСТАНТЫ ИГРЫ (ИСПРАВЛЕННЫЕ)
+        // ============================
+        const CONFIG = {
+            MINING_RATE: 0.001,
+            TOTAL_SUPPLY: 5000000000,
+            BUILDING_COSTS: {
+                base: 100,
+                mining: 200,
+                power: 200
+            },
+            ENERGY_CONSUMPTION: {
+                base: 0,
+                mining: 2,
+                power: 0
+            },
+            ENERGY_PRODUCTION: {
+                base: 0,
+                mining: 0,
+                power: 5
+            },
+            UPKEEP_COSTS: {
+                base: 0.0002,
+                mining: 0.0002,
+                power: 0.0002
+            }
+        };
+
+        // ============================
+        // СОСТОЯНИЕ ИГРЫ
+        // ============================
+        let gameState = {
+            balance: 500.0,
+            mined: 0.0,
+            supply: CONFIG.TOTAL_SUPPLY,
+            totalMinedAllTime: 0.0,
+            buildings: [],
+            placingBuilding: null,
+            nextId: 1,
+            hasBase: false,
+            energy: { production: 0, consumption: 0 },
+            upkeepDebt: 0,
+            lastUpdate: Date.now()
+        };
+
+        // ============================
+        // ГЕНЕРАЦИЯ ПОВЕРХНОСТИ МАРСА
+        // ============================
+        function generateMarsSurface() {
+            const surface = document.getElementById('mars-surface');
+            surface.innerHTML = '';
+            
+            for (let i = 0; i < 50; i++) {
+                const texture = document.createElement('div');
+                texture.style.position = 'absolute';
+                texture.style.left = Math.random() * 100 + '%';
+                texture.style.top = Math.random() * 100 + '%';
+                texture.style.width = Math.random() * 100 + 50 + 'px';
+                texture.style.height = Math.random() * 100 + 50 + 'px';
+                texture.style.background = `rgba(${
+                    Math.floor(139 + Math.random() * 40)
+                }, ${
+                    Math.floor(69 + Math.random() * 30)
+                }, ${
+                    Math.floor(19 + Math.random() * 20)
+                }, ${Math.random() * 0.3 + 0.1})`;
+                texture.style.borderRadius = '50%';
+                surface.appendChild(texture);
+            }
+            
+            for (let i = 0; i < 30; i++) {
+                const rock = document.createElement('div');
+                rock.className = 'rock';
+                rock.style.width = Math.random() * 30 + 15 + 'px';
+                rock.style.height = Math.random() * 30 + 15 + 'px';
+                rock.style.left = Math.random() * 95 + '%';
+                rock.style.top = Math.random() * 95 + '%';
+                const darkness = Math.floor(80 + Math.random() * 40);
+                rock.style.background = `rgb(${darkness}, ${darkness}, ${darkness})`;
+                surface.appendChild(rock);
+            }
+            
+            renderBuildings();
+        }
+
+        // ... (ВСТАВЬТЕ ВЕСЬ ОСТАВШИЙСЯ КОД ИГРЫ ЗДЕСЬ) ...
+
+        // ============================
+        // ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+        // ============================
+        window.onload = function() {
+            console.log('🌌 Mars Crypto Conflict загружен');
+            
+            // Проверяем Telegram
+            const inTelegram = detectTelegram();
+            
+            if (!inTelegram) {
+                // Не в Telegram - показываем панель авторизации
+                document.getElementById('tg-auth-panel').style.display = 'flex';
+            }
+            // Если в Telegram, detectTelegram уже запустит игру
+        };
+    </script>
+</body>
+</html>
