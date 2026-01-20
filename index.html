@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Mars Crypto Conflict</title>
+    <title>Mars Crypto Conflict - Улучшения</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="telegram-web-app-theme-color" content="#8B4513">
@@ -19,213 +19,267 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             height: 100vh;
             overflow: hidden;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
         
-        /* КОМПАКТНАЯ ИГРОВАЯ СЕТКА */
-        #game-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-        
-        /* ВЕРХНЯЯ ПАНЕЛЬ - СТАТИСТИКА */
+        /* ВЕРХНЯЯ ПАНЕЛЬ */
         #top-panel {
             background: rgba(20, 15, 10, 0.95);
             border-bottom: 3px solid #8B4513;
-            padding: 8px 12px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             flex-shrink: 0;
-            z-index: 10;
         }
         
-        .stat-compact {
-            text-align: center;
-            padding: 6px;
-            background: rgba(139, 69, 19, 0.3);
-            border-radius: 6px;
-            border: 1px solid #D2691E;
+        .stats-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
         }
         
-        .stat-label {
-            font-size: 10px;
-            color: #aaa;
-            margin-bottom: 2px;
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
         }
         
         .stat-value {
-            font-size: 14px;
-            font-weight: bold;
             color: gold;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-weight: bold;
+            font-size: 14px;
         }
         
-        /* ОСНОВНОЙ КОНТЕНТ */
-        #main-content {
+        .collect-btn {
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
             display: flex;
-            flex: 1;
-            min-height: 0;
-            overflow: hidden;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
         }
         
-        /* ИГРОВОЕ ПОЛЕ (70%) */
+        .collect-btn:hover {
+            background: linear-gradient(135deg, #3CB371, #66CDAA);
+            transform: scale(1.05);
+        }
+        
+        /* ИГРОВОЕ ПОЛЕ */
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 110px);
+        }
+        
         #mars-surface {
-            flex: 7;
+            flex: 1;
             background: linear-gradient(135deg, #8B4513, #A0522D, #D2691E);
             position: relative;
             overflow: hidden;
             cursor: crosshair;
         }
         
-        /* ПРАВАЯ ПАНЕЛЬ (30%) */
-        #right-panel {
-            flex: 3;
+        /* НИЖНЯЯ ПАНЕЛЬ С ВКЛАДКАМИ */
+        #bottom-panel {
             background: rgba(20, 15, 10, 0.95);
-            border-left: 3px solid #8B4513;
+            border-top: 3px solid #8B4513;
+            height: 200px;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            min-width: 0;
-            max-width: 300px;
         }
         
-        /* КОНТЕЙНЕР КНОПОК БЕЗ ПРОКРУТКИ */
-        #buttons-container {
+        /* ТАБЫ */
+        .tabs {
+            display: flex;
+            background: rgba(139, 69, 19, 0.3);
+            border-bottom: 2px solid #8B4513;
+        }
+        
+        .tab {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 10px;
-            overflow-y: auto;
-            min-height: 0;
+            padding: 12px;
+            text-align: center;
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
         }
         
-        /* КНОПКИ ПОСТРОЙКИ */
-        .building-btn-compact {
-            background: linear-gradient(135deg, #8B4513, #A0522D);
+        .tab.active {
             color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px;
-            margin: 4px 0;
-            font-size: 12px;
-            text-align: left;
+            background: rgba(139, 69, 19, 0.5);
+            border-bottom: 3px solid gold;
+        }
+        
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* ВКЛАДКА 1: СТРОИТЕЛЬСТВО И УЛУЧШЕНИЯ */
+        #buildings-tab {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .building-card {
+            background: rgba(139, 69, 19, 0.2);
+            border: 1px solid #D2691E;
+            border-radius: 10px;
+            padding: 12px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
+        }
+        
+        .building-card:hover {
+            background: rgba(139, 69, 19, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .building-card.selected {
+            background: rgba(70, 130, 180, 0.3);
+            border-color: #467CBE;
+        }
+        
+        .building-header {
             display: flex;
             align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .building-icon {
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+        
+        .building-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .building-level {
+            color: gold;
+            font-size: 12px;
+        }
+        
+        .building-cost {
+            font-size: 11px;
+            color: #ccc;
+            margin-top: 5px;
+        }
+        
+        .building-actions {
+            margin-top: 10px;
+            display: flex;
             gap: 8px;
         }
         
-        .building-btn-compact:hover {
-            background: linear-gradient(135deg, #A0522D, #D2691E);
-            transform: translateX(2px);
+        .action-btn {
+            flex: 1;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
         }
         
-        .building-btn-compact:disabled {
+        .build-btn {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: white;
+        }
+        
+        .upgrade-btn {
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            color: white;
+        }
+        
+        .action-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
         }
         
-        .building-icon {
-            font-size: 20px;
-            flex-shrink: 0;
+        /* ВКЛАДКА 2: МОИ ЗДАНИЯ */
+        #my-buildings-tab {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
         }
         
-        .building-info {
-            flex: 1;
-            min-width: 0;
+        .owned-building {
+            background: rgba(70, 130, 180, 0.2);
+            border: 1px solid #467CBE;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 12px;
         }
         
-        .building-title {
-            font-weight: bold;
+        .building-stats {
+            margin-top: 5px;
             font-size: 11px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            color: #aaa;
         }
         
-        .building-desc {
-            font-size: 9px;
-            color: #ccc;
-            margin-top: 2px;
+        /* ВКЛАДКА 3: БЛОКЧЕЙН */
+        #blockchain-tab {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
         
-        /* КНОПКА СБОРА */
-        .collect-btn {
-            background: linear-gradient(135deg, #2E8B57, #3CB371);
+        .wallet-info {
+            background: rgba(139, 69, 19, 0.2);
+            border: 1px solid #D2691E;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .wallet-address {
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin-top: 10px;
+        }
+        
+        .copy-btn {
+            background: #0088cc;
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 8px 0;
-            font-size: 14px;
-            font-weight: bold;
+            border-radius: 6px;
+            padding: 8px 15px;
+            margin-top: 10px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
+            font-size: 12px;
         }
-        
-        .collect-btn:hover {
-            background: linear-gradient(135deg, #3CB371, #66CDAA);
-            transform: scale(1.02);
-        }
-        
-        /* СПИСОК ЗДАНИЙ */
-        #buildings-section {
-            flex-shrink: 0;
-            padding: 10px;
-            border-top: 2px solid #8B4513;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-        
-        .buildings-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        
-        .buildings-count {
-            background: #8B4513;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        
-        .building-item-compact {
-            background: rgba(70, 130, 180, 0.2);
-            padding: 6px;
-            margin: 4px 0;
-            border-radius: 5px;
-            border-left: 3px solid #467CBE;
-            font-size: 10px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .building-status {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        
-        .building-status.active { background: #00FF00; }
-        .building-status.inactive { background: #FF5555; }
-        .building-status.power { background: gold; }
         
         /* ЗДАНИЯ НА КАРТЕ */
         .building {
@@ -233,7 +287,7 @@
             width: 50px;
             height: 50px;
             border: 2px solid white;
-            border-radius: 6px;
+            border-radius: 8px;
             transform: translate(-50%, -50%);
             cursor: pointer;
             transition: all 0.3s;
@@ -246,90 +300,41 @@
         
         .building:hover {
             transform: translate(-50%, -50%) scale(1.1);
-            box-shadow: 0 0 10px white;
+            box-shadow: 0 0 15px white;
         }
         
         .building.base { background: rgba(70, 130, 180, 0.9); }
         .building.mining { background: rgba(139, 69, 19, 0.9); }
         .building.power { background: rgba(255, 215, 0, 0.9); }
         
-        .building-level {
+        .building-level-badge {
             position: absolute;
-            top: -6px;
-            right: -6px;
+            top: -5px;
+            right: -5px;
             background: gold;
             color: black;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 9px;
+            font-size: 10px;
             font-weight: bold;
             border: 1px solid white;
-        }
-        
-        /* КАМНИ */
-        .rock {
-            position: absolute;
-            background: #696969;
-            border-radius: 50%;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-        }
-        
-        /* TELEGRAM HEADER */
-        #tg-header {
-            background: rgba(139, 69, 19, 0.8);
-            padding: 6px 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
-        }
-        
-        .tg-user {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .tg-avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 2px solid gold;
-        }
-        
-        .tg-name {
-            font-size: 12px;
-            font-weight: bold;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 120px;
-        }
-        
-        .tg-menu-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 0 5px;
         }
         
         /* СООБЩЕНИЯ */
         #message {
             position: fixed;
-            bottom: 10px;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.9);
             color: white;
             padding: 10px 20px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: bold;
             text-align: center;
             z-index: 1000;
@@ -341,36 +346,9 @@
         .message-success { border: 2px solid #00FF00; }
         .message-error { border: 2px solid #FF5555; }
         
-        /* АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ */
-        @media (max-width: 768px) {
-            #main-content {
-                flex-direction: column;
-            }
-            
-            #mars-surface {
-                flex: 6;
-            }
-            
-            #right-panel {
-                flex: 4;
-                max-width: 100%;
-                border-left: none;
-                border-top: 3px solid #8B4513;
-            }
-            
-            #top-panel {
-                grid-template-columns: repeat(2, 1fr);
-                padding: 6px 8px;
-            }
-            
-            .tg-name {
-                max-width: 100px;
-            }
-        }
-        
         /* СКРОЛЛБАР */
         ::-webkit-scrollbar {
-            width: 4px;
+            width: 6px;
         }
         
         ::-webkit-scrollbar-track {
@@ -379,104 +357,96 @@
         
         ::-webkit-scrollbar-thumb {
             background: #8B4513;
-            border-radius: 2px;
-        }
-        
-        /* TELEGRAM AUTH (скрыт по умолчанию) */
-        #tg-auth-panel {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            z-index: 2000;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            text-align: center;
+            border-radius: 3px;
         }
     </style>
 </head>
 <body>
-    <!-- TELEGRAM HEADER -->
-    <div id="tg-header" style="display: none;">
-        <div class="tg-user">
-            <img id="tg-avatar" src="" class="tg-avatar" alt="Avatar">
-            <div class="tg-name" id="tg-name">Игрок</div>
-        </div>
-        <button class="tg-menu-btn" onclick="showTelegramMenu()">⋯</button>
-    </div>
-    
-    <!-- ОСНОВНОЙ ИГРОВОЙ ИНТЕРФЕЙС -->
-    <div id="game-container">
-        <!-- ВЕРХНЯЯ ПАНЕЛЬ СТАТИСТИКИ -->
-        <div id="top-panel">
-            <div class="stat-compact">
-                <div class="stat-label">Баланс</div>
-                <div class="stat-value" id="balance">500.00 MNRT</div>
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+    <div id="top-panel">
+        <div class="stats-row">
+            <div class="stat-item">
+                <span>💰</span>
+                <span class="stat-value" id="balance">500.00</span>
+                <span>MNRT</span>
             </div>
-            <div class="stat-compact">
-                <div class="stat-label">Добыто</div>
-                <div class="stat-value" id="mined">0.0000 MNRT</div>
+            <div class="stat-item">
+                <span>⛏️</span>
+                <span class="stat-value" id="mined">0.0000</span>
+                <span>MNRT</span>
             </div>
-            <div class="stat-compact">
-                <div class="stat-label">Энергия</div>
-                <div class="stat-value" id="energy">0/0 ⚡</div>
+            <div class="stat-item">
+                <span>⚡</span>
+                <span class="stat-value" id="energy">0/0</span>
             </div>
-            <div class="stat-compact">
-                <div class="stat-label">Здания</div>
-                <div class="stat-value" id="building-count">0 шт</div>
+            <div class="stat-item">
+                <span>🏗️</span>
+                <span class="stat-value" id="building-count">0</span>
             </div>
         </div>
         
-        <!-- ОСНОВНОЙ КОНТЕНТ -->
-        <div id="main-content">
-            <!-- ИГРОВОЕ ПОЛЕ -->
-            <div id="mars-surface"></div>
+        <button class="collect-btn" onclick="collectResources()">
+            <span>💰</span>
+            <span>Собрать</span>
+        </button>
+    </div>
+    
+    <!-- ИГРОВОЕ ПОЛЕ -->
+    <div id="game-container">
+        <div id="mars-surface"></div>
+        
+        <!-- НИЖНЯЯ ПАНЕЛЬ С ВКЛАДКАМИ -->
+        <div id="bottom-panel">
+            <!-- ТАБЫ -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab(0)">🏗️ Строительство</button>
+                <button class="tab" onclick="switchTab(1)">📊 Мои здания</button>
+                <button class="tab" onclick="switchTab(2)">🔗 Блокчейн</button>
+            </div>
             
-            <!-- ПРАВАЯ ПАНЕЛЬ УПРАВЛЕНИЯ -->
-            <div id="right-panel">
-                <div id="buttons-container">
-                    <button class="building-btn-compact" onclick="startBuilding('base')" id="btn-base">
-                        <div class="building-icon">🏠</div>
-                        <div class="building-info">
-                            <div class="building-title">База</div>
-                            <div class="building-desc">100 MNRT • Основа колонии</div>
-                        </div>
-                    </button>
-                    
-                    <button class="building-btn-compact" onclick="startBuilding('mining')" id="btn-mining">
-                        <div class="building-icon">⛏️</div>
-                        <div class="building-info">
-                            <div class="building-title">Буровая</div>
-                            <div class="building-desc">200 MNRT • 0.001/сек • 2⚡</div>
-                        </div>
-                    </button>
-                    
-                    <button class="building-btn-compact" onclick="startBuilding('power')" id="btn-power">
-                        <div class="building-icon">⚡</div>
-                        <div class="building-info">
-                            <div class="building-title">Электростанция</div>
-                            <div class="building-desc">200 MNRT • +5⚡ энергии</div>
-                        </div>
-                    </button>
-                    
-                    <button class="collect-btn" onclick="collectResources()">
-                        <span>💰</span>
-                        <span>Собрать ресурсы</span>
-                    </button>
+            <!-- СОДЕРЖИМОЕ ВКЛАДОК -->
+            <div class="tab-content active" id="tab-0">
+                <div id="buildings-tab">
+                    <!-- Здания будут добавляться сюда динамически -->
                 </div>
-                
-                <!-- СПИСОК ПОСТРОЕННЫХ ЗДАНИЙ -->
-                <div id="buildings-section">
-                    <div class="buildings-header">
-                        <h4 style="font-size: 12px;">🏗️ Мои здания</h4>
-                        <div class="buildings-count" id="buildings-count">0</div>
+            </div>
+            
+            <div class="tab-content" id="tab-1">
+                <div id="my-buildings-tab">
+                    <!-- Построенные здания будут здесь -->
+                </div>
+            </div>
+            
+            <div class="tab-content" id="tab-2">
+                <div id="blockchain-tab">
+                    <div class="wallet-info">
+                        <h3 style="margin-bottom: 10px;">🔗 Кошелек для выплат</h3>
+                        <p style="font-size: 13px; color: #ccc; margin-bottom: 10px;">
+                            На этот адрес будут поступать добытые MNRT токены
+                        </p>
+                        <div class="wallet-address" id="wallet-address">
+                            Не подключен
+                        </div>
+                        <button class="copy-btn" onclick="copyWalletAddress()">
+                            📋 Копировать адрес
+                        </button>
                     </div>
-                    <div id="buildings-container"></div>
+                    
+                    <div style="font-size: 12px; color: #888; text-align: center;">
+                        <p>Для подключения MetaMask или Trust Wallet используйте кнопку ниже</p>
+                        <button onclick="connectWallet()" style="
+                            background: linear-gradient(135deg, #F6851B, #F6851B);
+                            color: white;
+                            border: none;
+                            border-radius: 8px;
+                            padding: 10px 20px;
+                            margin-top: 10px;
+                            cursor: pointer;
+                            font-size: 12px;
+                        ">
+                            🦊 Подключить MetaMask
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -484,165 +454,67 @@
     
     <!-- СООБЩЕНИЯ -->
     <div id="message"></div>
-    
-    <!-- TELEGRAM AUTH PANEL -->
-    <div id="tg-auth-panel">
-        <div style="font-size: 48px; margin-bottom: 15px;">🚀</div>
-        <h1 style="color: #FF4500; margin-bottom: 10px; font-size: 24px;">Mars Crypto Conflict</h1>
-        <p style="color: #ccc; margin-bottom: 25px; max-width: 300px; font-size: 14px;">
-            Космическая стратегия на блокчейне BSC
-        </p>
-        
-        <button onclick="launchInTelegram()" style="
-            background: linear-gradient(135deg, #0088cc, #00aced);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s;
-        ">
-            ▶️ Играть в Telegram
-        </button>
-        
-        <div style="margin-top: 20px; font-size: 13px; color: #888;">
-            Бот: @MarsCC_Bot
-        </div>
-    </div>
 
-    <!-- TELEGRAM SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
     <script>
         // ============================
-        // ТЕЛЕГРАМ ИНТЕГРАЦИЯ
-        // ============================
-        let TelegramWebApp = null;
-        let tgUser = null;
-        let isTelegram = false;
-        
-        function detectTelegram() {
-            try {
-                if (window.Telegram && window.Telegram.WebApp) {
-                    TelegramWebApp = window.Telegram.WebApp;
-                    isTelegram = true;
-                    
-                    TelegramWebApp.ready();
-                    TelegramWebApp.expand();
-                    TelegramWebApp.setHeaderColor('#8B4513');
-                    TelegramWebApp.setBackgroundColor('#0a0a1a');
-                    
-                    if (TelegramWebApp.initDataUnsafe?.user) {
-                        tgUser = TelegramWebApp.initDataUnsafe.user;
-                        showTelegramUser();
-                    }
-                    
-                    setupTelegramButtons();
-                    hideAuthPanel();
-                    showGame();
-                    initGame();
-                    
-                    return true;
-                }
-            } catch (error) {
-                console.log('Not in Telegram');
-            }
-            return false;
-        }
-        
-        function showTelegramUser() {
-            if (!tgUser) return;
-            
-            document.getElementById('tg-header').style.display = 'flex';
-            
-            if (tgUser.photo_url) {
-                document.getElementById('tg-avatar').src = tgUser.photo_url;
-            }
-            
-            let name = tgUser.first_name || 'Игрок';
-            if (tgUser.username) {
-                name += ' (@' + tgUser.username + ')';
-            }
-            document.getElementById('tg-name').textContent = name;
-        }
-        
-        function hideAuthPanel() {
-            document.getElementById('tg-auth-panel').style.display = 'none';
-        }
-        
-        function showGame() {
-            document.getElementById('game-container').style.display = 'flex';
-        }
-        
-        function launchInTelegram() {
-            const botUsername = 'MarsCC_Bot';
-            const gameUrl = window.location.href;
-            const telegramUrl = `https://t.me/${botUsername}?startapp=${encodeURIComponent(gameUrl)}`;
-            
-            if (window.Telegram?.WebApp) {
-                Telegram.WebApp.openLink(telegramUrl);
-            } else {
-                window.open(telegramUrl, '_blank');
-            }
-        }
-        
-        function setupTelegramButtons() {
-            if (!TelegramWebApp) return;
-            
-            TelegramWebApp.MainButton.setText('Профиль');
-            TelegramWebApp.MainButton.onClick(showProfile);
-            TelegramWebApp.MainButton.show();
-        }
-        
-        function showTelegramMenu() {
-            if (!TelegramWebApp) return;
-            
-            TelegramWebApp.showPopup({
-                title: 'Меню',
-                message: 'Выберите действие:',
-                buttons: [
-                    {id: 'profile', type: 'default', text: '📊 Профиль'},
-                    {id: 'share', type: 'default', text: '📢 Пригласить'},
-                    {type: 'cancel'}
-                ]
-            }, function(buttonId) {
-                if (buttonId === 'profile') showProfile();
-                if (buttonId === 'share') shareGame();
-            });
-        }
-        
-        function showProfile() {
-            if (!tgUser) return;
-            showMessage(`👤 ${tgUser.first_name}\nID: ${tgUser.id}\nБаланс: ${gameState.balance.toFixed(2)} MNRT`, 'success');
-        }
-        
-        function shareGame() {
-            const botUsername = 'MarsCC_Bot';
-            const shareText = `🚀 Присоединяйся к Mars Crypto Conflict!`;
-            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(`https://t.me/${botUsername}`)}&text=${encodeURIComponent(shareText)}`;
-            
-            if (isTelegram && TelegramWebApp) {
-                TelegramWebApp.openLink(shareUrl);
-            } else {
-                window.open(shareUrl, '_blank');
-            }
-        }
-        
-        // ============================
-        // ИГРОВАЯ ЛОГИКА
+        // КОНСТАНТЫ ИГРЫ
         // ============================
         const CONFIG = {
             MINING_RATE: 0.001,
             TOTAL_SUPPLY: 5000000000,
-            BUILDING_COSTS: { base: 100, mining: 200, power: 200 },
-            ENERGY_CONSUMPTION: { base: 0, mining: 2, power: 0 },
-            ENERGY_PRODUCTION: { base: 0, mining: 0, power: 5 },
-            UPKEEP_COSTS: { base: 0.0002, mining: 0.0002, power: 0.0002 }
+            
+            // Стоимость улучшений для каждого уровня (0→1, 1→2, 2→3)
+            UPGRADE_COSTS: {
+                base: [50, 100, 200],
+                mining: [100, 200, 400],
+                power: [100, 200, 400]
+            },
+            
+            // Бонусы от улучшений
+            UPGRADE_BONUSES: {
+                base: [50, 100, 150],           // +50, +100, +150 к хранилищу
+                mining: [0.2, 0.4, 0.8],        // +20%, +40%, +80% к добыче
+                power: [2, 4, 8]                // +2, +4, +8 энергии
+            },
+            
+            // Множители расходов при улучшении
+            UPGRADE_UPKEEP_MULTIPLIERS: {
+                base: [2.0, 4.0, 6.0],
+                mining: [2.0, 4.0, 6.0],
+                power: [2.0, 4.0, 6.0]
+            },
+            
+            // Базовая стоимость зданий
+            BUILDING_COSTS: {
+                base: 100,
+                mining: 200,
+                power: 200
+            },
+            
+            // Базовая энергетика
+            ENERGY_CONSUMPTION: {
+                base: 0,
+                mining: 2,
+                power: 0
+            },
+            
+            ENERGY_PRODUCTION: {
+                base: 0,
+                mining: 0,
+                power: 5
+            },
+            
+            // Базовые расходы на содержание
+            UPKEEP_COSTS: {
+                base: 0.0002,
+                mining: 0.0002,
+                power: 0.0002
+            }
         };
 
+        // ============================
+        // СОСТОЯНИЕ ИГРЫ
+        // ============================
         let gameState = {
             balance: 500.0,
             mined: 0.0,
@@ -654,140 +526,273 @@
             hasBase: false,
             energy: { production: 0, consumption: 0 },
             upkeepDebt: 0,
-            lastUpdate: Date.now()
+            lastUpdate: Date.now(),
+            selectedBuilding: null,
+            walletAddress: null
         };
 
-        function generateMarsSurface() {
-            const surface = document.getElementById('mars-surface');
-            surface.innerHTML = '';
-            
-            for (let i = 0; i < 30; i++) {
-                const rock = document.createElement('div');
-                rock.className = 'rock';
-                rock.style.width = Math.random() * 30 + 15 + 'px';
-                rock.style.height = Math.random() * 30 + 15 + 'px';
-                rock.style.left = Math.random() * 95 + '%';
-                rock.style.top = Math.random() * 95 + '%';
-                rock.style.background = `rgb(${80 + Math.random() * 40}, ${80 + Math.random() * 40}, ${80 + Math.random() * 40})`;
-                surface.appendChild(rock);
-            }
-            
-            renderBuildings();
+        // ============================
+        // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        // ============================
+        function getBuildingName(type) {
+            const names = {
+                base: 'База',
+                mining: 'Буровая',
+                power: 'Электростанция'
+            };
+            return names[type] || type;
         }
 
-        function createBuildingElement(building) {
-            const div = document.createElement('div');
-            div.className = `building ${building.type}`;
-            div.id = `building-${building.id}`;
-            div.style.left = building.x + 'px';
-            div.style.top = building.y + 'px';
-            
-            const icon = document.createElement('div');
-            icon.textContent = building.type === 'base' ? '🏠' : building.type === 'mining' ? '⛏️' : '⚡';
-            div.appendChild(icon);
-            
-            if (building.level > 0) {
-                const level = document.createElement('div');
-                level.className = 'building-level';
-                level.textContent = building.level;
-                div.appendChild(level);
-            }
-            
-            return div;
+        function getBuildingIcon(type) {
+            const icons = {
+                base: '🏠',
+                mining: '⛏️',
+                power: '⚡'
+            };
+            return icons[type] || '🏗️';
         }
 
-        function renderBuildings() {
-            const surface = document.getElementById('mars-surface');
-            document.querySelectorAll('.building').forEach(el => el.remove());
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = type === 'error' ? 'message-error' : 'message-success';
+            messageEl.style.display = 'block';
             
-            gameState.buildings.forEach(building => {
-                const buildingEl = createBuildingElement(building);
-                surface.appendChild(buildingEl);
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 3000);
+        }
+
+        // ============================
+        // СИСТЕМА ВКЛАДОК
+        // ============================
+        function switchTab(tabIndex) {
+            // Обновляем активные табы
+            document.querySelectorAll('.tab').forEach((tab, index) => {
+                tab.classList.toggle('active', index === tabIndex);
+            });
+            
+            document.querySelectorAll('.tab-content').forEach((content, index) => {
+                content.classList.toggle('active', index === tabIndex);
+            });
+            
+            // Обновляем содержимое табов при переключении
+            if (tabIndex === 1) {
+                updateMyBuildingsTab();
+            }
+        }
+
+        // ============================
+        // ОБНОВЛЕНИЕ ИНТЕРФЕЙСА
+        // ============================
+        function updateUI() {
+            // Верхняя панель
+            document.getElementById('balance').textContent = gameState.balance.toFixed(2);
+            document.getElementById('mined').textContent = gameState.mined.toFixed(4);
+            
+            const energy = calculateEnergy();
+            document.getElementById('energy').textContent = `${energy.production}/${energy.consumption}`;
+            document.getElementById('energy').style.color = energy.production >= energy.consumption ? '#00FF00' : '#FF5555';
+            
+            document.getElementById('building-count').textContent = gameState.buildings.length;
+            
+            // Вкладка строительства
+            updateBuildingsTab();
+            
+            // Вкладка моих зданий
+            updateMyBuildingsTab();
+        }
+
+        function updateBuildingsTab() {
+            const container = document.getElementById('buildings-tab');
+            container.innerHTML = '';
+            
+            const buildingTypes = ['base', 'mining', 'power'];
+            
+            buildingTypes.forEach(type => {
+                const ownedCount = gameState.buildings.filter(b => b.type === type).length;
+                const maxLevel = ownedCount > 0 ? 
+                    Math.max(...gameState.buildings.filter(b => b.type === type).map(b => b.level)) : -1;
                 
-                buildingEl.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    showMessage(`${getBuildingName(building.type)} #${building.id}`, 'success');
-                });
+                const card = document.createElement('div');
+                card.className = `building-card ${gameState.selectedBuilding === type ? 'selected' : ''}`;
+                card.onclick = () => selectBuildingForAction(type);
+                
+                const canBuild = (type === 'base' || gameState.hasBase) && 
+                                gameState.balance >= CONFIG.BUILDING_COSTS[type];
+                const canUpgrade = ownedCount > 0 && maxLevel < 3 && 
+                                 gameState.balance >= getUpgradeCost(type, maxLevel + 1);
+                
+                card.innerHTML = `
+                    <div class="building-header">
+                        <div class="building-icon">${getBuildingIcon(type)}</div>
+                        <div>
+                            <div class="building-name">${getBuildingName(type)}</div>
+                            <div class="building-level">Уровень: ${maxLevel >= 0 ? maxLevel + 1 : 'Не построено'}</div>
+                        </div>
+                    </div>
+                    <div class="building-cost">
+                        Построено: ${ownedCount} шт.<br>
+                        Стоимость: ${CONFIG.BUILDING_COSTS[type]} MNRT<br>
+                        ${type === 'mining' ? 'Добыча: 0.001 MNRT/сек' : ''}
+                        ${type === 'power' ? 'Энергия: +5⚡' : ''}
+                    </div>
+                    <div class="building-actions">
+                        <button class="action-btn build-btn" 
+                                onclick="startBuilding('${type}'); event.stopPropagation();"
+                                ${canBuild ? '' : 'disabled'}>
+                            🏗️ Построить
+                        </button>
+                        <button class="action-btn upgrade-btn" 
+                                onclick="upgradeBuildingType('${type}'); event.stopPropagation();"
+                                ${canUpgrade ? '' : 'disabled'}>
+                            ⬆️ Улучшить (${getUpgradeCost(type, maxLevel + 2)} MNRT)
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(card);
             });
         }
 
+        function updateMyBuildingsTab() {
+            const container = document.getElementById('my-buildings-tab');
+            container.innerHTML = '';
+            
+            if (gameState.buildings.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Нет построенных зданий</div>';
+                return;
+            }
+            
+            // Группируем здания по типу
+            const buildingGroups = {};
+            gameState.buildings.forEach(building => {
+                if (!buildingGroups[building.type]) {
+                    buildingGroups[building.type] = [];
+                }
+                buildingGroups[building.type].push(building);
+            });
+            
+            Object.entries(buildingGroups).forEach(([type, buildings]) => {
+                const levelCounts = {0: 0, 1: 0, 2: 0, 3: 0};
+                buildings.forEach(b => levelCounts[b.level]++);
+                
+                const card = document.createElement('div');
+                card.className = 'owned-building';
+                card.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <div style="font-size: 20px;">${getBuildingIcon(type)}</div>
+                        <div>
+                            <div style="font-weight: bold;">${getBuildingName(type)}</div>
+                            <div style="font-size: 11px; color: gold;">Всего: ${buildings.length} шт.</div>
+                        </div>
+                    </div>
+                    <div class="building-stats">
+                        <div>Уровень 1: ${levelCounts[0]} шт.</div>
+                        <div>Уровень 2: ${levelCounts[1]} шт.</div>
+                        <div>Уровень 3: ${levelCounts[2]} шт.</div>
+                        <div>Уровень 4: ${levelCounts[3]} шт.</div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // ============================
+        // ВЫБОР ЗДАНИЯ ДЛЯ ДЕЙСТВИЙ
+        // ============================
+        function selectBuildingForAction(type) {
+            gameState.selectedBuilding = gameState.selectedBuilding === type ? null : type;
+            updateBuildingsTab();
+        }
+
+        // ============================
+        // СИСТЕМА УЛУЧШЕНИЙ
+        // ============================
+        function getUpgradeCost(type, targetLevel) {
+            // targetLevel: 1 для улучшения с 0 на 1, 2 для 1 на 2, 3 для 2 на 3
+            if (targetLevel >= 1 && targetLevel <= 3) {
+                return CONFIG.UPGRADE_COSTS[type][targetLevel - 1];
+            }
+            return 0;
+        }
+
+        function upgradeBuildingType(type) {
+            const buildingsOfType = gameState.buildings.filter(b => b.type === type);
+            if (buildingsOfType.length === 0) {
+                showMessage(`Нет построенных ${getBuildingName(type)} для улучшения`, 'error');
+                return;
+            }
+            
+            // Находим минимальный уровень среди всех зданий этого типа
+            const minLevel = Math.min(...buildingsOfType.map(b => b.level));
+            if (minLevel >= 3) {
+                showMessage(`Все ${getBuildingName(type)} уже максимального уровня`, 'error');
+                return;
+            }
+            
+            const upgradeCost = getUpgradeCost(type, minLevel + 1);
+            if (gameState.balance < upgradeCost) {
+                showMessage(`Недостаточно MNRT для улучшения. Нужно: ${upgradeCost}`, 'error');
+                return;
+            }
+            
+            // Улучшаем все здания минимального уровня
+            let upgradedCount = 0;
+            gameState.buildings.forEach(building => {
+                if (building.type === type && building.level === minLevel) {
+                    building.level++;
+                    upgradedCount++;
+                }
+            });
+            
+            gameState.balance -= upgradeCost;
+            showMessage(`✅ Улучшено ${upgradedCount} ${getBuildingName(type)} до уровня ${minLevel + 2}`, 'success');
+            updateUI();
+            renderBuildings();
+        }
+
+        // ============================
+        // СТРОИТЕЛЬСТВО ЗДАНИЙ
+        // ============================
         function startBuilding(type) {
             const cost = CONFIG.BUILDING_COSTS[type];
             
             if (gameState.balance < cost) {
-                showMessage(`❌ Нужно ${cost} MNRT`, 'error');
+                showMessage(`❌ Недостаточно MNRT! Нужно: ${cost}`, 'error');
                 return;
             }
             
             if ((type === 'mining' || type === 'power') && !gameState.hasBase) {
-                showMessage('❌ Сначала постройте базу', 'error');
+                showMessage('❌ Сначала постройте базу!', 'error');
                 return;
             }
             
             gameState.placingBuilding = type;
-            showMessage(`🏗️ Кликните для размещения`, 'success');
+            showMessage(`🏗️ Кликните на карту для размещения ${getBuildingName(type)}`, 'success');
         }
 
-        document.getElementById('mars-surface').addEventListener('click', function(e) {
-            if (!gameState.placingBuilding) return;
-            
-            const rect = this.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            for (const building of gameState.buildings) {
-                const distance = Math.sqrt(Math.pow(x - building.x, 2) + Math.pow(y - building.y, 2));
-                if (distance < 70) {
-                    showMessage('⚠️ Слишком близко', 'error');
-                    return;
-                }
-            }
-            
-            const cost = CONFIG.BUILDING_COSTS[gameState.placingBuilding];
-            gameState.balance -= cost;
-            
-            const building = {
-                id: gameState.nextId++,
-                type: gameState.placingBuilding,
-                x: x,
-                y: y,
-                level: 0,
-                hasPower: true
-            };
-            
-            gameState.buildings.push(building);
-            
-            if (gameState.placingBuilding === 'base') {
-                gameState.hasBase = true;
-            }
-            
-            gameState.placingBuilding = null;
-            updateUI();
-            renderBuildings();
-            
-            showMessage(`✅ ${getBuildingName(building.type)} построена`, 'success');
-        });
-
-        function collectResources() {
-            if (gameState.mined > 0) {
-                const collected = gameState.mined;
-                gameState.balance += collected;
-                gameState.totalMinedAllTime += collected;
-                gameState.mined = 0;
-                showMessage(`💰 +${collected.toFixed(4)} MNRT`, 'success');
-                updateUI();
-            } else {
-                showMessage('⛏️ Нет ресурсов', 'error');
-            }
-        }
-
+        // ============================
+        // ИГРОВАЯ ЛОГИКА
+        // ============================
         function calculateEnergy() {
             let production = 0;
             let consumption = 0;
             
             gameState.buildings.forEach(building => {
-                production += CONFIG.ENERGY_PRODUCTION[building.type] || 0;
-                consumption += CONFIG.ENERGY_CONSUMPTION[building.type] || 0;
+                // Базовая энергия
+                if (CONFIG.ENERGY_PRODUCTION[building.type]) {
+                    production += CONFIG.ENERGY_PRODUCTION[building.type];
+                }
+                if (CONFIG.ENERGY_CONSUMPTION[building.type]) {
+                    consumption += CONFIG.ENERGY_CONSUMPTION[building.type];
+                }
+                
+                // Бонусы от улучшений
+                if (building.level > 0) {
+                    production += CONFIG.UPGRADE_BONUSES.power[building.level - 1] || 0;
+                }
             });
             
             gameState.buildings.forEach(building => {
@@ -798,6 +803,34 @@
             
             gameState.energy = { production, consumption };
             return { production, consumption };
+        }
+
+        function calculateMiningRate(building) {
+            let rate = CONFIG.MINING_RATE;
+            
+            // Бонусы от улучшений
+            if (building.level > 0) {
+                const bonus = CONFIG.UPGRADE_BONUSES.mining[building.level - 1] || 0;
+                rate *= (1 + bonus);
+            }
+            
+            return rate;
+        }
+
+        function calculateUpkeep() {
+            let totalUpkeep = 0;
+            gameState.buildings.forEach(building => {
+                let upkeep = CONFIG.UPKEEP_COSTS[building.type] || 0;
+                
+                // Увеличение расходов при улучшениях
+                if (building.level > 0) {
+                    const multiplier = CONFIG.UPGRADE_UPKEEP_MULTIPLIERS[building.type][building.level - 1] || 1;
+                    upkeep *= multiplier;
+                }
+                
+                totalUpkeep += upkeep;
+            });
+            return totalUpkeep;
         }
 
         function updateMining() {
@@ -827,112 +860,191 @@
             
             let totalMining = 0;
             activeMiningBuildings.forEach(building => {
-                const multiplier = 1 + (building.level * 0.2);
-                totalMining += CONFIG.MINING_RATE * multiplier;
+                totalMining += calculateMiningRate(building);
             });
             
             const netMiningPerSecond = totalMining - upkeepPerSecond;
             
             if (netMiningPerSecond > 0) {
                 const minedThisTick = netMiningPerSecond * elapsedSeconds;
+                
                 if (gameState.supply >= minedThisTick) {
                     gameState.mined += minedThisTick;
                     gameState.supply -= minedThisTick;
+                } else if (gameState.supply > 0) {
+                    gameState.mined += gameState.supply;
+                    gameState.supply = 0;
+                }
+            } else {
+                const lossPerSecond = -netMiningPerSecond;
+                const lossThisTick = lossPerSecond * elapsedSeconds;
+                
+                if (gameState.mined >= lossThisTick) {
+                    gameState.mined -= lossThisTick;
+                } else {
+                    const remainingLoss = lossThisTick - gameState.mined;
+                    gameState.mined = 0;
+                    gameState.upkeepDebt += remainingLoss;
                 }
             }
             
             updateUI();
         }
 
-        function calculateUpkeep() {
-            let totalUpkeep = 0;
+        function collectResources() {
+            if (gameState.mined > 0) {
+                const collected = gameState.mined;
+                gameState.balance += collected;
+                gameState.totalMinedAllTime += collected;
+                gameState.mined = 0;
+                
+                showMessage(`💰 Собрано ${collected.toFixed(4)} MNRT!`, 'success');
+                updateUI();
+            } else {
+                showMessage('⛏️ Нет добытых ресурсов для сбора', 'error');
+            }
+        }
+
+        // ============================
+        // РЕНДЕРИНГ ЗДАНИЙ НА КАРТЕ
+        // ============================
+        function generateMarsSurface() {
+            const surface = document.getElementById('mars-surface');
+            surface.innerHTML = '';
+            
+            for (let i = 0; i < 30; i++) {
+                const rock = document.createElement('div');
+                rock.style.position = 'absolute';
+                rock.style.left = Math.random() * 95 + '%';
+                rock.style.top = Math.random() * 95 + '%';
+                rock.style.width = Math.random() * 30 + 15 + 'px';
+                rock.style.height = Math.random() * 30 + 15 + 'px';
+                rock.style.background = `rgb(${80 + Math.random() * 40}, ${80 + Math.random() * 40}, ${80 + Math.random() * 40})`;
+                rock.style.borderRadius = '50%';
+                surface.appendChild(rock);
+            }
+            
+            renderBuildings();
+        }
+
+        function createBuildingElement(building) {
+            const div = document.createElement('div');
+            div.className = `building ${building.type}`;
+            div.id = `building-${building.id}`;
+            div.style.left = building.x + 'px';
+            div.style.top = building.y + 'px';
+            div.title = `${getBuildingName(building.type)} #${building.id} | Уровень ${building.level + 1}`;
+            
+            const icon = document.createElement('div');
+            icon.textContent = getBuildingIcon(building.type);
+            div.appendChild(icon);
+            
+            if (building.level > 0) {
+                const levelBadge = document.createElement('div');
+                levelBadge.className = 'building-level-badge';
+                levelBadge.textContent = building.level;
+                div.appendChild(levelBadge);
+            }
+            
+            return div;
+        }
+
+        function renderBuildings() {
+            const surface = document.getElementById('mars-surface');
+            document.querySelectorAll('.building').forEach(el => el.remove());
+            
             gameState.buildings.forEach(building => {
-                totalUpkeep += CONFIG.UPKEEP_COSTS[building.type] || 0;
+                const buildingEl = createBuildingElement(building);
+                surface.appendChild(buildingEl);
             });
-            return totalUpkeep;
         }
 
-        function getBuildingName(type) {
-            const names = { base: 'База', mining: 'Буровая', power: 'Электростанция' };
-            return names[type] || type;
+        // Обработчик клика по карте
+        document.getElementById('mars-surface').addEventListener('click', function(e) {
+            if (!gameState.placingBuilding) return;
+            
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Проверка на расстояние между зданиями
+            for (const building of gameState.buildings) {
+                const distance = Math.sqrt(
+                    Math.pow(x - building.x, 2) + 
+                    Math.pow(y - building.y, 2)
+                );
+                if (distance < 70) {
+                    showMessage('⚠️ Слишком близко к другому зданию!', 'error');
+                    return;
+                }
+            }
+            
+            const cost = CONFIG.BUILDING_COSTS[gameState.placingBuilding];
+            gameState.balance -= cost;
+            
+            const building = {
+                id: gameState.nextId++,
+                type: gameState.placingBuilding,
+                x: x,
+                y: y,
+                level: 0,
+                hasPower: true
+            };
+            
+            gameState.buildings.push(building);
+            
+            if (gameState.placingBuilding === 'base') {
+                gameState.hasBase = true;
+            }
+            
+            gameState.placingBuilding = null;
+            updateUI();
+            renderBuildings();
+            
+            showMessage(`✅ ${getBuildingName(building.type)} построена!`, 'success');
+        });
+
+        // ============================
+        // БЛОКЧЕЙН ИНТЕГРАЦИЯ
+        // ============================
+        function connectWallet() {
+            // Заглушка для интеграции с MetaMask/Trust Wallet
+            // В реальном приложении здесь будет Web3 интеграция
+            
+            // Генерируем тестовый адрес
+            const testAddress = '0x' + Array.from({length: 40}, () => 
+                Math.floor(Math.random() * 16).toString(16)).join('');
+            
+            gameState.walletAddress = testAddress;
+            document.getElementById('wallet-address').textContent = testAddress;
+            
+            showMessage('✅ Кошелек подключен (тестовый режим)', 'success');
         }
 
-        function showMessage(text, type) {
-            const messageEl = document.getElementById('message');
-            messageEl.textContent = text;
-            messageEl.className = `message-${type}`;
-            messageEl.style.display = 'block';
-            
-            setTimeout(() => {
-                messageEl.style.display = 'none';
-            }, 2000);
-        }
-
-        function updateUI() {
-            // ОБНОВЛЯЕМ СТАТИСТИКУ
-            document.getElementById('balance').textContent = gameState.balance.toFixed(2) + ' MNRT';
-            document.getElementById('mined').textContent = gameState.mined.toFixed(4) + ' MNRT';
-            
-            const energy = calculateEnergy();
-            document.getElementById('energy').textContent = `${energy.production}/${energy.consumption} ⚡`;
-            document.getElementById('energy').style.color = energy.production >= energy.consumption ? '#00FF00' : '#FF5555';
-            
-            document.getElementById('building-count').textContent = gameState.buildings.length + ' шт';
-            document.getElementById('buildings-count').textContent = gameState.buildings.length;
-            
-            // ОБНОВЛЯЕМ КНОПКИ
-            document.getElementById('btn-base').disabled = gameState.balance < 100;
-            document.getElementById('btn-mining').disabled = gameState.balance < 200 || !gameState.hasBase;
-            document.getElementById('btn-power').disabled = gameState.balance < 200 || !gameState.hasBase;
-            
-            // ОБНОВЛЯЕМ СПИСОК ЗДАНИЙ
-            updateBuildingsList();
-        }
-
-        function updateBuildingsList() {
-            const container = document.getElementById('buildings-container');
-            container.innerHTML = '';
-            
-            if (gameState.buildings.length === 0) {
-                container.innerHTML = '<div style="color: #888; text-align: center; padding: 10px; font-size: 10px;">Нет зданий</div>';
+        function copyWalletAddress() {
+            if (!gameState.walletAddress) {
+                showMessage('Сначала подключите кошелек', 'error');
                 return;
             }
             
-            gameState.buildings.forEach(building => {
-                const div = document.createElement('div');
-                div.className = 'building-item-compact';
-                
-                let statusClass = 'active';
-                if (building.type === 'mining') {
-                    statusClass = building.hasPower ? 'active' : 'inactive';
-                } else if (building.type === 'power') {
-                    statusClass = 'power';
-                }
-                
-                div.innerHTML = `
-                    <div class="building-status ${statusClass}"></div>
-                    <div style="flex: 1; min-width: 0;">
-                        <div style="font-weight: bold; font-size: 9px;">${getBuildingName(building.type)} #${building.id}</div>
-                        <div style="font-size: 8px; color: #aaa;">Ур. ${building.level + 1} | ${building.type === 'mining' ? (building.hasPower ? '🟢' : '🔴') : ''}</div>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
+            navigator.clipboard.writeText(gameState.walletAddress)
+                .then(() => showMessage('Адрес скопирован в буфер', 'success'))
+                .catch(() => showMessage('Ошибка копирования', 'error'));
         }
 
+        // ============================
+        // ИНИЦИАЛИЗАЦИЯ ИГРЫ
+        // ============================
         function initGame() {
             generateMarsSurface();
             updateUI();
+            
             gameState.lastUpdate = Date.now();
             setInterval(updateMining, 1000);
         }
 
-        // ЗАПУСК ПРИ ЗАГРУЗКЕ
-        window.onload = function() {
-            if (!detectTelegram()) {
-                document.getElementById('tg-auth-panel').style.display = 'flex';
-            }
-        };
+        // Запуск при загрузке
+        window.onload = initGame;
     </script>
 </body>
 </html>
