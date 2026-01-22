@@ -352,6 +352,24 @@
         .message-success { border: 2px solid #00FF00; }
         .message-error { border: 2px solid #FF5555; }
         
+        /* БЕСПЛАТНАЯ ПОСТРОЙКА */
+        .free-badge {
+            background: linear-gradient(135deg, #00AA00, #00FF00);
+            color: black;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 5px;
+            animation: pulse-green 1.5s infinite;
+        }
+        
+        @keyframes pulse-green {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
         @keyframes pulse-base {
             0% { box-shadow: 0 0 5px rgba(70, 130, 180, 0.5); }
             50% { box-shadow: 0 0 20px rgba(70, 130, 180, 0.8); }
@@ -523,7 +541,14 @@
             
             WITHDRAWAL_MIN: 10,
             WITHDRAWAL_COOLDOWN: 24 * 60 * 60 * 1000,
-            GAS_FEE: 0.001
+            GAS_FEE: 0.001,
+            
+            // БЕСПЛАТНЫЕ ЗДАНИЯ ДЛЯ НОВЫХ ИГРОКОВ
+            FREE_BUILDINGS: {
+                base: true,    // Первая база бесплатно
+                mining: true,  // Первая буровая бесплатно
+                power: true    // Первая электростанция бесплатно
+            }
         };
 
         // ============================
@@ -546,6 +571,13 @@
             lastWithdrawal: null,
             miningActive: true,
             storageFull: false,
+            
+            // Счетчик бесплатных построек для каждого типа зданий
+            freeBuildingsUsed: {
+                base: false,
+                mining: false,
+                power: false
+            },
             
             statistics: {
                 totalMined: 0,
@@ -763,8 +795,28 @@
                 card.className = `building-card ${gameState.selectedBuilding === type ? 'selected' : ''}`;
                 card.onclick = () => selectBuildingForAction(type);
                 
-                const canBuild = (type === 'base' || gameState.hasBase) && 
-                                gameState.balance >= CONFIG.BUILDING_COSTS[type];
+                // Проверяем, доступна ли бесплатная постройка
+                const isFirstBuildingFree = CONFIG.FREE_BUILDINGS[type] && !gameState.freeBuildingsUsed[type];
+                
+                // Проверяем условия для строительства
+                let canBuild = false;
+                let cost = CONFIG.BUILDING_COSTS[type];
+                
+                if (type === 'base' && ownedCount === 0) {
+                    // Базу можно построить всегда
+                    canBuild = true;
+                } else if ((type === 'mining' || type === 'power') && !gameState.hasBase) {
+                    // Для буровых и электростанций нужна база
+                    canBuild = false;
+                } else if (isFirstBuildingFree) {
+                    // Бесплатная постройка доступна
+                    canBuild = true;
+                    cost = 0;
+                } else {
+                    // Проверяем баланс
+                    canBuild = gameState.balance >= cost;
+                }
+                
                 const canUpgrade = ownedCount > 0 && maxLevel < 3 && 
                                  gameState.balance >= getUpgradeCost(type, maxLevel + 1);
                 
@@ -794,24 +846,38 @@
                     `;
                 }
                 
+                // Текст для кнопки строительства
+                let buildButtonText = `🏗️ Построить (${cost} MNRT)`;
+                if (isFirstBuildingFree && ownedCount === 0) {
+                    buildButtonText = `🏗️ Построить БЕСПЛАТНО!`;
+                } else if (isFirstBuildingFree) {
+                    buildButtonText = `🏗️ Построить (${cost} MNRT)`;
+                }
+                
                 card.innerHTML = `
                     <div class="building-header">
                         <div class="building-icon">${getBuildingIcon(type)}</div>
                         <div>
                             <div class="building-name">${getBuildingName(type)}</div>
-                            <div class="building-level">Уровень: ${currentLevel}/4</div>
+                            <div class="building-level">
+                                Уровень: ${currentLevel}/4
+                                ${isFirstBuildingFree && ownedCount === 0 ? '<span class="free-badge">БЕСПЛАТНО</span>' : ''}
+                            </div>
                         </div>
                     </div>
                     <div class="building-cost">
                         Построено: ${ownedCount} шт.<br>
-                        Стоимость: <span style="color: gold">${CONFIG.BUILDING_COSTS[type]} MNRT</span><br>
+                        ${isFirstBuildingFree && ownedCount === 0 ? 
+                          'Стоимость: <span style="color: #00FF00">БЕСПЛАТНО!</span><br>' : 
+                          `Стоимость: <span style="color: gold">${CONFIG.BUILDING_COSTS[type]} MNRT</span><br>`}
                         ${buildingInfo}
                     </div>
                     <div class="building-actions">
                         <button class="action-btn build-btn" 
                                 onclick="startBuilding('${type}'); event.stopPropagation();"
-                                ${canBuild ? '' : 'disabled'}>
-                            🏗️ Построить (${CONFIG.BUILDING_COSTS[type]} MNRT)
+                                ${canBuild ? '' : 'disabled'}
+                                style="${isFirstBuildingFree && ownedCount === 0 ? 'background: linear-gradient(135deg, #00AA00, #00FF00);' : ''}">
+                            ${buildButtonText}
                         </button>
                         <button class="action-btn upgrade-btn" 
                                 onclick="upgradeBuildingType('${type}'); event.stopPropagation();"
@@ -879,12 +945,14 @@
         }
 
         // ============================
-        // СТРОИТЕЛЬСТВО ЗДАНИЙ
+        // СТРОИТЕЛЬСТВО ЗДАНИЙ (С БЕСПЛАТНОЙ ПЕРВОЙ ПОСТРОЙКОЙ)
         // ============================
         function startBuilding(type) {
-            const cost = CONFIG.BUILDING_COSTS[type];
+            // Проверяем, доступна ли бесплатная постройка
+            const isFirstBuildingFree = CONFIG.FREE_BUILDINGS[type] && !gameState.freeBuildingsUsed[type];
+            const cost = isFirstBuildingFree ? 0 : CONFIG.BUILDING_COSTS[type];
             
-            if (gameState.balance < cost) {
+            if (!isFirstBuildingFree && gameState.balance < cost) {
                 showMessage(`❌ Недостаточно MNRT! Нужно: ${cost}`, 'error');
                 return;
             }
@@ -894,8 +962,14 @@
                 return;
             }
             
+            if (type === 'base' && gameState.hasBase) {
+                showMessage('❌ У вас уже есть база!', 'error');
+                return;
+            }
+            
             gameState.placingBuilding = type;
-            showMessage(`🏗️ Кликните на карту для размещения ${getBuildingName(type)}`, 'success');
+            gameState.isFreeBuilding = isFirstBuildingFree;
+            showMessage(`🏗️ Кликните на карту для размещения ${getBuildingName(type)}${isFirstBuildingFree ? ' (БЕСПЛАТНО!)' : ''}`, 'success');
         }
 
         // ============================
@@ -1025,7 +1099,7 @@
         }
 
         // ============================
-        // ОБРАБОТЧИК КЛИКА ПО КАРТЕ
+        // ОБРАБОТЧИК КЛИКА ПО КАРТЕ (С БЕСПЛАТНОЙ ПОСТРОЙКОЙ)
         // ============================
         document.getElementById('mars-surface').addEventListener('click', function(e) {
             if (!gameState.placingBuilding) return;
@@ -1045,12 +1119,28 @@
                 }
             }
             
-            const cost = CONFIG.BUILDING_COSTS[gameState.placingBuilding];
-            gameState.balance -= cost;
+            const type = gameState.placingBuilding;
+            const isFirstBuildingFree = CONFIG.FREE_BUILDINGS[type] && !gameState.freeBuildingsUsed[type];
+            const cost = isFirstBuildingFree ? 0 : CONFIG.BUILDING_COSTS[type];
+            
+            if (!isFirstBuildingFree && gameState.balance < cost) {
+                showMessage(`❌ Недостаточно MNRT! Нужно: ${cost}`, 'error');
+                return;
+            }
+            
+            // Списание стоимости (если не бесплатно)
+            if (!isFirstBuildingFree) {
+                gameState.balance -= cost;
+            }
+            
+            // Отмечаем, что бесплатная постройка использована
+            if (isFirstBuildingFree) {
+                gameState.freeBuildingsUsed[type] = true;
+            }
             
             const building = {
                 id: gameState.nextId++,
-                type: gameState.placingBuilding,
+                type: type,
                 x: x,
                 y: y,
                 level: 0
@@ -1059,7 +1149,7 @@
             gameState.buildings.push(building);
             gameState.statistics.totalBuildingsBuilt++;
             
-            if (gameState.placingBuilding === 'base') {
+            if (type === 'base') {
                 gameState.hasBase = true;
             }
             
@@ -1067,7 +1157,10 @@
             updateUI();
             renderBuildings();
             
-            showMessage(`✅ ${getBuildingName(building.type)} построена!`, 'success');
+            const message = isFirstBuildingFree ? 
+                `✅ ${getBuildingName(type)} построена БЕСПЛАТНО!` : 
+                `✅ ${getBuildingName(type)} построена!`;
+            showMessage(message, 'success');
         });
 
         // ============================
@@ -1079,6 +1172,11 @@
             
             gameState.lastUpdate = Date.now();
             setInterval(updateMining, 1000);
+            
+            // Приветственное сообщение
+            setTimeout(() => {
+                showMessage('🎉 Добро пожаловать! Первая постройка каждого типа зданий - БЕСПЛАТНА!', 'success');
+            }, 1000);
         }
 
         // Запуск при загрузке
