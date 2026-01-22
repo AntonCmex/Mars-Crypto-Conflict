@@ -71,6 +71,12 @@
             transform: scale(1.05);
         }
         
+        .collect-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
         /* ИГРОВОЕ ПОЛЕ */
         #game-container {
             display: flex;
@@ -134,6 +140,45 @@
         
         /* ВКЛАДКА 1: СТРОИТЕЛЬСТВО */
         #buildings-tab {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        /* ИНФОРМАЦИЯ ОБ ЭНЕРГИИ */
+        .energy-upkeep-info {
+            background: rgba(0, 100, 255, 0.1);
+            border: 1px solid #0088ff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .energy-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 3px 0;
+            font-size: 11px;
+        }
+        
+        .energy-positive {
+            color: #00ff00;
+        }
+        
+        .energy-negative {
+            color: #ff5555;
+        }
+        
+        .profit-info {
+            color: #00ff00;
+            font-weight: bold;
+            margin-top: 5px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        /* КАРТОЧКИ ЗДАНИЙ */
+        .buildings-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 10px;
@@ -225,38 +270,6 @@
             transform: none;
         }
         
-        /* ЭНЕРГИЯ И РАСХОДЫ */
-        .energy-upkeep-info {
-            background: rgba(0, 100, 255, 0.1);
-            border: 1px solid #0088ff;
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 10px;
-            grid-column: 1 / -1;
-        }
-        
-        .energy-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 3px 0;
-            font-size: 11px;
-        }
-        
-        .energy-positive {
-            color: #00ff00;
-        }
-        
-        .energy-negative {
-            color: #ff5555;
-        }
-        
-        .profit-info {
-            color: #00ff00;
-            font-weight: bold;
-            margin-top: 5px;
-            text-align: center;
-        }
-        
         /* ЗДАНИЯ НА КАРТЕ */
         .building {
             position: absolute;
@@ -309,6 +322,14 @@
             border: 1px solid white;
         }
         
+        /* КАМНИ */
+        .rock {
+            position: absolute;
+            background: #696969;
+            border-radius: 50%;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        
         /* СООБЩЕНИЯ */
         #message {
             position: fixed;
@@ -330,6 +351,12 @@
         
         .message-success { border: 2px solid #00FF00; }
         .message-error { border: 2px solid #FF5555; }
+        
+        @keyframes pulse-base {
+            0% { box-shadow: 0 0 5px rgba(70, 130, 180, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(70, 130, 180, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(70, 130, 180, 0.5); }
+        }
     </style>
 </head>
 <body>
@@ -348,7 +375,7 @@
             </div>
             <div class="stat-item">
                 <span>⚡</span>
-                <span class="stat-value" id="energy">0/0 (+3)</span>
+                <span class="stat-value" id="energy">0/0 (+0)</span>
             </div>
             <div class="stat-item">
                 <span>📊</span>
@@ -369,6 +396,7 @@
         
         <!-- НИЖНЯЯ ПАНЕЛЬ С ВКЛАДКАМИ -->
         <div id="bottom-panel">
+            <!-- ТАБЫ -->
             <div class="tabs">
                 <button class="tab active" onclick="switchTab(0)">🏗️ Строительство</button>
                 <button class="tab" onclick="switchTab(1)">📊 Мои здания</button>
@@ -376,57 +404,105 @@
                 <button class="tab" onclick="switchTab(3)">👛 Кошелек</button>
             </div>
             
+            <!-- СОДЕРЖИМОЕ ВКЛАДОК -->
             <div class="tab-content active" id="tab-0">
                 <div id="buildings-tab">
-                    <!-- Энергия и доходы будут здесь -->
+                    <!-- Информация об энергии и прибыли -->
+                    <div id="energy-upkeep-info" class="energy-upkeep-info" style="display: none;">
+                        <div class="energy-row">
+                            <span>⚡ Производство энергии:</span>
+                            <span class="energy-positive" id="energy-production">0</span>
+                        </div>
+                        <div class="energy-row">
+                            <span>🔌 Потребление энергии:</span>
+                            <span class="energy-negative" id="energy-consumption">0</span>
+                        </div>
+                        <div class="energy-row">
+                            <span>⚖️ Свободная энергия:</span>
+                            <span id="energy-balance">0 ⚡</span>
+                        </div>
+                        <div class="energy-row">
+                            <span>⛏️ Добыча в секунду:</span>
+                            <span class="energy-positive" id="mining-per-second">0.0000 MNRT</span>
+                        </div>
+                        <div class="energy-row">
+                            <span>💸 Расходы в секунду:</span>
+                            <span class="energy-negative" id="upkeep-per-second">0.0000 MNRT</span>
+                        </div>
+                        <div class="profit-info">
+                            📈 Чистая прибыль: <span id="net-profit">0.0000</span> MNRT/сек
+                        </div>
+                    </div>
+                    
+                    <!-- Карточки зданий -->
+                    <div id="buildings-grid" class="buildings-grid">
+                        <!-- Здания будут добавляться сюда -->
+                    </div>
                 </div>
             </div>
             
-            <!-- ... остальные вкладки ... -->
+            <div class="tab-content" id="tab-1">
+                <div id="my-buildings-tab">
+                    <div style="text-align: center; padding: 40px; color: #888;">
+                        Нет построенных зданий
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="tab-2">
+                <div id="stats-tab">
+                    <div style="text-align: center; padding: 40px; color: #888;">
+                        Статистика будет здесь
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="tab-3">
+                <div id="wallet-tab">
+                    <div style="text-align: center; padding: 40px; color: #888;">
+                        Кошелек будет здесь
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
+    <!-- СООБЩЕНИЯ -->
     <div id="message"></div>
 
     <script>
         // ============================
-        // ИСПРАВЛЕННЫЕ КОНСТАНТЫ
+        // КОНСТАНТЫ ИГРЫ
         // ============================
         const CONFIG = {
-            // ДОБЫЧА
-            MINING_RATE: 0.001, // 0.001 MNRT/сек на 1 буровую
+            MINING_RATE: 0.001,
             
-            // ЭНЕРГЕТИКА (ИСПРАВЛЕНО)
             ENERGY_CONSUMPTION: {
-                base: 1,      // База потребляет 1⚡
-                mining: 1,    // Буровая потребляет 1⚡
-                power: 0      // Электростанция не потребляет
+                base: 1,
+                mining: 1,
+                power: 0
             },
             
             ENERGY_PRODUCTION: {
-                base: 0,      // База не производит
-                mining: 0,    // Буровая не производит  
-                power: 5      // Электростанция дает 5⚡
+                base: 0,
+                mining: 0,
+                power: 5
             },
             
-            // РАСХОДЫ НА СОДЕРЖАНИЕ
             UPKEEP_COSTS: {
-                base: 0.0002,   // База: 0.0002 MNRT/сек
-                mining: 0.0002, // Буровая: 0.0002 MNRT/сек
-                power: 0.0002   // Электростанция: 0.0002 MNRT/сек
+                base: 0.0002,
+                mining: 0.0002,
+                power: 0.0002
             },
             
-            // ХРАНИЛИЩЕ
             BASE_STORAGE_CAPACITY: 100,
             
-            // СТОИМОСТЬ СТРОИТЕЛЬСТВА
             BUILDING_COSTS: {
                 base: 100,
                 mining: 400,
                 power: 400
             },
             
-            // УЛУЧШЕНИЯ
             UPGRADE_COSTS: {
                 base: [50, 100, 200],
                 mining: [100, 200, 400],
@@ -434,9 +510,9 @@
             },
             
             UPGRADE_BONUSES: {
-                base: [50, 100, 150],     // + к хранилищу
-                mining: [0.2, 0.4, 0.8],  // + к добыче
-                power: [2, 4, 8]          // + к энергии
+                base: [50, 100, 150],
+                mining: [0.2, 0.4, 0.8],
+                power: [2, 4, 8]
             },
             
             UPGRADE_UPKEEP_MULTIPLIERS: {
@@ -445,7 +521,6 @@
                 power: [2.0, 4.0, 6.0]
             },
             
-            // ВЫВОД
             WITHDRAWAL_MIN: 10,
             WITHDRAWAL_COOLDOWN: 24 * 60 * 60 * 1000,
             GAS_FEE: 0.001
@@ -463,7 +538,7 @@
             nextId: 1,
             hasBase: false,
             energy: { production: 0, consumption: 0, balance: 0 },
-            profitPerSecond: 0, // Чистая прибыль в секунду
+            profitPerSecond: 0,
             lastUpdate: Date.now(),
             selectedBuilding: null,
             walletAddress: null,
@@ -483,7 +558,52 @@
         };
 
         // ============================
-        // РАСЧЕТ ЭНЕРГИИ И РАСХОДОВ
+        // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        // ============================
+        function getBuildingName(type) {
+            const names = {
+                base: 'База',
+                mining: 'Буровая',
+                power: 'Электростанция'
+            };
+            return names[type] || type;
+        }
+
+        function getBuildingIcon(type) {
+            const icons = {
+                base: '🏠',
+                mining: '⛏️',
+                power: '⚡'
+            };
+            return icons[type] || '🏗️';
+        }
+
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = type === 'error' ? 'message-error' : 'message-success';
+            messageEl.style.display = 'block';
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 3000);
+        }
+
+        // ============================
+        // СИСТЕМА ВКЛАДОК
+        // ============================
+        function switchTab(tabIndex) {
+            document.querySelectorAll('.tab').forEach((tab, index) => {
+                tab.classList.toggle('active', index === tabIndex);
+            });
+            
+            document.querySelectorAll('.tab-content').forEach((content, index) => {
+                content.classList.toggle('active', index === tabIndex);
+            });
+        }
+
+        // ============================
+        // РАСЧЕТ ЭНЕРГИИ И ПРИБЫЛИ
         // ============================
         
         function calculateEnergyAndProfit() {
@@ -492,7 +612,6 @@
             let totalUpkeep = 0;
             let totalMining = 0;
             
-            // Считаем производство, потребление и расходы
             gameState.buildings.forEach(building => {
                 // Энергия
                 if (CONFIG.ENERGY_PRODUCTION[building.type]) {
@@ -503,20 +622,18 @@
                 }
                 
                 // Бонусы от улучшений
-                if (building.level > 0) {
-                    if (building.type === 'power') {
-                        production += CONFIG.UPGRADE_BONUSES.power[building.level - 1];
-                    }
+                if (building.level > 0 && building.type === 'power') {
+                    production += CONFIG.UPGRADE_BONUSES.power[building.level - 1];
                 }
                 
-                // Расходы на содержание
+                // Расходы
                 let upkeep = CONFIG.UPKEEP_COSTS[building.type];
                 if (building.level > 0) {
                     upkeep *= CONFIG.UPGRADE_UPKEEP_MULTIPLIERS[building.type][building.level - 1];
                 }
                 totalUpkeep += upkeep;
                 
-                // Добыча (только буровые с энергией)
+                // Добыча (только буровые)
                 if (building.type === 'mining') {
                     let miningRate = CONFIG.MINING_RATE;
                     if (building.level > 0) {
@@ -529,7 +646,7 @@
             // Баланс энергии
             const energyBalance = production - consumption;
             
-            // Доступная добыча (только если есть энергия для буровых)
+            // Доступная добыча (только если есть энергия)
             let availableMining = 0;
             if (energyBalance >= 0) {
                 // Достаточно энергии для всех буровых
@@ -553,7 +670,7 @@
                 });
             }
             
-            // Чистая прибыль в секунду
+            // Чистая прибыль
             const netProfit = availableMining - totalUpkeep;
             
             // Сохраняем состояние
@@ -575,60 +692,6 @@
         }
 
         // ============================
-        // ОБНОВЛЕНИЕ ДОБЫЧИ
-        // ============================
-        
-        function updateMining() {
-            const now = Date.now();
-            const elapsedSeconds = (now - gameState.lastUpdate) / 1000;
-            gameState.lastUpdate = now;
-            
-            // 1. Расчет энергии и прибыли
-            const stats = calculateEnergyAndProfit();
-            
-            // 2. Если нет прибыли или отрицательная - только расходы
-            if (stats.profit <= 0) {
-                // Только расходы из хранилища
-                const upkeepCost = stats.upkeep * elapsedSeconds;
-                if (gameState.baseStorage >= upkeepCost) {
-                    gameState.baseStorage -= upkeepCost;
-                    gameState.statistics.totalUpkeepPaid += upkeepCost;
-                } else {
-                    // Не хватает на расходы - останавливаем
-                    gameState.baseStorage = 0;
-                    if (gameState.miningActive) {
-                        gameState.miningActive = false;
-                        showMessage('⛔ Недостаточно MNRT для оплаты расходов!', 'error');
-                    }
-                }
-                updateUI();
-                return;
-            }
-            
-            // 3. Чистая добыча (доход - расходы)
-            const netMined = stats.profit * elapsedSeconds;
-            
-            // 4. Проверяем место в хранилище
-            const availableStorage = CONFIG.BASE_STORAGE_CAPACITY - gameState.baseStorage;
-            const actualMined = Math.min(netMined, availableStorage);
-            
-            if (actualMined > 0) {
-                // Добавляем в хранилище
-                gameState.baseStorage += actualMined;
-                gameState.statistics.totalMined += actualMined;
-                
-                // Проверяем заполнение хранилища
-                if (gameState.baseStorage >= CONFIG.BASE_STORAGE_CAPACITY) {
-                    gameState.storageFull = true;
-                    gameState.miningActive = false;
-                    showMessage('🏠 Хранилище заполнено! Соберите ресурсы.', 'error');
-                }
-            }
-            
-            updateUI();
-        }
-
-        // ============================
         // ОБНОВЛЕНИЕ ИНТЕРФЕЙСА
         // ============================
         
@@ -640,16 +703,15 @@
             document.getElementById('storage').textContent = 
                 `${gameState.baseStorage.toFixed(2)}/${CONFIG.BASE_STORAGE_CAPACITY}`;
             
-            // Энергия
+            // Энергия и прибыль
             const stats = calculateEnergyAndProfit();
-            const energyBalance = stats.balance;
-            const freeEnergy = Math.max(0, energyBalance);
+            const freeEnergy = Math.max(0, stats.balance);
+            
             document.getElementById('energy').textContent = 
                 `${stats.production}/${stats.consumption} (+${freeEnergy})`;
             document.getElementById('energy').style.color = 
-                energyBalance >= 0 ? '#00FF00' : '#FF5555';
+                stats.balance >= 0 ? '#00FF00' : '#FF5555';
             
-            // Прибыль в секунду
             document.getElementById('profit').textContent = 
                 stats.profit.toFixed(4);
             document.getElementById('profit').style.color = 
@@ -658,49 +720,38 @@
             // Кнопка сбора
             document.getElementById('collect-btn').disabled = gameState.baseStorage <= 0;
             
-            // Обновляем вкладки
-            updateBuildingsTab();
+            // Обновляем информацию об энергии
+            updateEnergyInfo();
+            
+            // Обновляем карточки зданий
+            updateBuildingsCards();
         }
         
-        function updateBuildingsTab() {
-            const container = document.getElementById('buildings-tab');
-            container.innerHTML = '';
-            
-            // Информация об энергии и прибыли
+        function updateEnergyInfo() {
+            const energyInfo = document.getElementById('energy-upkeep-info');
             const stats = calculateEnergyAndProfit();
             
-            const energyInfo = document.createElement('div');
-            energyInfo.className = 'energy-upkeep-info';
-            energyInfo.innerHTML = `
-                <div class="energy-row">
-                    <span>⚡ Производство энергии:</span>
-                    <span class="energy-positive">${stats.production} ⚡</span>
-                </div>
-                <div class="energy-row">
-                    <span>🔌 Потребление энергии:</span>
-                    <span class="energy-negative">${stats.consumption} ⚡</span>
-                </div>
-                <div class="energy-row">
-                    <span>⚖️ Свободная энергия:</span>
-                    <span class="${stats.balance >= 0 ? 'energy-positive' : 'energy-negative'}">
-                        ${Math.max(0, stats.balance)} ⚡
-                    </span>
-                </div>
-                <div class="energy-row">
-                    <span>⛏️ Добыча в секунду:</span>
-                    <span class="energy-positive">${stats.mining.toFixed(4)} MNRT</span>
-                </div>
-                <div class="energy-row">
-                    <span>💸 Расходы в секунду:</span>
-                    <span class="energy-negative">${stats.upkeep.toFixed(4)} MNRT</span>
-                </div>
-                <div class="profit-info">
-                    📈 Чистая прибыль: ${stats.profit.toFixed(4)} MNRT/сек
-                </div>
-            `;
-            container.appendChild(energyInfo);
+            if (gameState.buildings.length > 0) {
+                energyInfo.style.display = 'block';
+                
+                document.getElementById('energy-production').textContent = `${stats.production} ⚡`;
+                document.getElementById('energy-consumption').textContent = `${stats.consumption} ⚡`;
+                document.getElementById('energy-balance').textContent = `${Math.max(0, stats.balance)} ⚡`;
+                document.getElementById('energy-balance').className = stats.balance >= 0 ? 'energy-positive' : 'energy-negative';
+                
+                document.getElementById('mining-per-second').textContent = `${stats.mining.toFixed(4)} MNRT`;
+                document.getElementById('upkeep-per-second').textContent = `${stats.upkeep.toFixed(4)} MNRT`;
+                document.getElementById('net-profit').textContent = stats.profit.toFixed(4);
+                
+            } else {
+                energyInfo.style.display = 'none';
+            }
+        }
+        
+        function updateBuildingsCards() {
+            const container = document.getElementById('buildings-grid');
+            container.innerHTML = '';
             
-            // Карточки зданий
             const buildingTypes = ['base', 'mining', 'power'];
             
             buildingTypes.forEach(type => {
@@ -723,23 +774,23 @@
                 let buildingInfo = '';
                 if (type === 'base') {
                     buildingInfo = `
-                        Хранилище: 100 MNRT<br>
-                        Расходы: 0.0002 MNRT/сек<br>
-                        Потребление: 1⚡
+                        🏠 Хранилище: 100 MNRT<br>
+                        💸 Расходы: 0.0002 MNRT/сек<br>
+                        ⚡ Потребление: 1⚡
                     `;
                 } else if (type === 'mining') {
                     const baseRate = CONFIG.MINING_RATE;
                     buildingInfo = `
-                        Добыча: ${baseRate.toFixed(3)} MNRT/сек<br>
-                        Расходы: 0.0002 MNRT/сек<br>
-                        Потребление: 1⚡<br>
-                        Чистая прибыль: ${(baseRate - 0.0002).toFixed(4)} MNRT/сек
+                        ⛏️ Добыча: ${baseRate.toFixed(3)} MNRT/сек<br>
+                        💸 Расходы: 0.0002 MNRT/сек<br>
+                        ⚡ Потребление: 1⚡<br>
+                        📈 Чистая прибыль: ${(baseRate - 0.0002).toFixed(4)} MNRT/сек
                     `;
                 } else if (type === 'power') {
                     buildingInfo = `
-                        Производство: 5⚡<br>
-                        Расходы: 0.0002 MNRT/сек<br>
-                        Потребление: 0⚡
+                        ⚡ Производство: 5⚡<br>
+                        💸 Расходы: 0.0002 MNRT/сек<br>
+                        🔋 Потребление: 0⚡
                     `;
                 }
                 
@@ -760,12 +811,13 @@
                         <button class="action-btn build-btn" 
                                 onclick="startBuilding('${type}'); event.stopPropagation();"
                                 ${canBuild ? '' : 'disabled'}>
-                            🏗️ Построить
+                            🏗️ Построить (${CONFIG.BUILDING_COSTS[type]} MNRT)
                         </button>
                         <button class="action-btn upgrade-btn" 
                                 onclick="upgradeBuildingType('${type}'); event.stopPropagation();"
                                 ${canUpgrade ? '' : 'disabled'}>
-                            ${currentLevel < 4 ? `⬆️ Уровень ${currentLevel + 1}` : '✅ Макс'}
+                            ${currentLevel < 4 ? `⬆️ Улучшить` : '✅ Макс'}
+                            ${currentLevel < 4 ? `(${getUpgradeCost(type, currentLevel)} MNRT)` : ''}
                         </button>
                     </div>
                 `;
@@ -775,64 +827,60 @@
         }
 
         // ============================
-        // ПРИМЕР РАСЧЕТА ДЛЯ 1 БАЗЫ + 1 БУРОВОЙ + 1 ЭЛЕКТРОСТАНЦИИ
+        // ВЫБОР ЗДАНИЯ ДЛЯ ДЕЙСТВИЙ
         // ============================
-        
-        function calculateExample() {
-            /*
-            РАСЧЕТ ДЛЯ 1 КОМПЛЕКТА:
-            
-            1. Электростанция:
-               - Производит: 5⚡
-               - Расходы: 0.0002 MNRT/сек
-            
-            2. База:
-               - Потребляет: 1⚡  
-               - Расходы: 0.0002 MNRT/сек
-               - Хранилище: 100 MNRT
-            
-            3. Буровая:
-               - Потребляет: 1⚡
-               - Расходы: 0.0002 MNRT/сек
-               - Добывает: 0.001 MNRT/сек
-            
-            ИТОГО:
-            - Энергия: 5⚡ (производство) - 2⚡ (потребление) = +3⚡ свободных
-            - Доход: 0.001 MNRT/сек
-            - Расходы: 0.0002 + 0.0002 + 0.0002 = 0.0006 MNRT/сек
-            - Чистая прибыль: 0.001 - 0.0006 = 0.0004 MNRT/сек
-            
-            В ЧАС:
-            - Чистая прибыль: 0.0004 × 60 × 60 = 1.44 MNRT/час
-            
-            В ДЕНЬ (24 часа):
-            - Чистая прибыль: 1.44 × 24 = 34.56 MNRT/день
-            
-            В МЕСЯЦ (30 дней):
-            - Чистая прибыль: 34.56 × 30 = 1036.8 MNRT/месяц
-            */
-            
-            const hourlyProfit = 0.0004 * 60 * 60;
-            const dailyProfit = hourlyProfit * 24;
-            const monthlyProfit = dailyProfit * 30;
-            
-            console.log('📊 Пример расчета для 1 комплекта:');
-            console.log('Чистая прибыль в час:', hourlyProfit.toFixed(2), 'MNRT');
-            console.log('Чистая прибыль в день:', dailyProfit.toFixed(2), 'MNRT');
-            console.log('Чистая прибыль в месяц:', monthlyProfit.toFixed(2), 'MNRT');
-            
-            return {
-                perSecond: 0.0004,
-                perHour: hourlyProfit,
-                perDay: dailyProfit,
-                perMonth: monthlyProfit
-            };
+        function selectBuildingForAction(type) {
+            gameState.selectedBuilding = gameState.selectedBuilding === type ? null : type;
+            updateBuildingsCards();
         }
 
         // ============================
-        // ФУНКЦИИ СТРОИТЕЛЬСТВА
+        // СИСТЕМА УЛУЧШЕНИЙ
         // ============================
-        
+        function getUpgradeCost(type, targetLevel) {
+            if (targetLevel >= 1 && targetLevel <= 3) {
+                return CONFIG.UPGRADE_COSTS[type][targetLevel - 1];
+            }
+            return 0;
+        }
+
+        function upgradeBuildingType(type) {
+            const buildingsOfType = gameState.buildings.filter(b => b.type === type);
+            if (buildingsOfType.length === 0) {
+                showMessage(`Нет построенных ${getBuildingName(type)} для улучшения`, 'error');
+                return;
+            }
+            
+            const minLevel = Math.min(...buildingsOfType.map(b => b.level));
+            if (minLevel >= 3) {
+                showMessage(`Все ${getBuildingName(type)} уже максимального уровня`, 'error');
+                return;
+            }
+            
+            const upgradeCost = getUpgradeCost(type, minLevel + 1);
+            if (gameState.balance < upgradeCost) {
+                showMessage(`Недостаточно MNRT для улучшения. Нужно: ${upgradeCost}`, 'error');
+                return;
+            }
+            
+            let upgradedCount = 0;
+            gameState.buildings.forEach(building => {
+                if (building.type === type && building.level === minLevel) {
+                    building.level++;
+                    upgradedCount++;
+                }
+            });
+            
+            gameState.balance -= upgradeCost;
+            gameState.statistics.totalUpgrades++;
+            showMessage(`✅ Улучшено ${upgradedCount} ${getBuildingName(type)}`, 'success');
+            updateUI();
+            renderBuildings();
+        }
+
+        // ============================
+        // СТРОИТЕЛЬСТВО ЗДАНИЙ
+        // ============================
         function startBuilding(type) {
             const cost = CONFIG.BUILDING_COSTS[type];
             
@@ -849,7 +897,58 @@
             gameState.placingBuilding = type;
             showMessage(`🏗️ Кликните на карту для размещения ${getBuildingName(type)}`, 'success');
         }
+
+        // ============================
+        // СИСТЕМА ДОБЫЧИ
+        // ============================
         
+        function updateMining() {
+            const now = Date.now();
+            const elapsedSeconds = (now - gameState.lastUpdate) / 1000;
+            gameState.lastUpdate = now;
+            
+            // Расчет энергии и прибыли
+            const stats = calculateEnergyAndProfit();
+            
+            // Если нет прибыли или отрицательная
+            if (stats.profit <= 0) {
+                const upkeepCost = stats.upkeep * elapsedSeconds;
+                if (gameState.baseStorage >= upkeepCost) {
+                    gameState.baseStorage -= upkeepCost;
+                    gameState.statistics.totalUpkeepPaid += upkeepCost;
+                } else {
+                    gameState.baseStorage = 0;
+                    if (gameState.miningActive) {
+                        gameState.miningActive = false;
+                        showMessage('⛔ Недостаточно MNRT для оплаты расходов!', 'error');
+                    }
+                }
+                updateUI();
+                return;
+            }
+            
+            // Чистая добыча
+            const netMined = stats.profit * elapsedSeconds;
+            const availableStorage = CONFIG.BASE_STORAGE_CAPACITY - gameState.baseStorage;
+            const actualMined = Math.min(netMined, availableStorage);
+            
+            if (actualMined > 0) {
+                gameState.baseStorage += actualMined;
+                gameState.statistics.totalMined += actualMined;
+                
+                if (gameState.baseStorage >= CONFIG.BASE_STORAGE_CAPACITY) {
+                    gameState.storageFull = true;
+                    gameState.miningActive = false;
+                    showMessage('🏠 Хранилище заполнено! Соберите ресурсы.', 'error');
+                }
+            }
+            
+            updateUI();
+        }
+
+        // ============================
+        // СБОР РЕСУРСОВ
+        // ============================
         function collectFromBase() {
             if (gameState.baseStorage <= 0) {
                 showMessage('⛏️ Нет ресурсов в хранилище базы', 'error');
@@ -870,97 +969,12 @@
         }
 
         // ============================
-        // ИНИЦИАЛИЗАЦИЯ
+        // РЕНДЕРИНГ ЗДАНИЙ НА КАРТЕ
         // ============================
-        
-        function initGame() {
-            generateMarsSurface();
-            
-            // Показываем пример расчета
-            calculateExample();
-            
-            updateBuildingsTab();
-            updateUI();
-            
-            gameState.lastUpdate = Date.now();
-            setInterval(updateMining, 1000);
-            
-            // Событие клика по карте
-            document.getElementById('mars-surface').addEventListener('click', function(e) {
-                if (!gameState.placingBuilding) return;
-                
-                const rect = this.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                // Проверка расстояния
-                for (const building of gameState.buildings) {
-                    const distance = Math.sqrt(
-                        Math.pow(x - building.x, 2) + 
-                        Math.pow(y - building.y, 2)
-                    );
-                    if (distance < 70) {
-                        showMessage('⚠️ Слишком близко к другому зданию!', 'error');
-                        return;
-                    }
-                }
-                
-                // Строим
-                const cost = CONFIG.BUILDING_COSTS[gameState.placingBuilding];
-                gameState.balance -= cost;
-                
-                const building = {
-                    id: gameState.nextId++,
-                    type: gameState.placingBuilding,
-                    x: x,
-                    y: y,
-                    level: 0
-                };
-                
-                gameState.buildings.push(building);
-                gameState.statistics.totalBuildingsBuilt++;
-                
-                if (gameState.placingBuilding === 'base') {
-                    gameState.hasBase = true;
-                }
-                
-                gameState.placingBuilding = null;
-                updateUI();
-                renderBuildings();
-                
-                showMessage(`✅ ${getBuildingName(building.type)} построена!`, 'success');
-            });
-        }
-        
-        // Вспомогательные функции
-        function getBuildingName(type) {
-            return { base: 'База', mining: 'Буровая', power: 'Электростанция' }[type] || type;
-        }
-        
-        function getBuildingIcon(type) {
-            return { base: '🏠', mining: '⛏️', power: '⚡' }[type] || '🏗️';
-        }
-        
-        function showMessage(text, type) {
-            const messageEl = document.getElementById('message');
-            messageEl.textContent = text;
-            messageEl.className = type === 'error' ? 'message-error' : 'message-success';
-            messageEl.style.display = 'block';
-            setTimeout(() => messageEl.style.display = 'none', 3000);
-        }
-        
-        function switchTab(tabIndex) {
-            document.querySelectorAll('.tab').forEach((tab, index) => {
-                tab.classList.toggle('active', index === tabIndex);
-            });
-            document.querySelectorAll('.tab-content').forEach((content, index) => {
-                content.classList.toggle('active', index === tabIndex);
-            });
-        }
-        
         function generateMarsSurface() {
             const surface = document.getElementById('mars-surface');
             surface.innerHTML = '';
+            
             for (let i = 0; i < 30; i++) {
                 const rock = document.createElement('div');
                 rock.style.position = 'absolute';
@@ -972,35 +986,102 @@
                 rock.style.borderRadius = '50%';
                 surface.appendChild(rock);
             }
+            
+            renderBuildings();
         }
-        
+
+        function createBuildingElement(building) {
+            const div = document.createElement('div');
+            div.className = `building ${building.type}`;
+            div.id = `building-${building.id}`;
+            div.style.left = building.x + 'px';
+            div.style.top = building.y + 'px';
+            
+            const displayLevel = building.level + 1;
+            div.title = `${getBuildingName(building.type)} #${building.id} | Уровень ${displayLevel}`;
+            
+            const icon = document.createElement('div');
+            icon.textContent = getBuildingIcon(building.type);
+            div.appendChild(icon);
+            
+            if (building.level > 0) {
+                const levelBadge = document.createElement('div');
+                levelBadge.className = 'building-level-badge';
+                levelBadge.textContent = displayLevel;
+                div.appendChild(levelBadge);
+            }
+            
+            return div;
+        }
+
         function renderBuildings() {
             const surface = document.getElementById('mars-surface');
             document.querySelectorAll('.building').forEach(el => el.remove());
             
             gameState.buildings.forEach(building => {
-                const div = document.createElement('div');
-                div.className = `building ${building.type}`;
-                div.id = `building-${building.id}`;
-                div.style.left = building.x + 'px';
-                div.style.top = building.y + 'px';
-                div.title = `${getBuildingName(building.type)} #${building.id} | Уровень ${building.level + 1}`;
-                
-                const icon = document.createElement('div');
-                icon.textContent = getBuildingIcon(building.type);
-                div.appendChild(icon);
-                
-                if (building.level > 0) {
-                    const badge = document.createElement('div');
-                    badge.className = 'building-level-badge';
-                    badge.textContent = building.level + 1;
-                    div.appendChild(badge);
-                }
-                
-                surface.appendChild(div);
+                const buildingEl = createBuildingElement(building);
+                surface.appendChild(buildingEl);
             });
         }
 
+        // ============================
+        // ОБРАБОТЧИК КЛИКА ПО КАРТЕ
+        // ============================
+        document.getElementById('mars-surface').addEventListener('click', function(e) {
+            if (!gameState.placingBuilding) return;
+            
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            for (const building of gameState.buildings) {
+                const distance = Math.sqrt(
+                    Math.pow(x - building.x, 2) + 
+                    Math.pow(y - building.y, 2)
+                );
+                if (distance < 70) {
+                    showMessage('⚠️ Слишком близко к другому зданию!', 'error');
+                    return;
+                }
+            }
+            
+            const cost = CONFIG.BUILDING_COSTS[gameState.placingBuilding];
+            gameState.balance -= cost;
+            
+            const building = {
+                id: gameState.nextId++,
+                type: gameState.placingBuilding,
+                x: x,
+                y: y,
+                level: 0
+            };
+            
+            gameState.buildings.push(building);
+            gameState.statistics.totalBuildingsBuilt++;
+            
+            if (gameState.placingBuilding === 'base') {
+                gameState.hasBase = true;
+            }
+            
+            gameState.placingBuilding = null;
+            updateUI();
+            renderBuildings();
+            
+            showMessage(`✅ ${getBuildingName(building.type)} построена!`, 'success');
+        });
+
+        // ============================
+        // ИНИЦИАЛИЗАЦИЯ ИГРЫ
+        // ============================
+        function initGame() {
+            generateMarsSurface();
+            updateUI();
+            
+            gameState.lastUpdate = Date.now();
+            setInterval(updateMining, 1000);
+        }
+
+        // Запуск при загрузке
         window.onload = initGame;
     </script>
 </body>
