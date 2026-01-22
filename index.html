@@ -51,6 +51,24 @@
             font-size: 14px;
         }
         
+        /* НОВЫЙ СЧЕТЧИК ДОБЫЧИ В РЕАЛЬНОМ ВРЕМЕНИ */
+        .mining-counter {
+            background: rgba(139, 69, 19, 0.3);
+            border: 1px solid #D2691E;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            animation: pulse-counter 2s infinite;
+        }
+        
+        .mining-counter-value {
+            color: #00FF00;
+            font-weight: bold;
+        }
+        
         .collect-btn {
             background: linear-gradient(135deg, #2E8B57, #3CB371);
             color: white;
@@ -306,6 +324,44 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+        }
+        
+        /* TELEGRAM USER INFO */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(139, 69, 19, 0.2);
+            border-radius: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .user-details {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .user-id {
+            font-size: 11px;
+            color: #888;
         }
         
         .wallet-info {
@@ -573,8 +629,8 @@
         /* ЗДАНИЯ НА КАРТЕ */
         .building {
             position: absolute;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border: 2px solid white;
             border-radius: 8px;
             transform: translate(-50%, -50%);
@@ -584,12 +640,13 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 24px;
         }
         
         .building:hover {
             transform: translate(-50%, -50%) scale(1.1);
             box-shadow: 0 0 15px white;
+            z-index: 100;
         }
         
         .building.base { 
@@ -610,6 +667,28 @@
             box-shadow: 0 0 20px red;
         }
         
+        /* ЭФФЕКТ ДОБЫЧИ ДЛЯ БУРОВОЙ */
+        .mining-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, rgba(255,215,0,0) 70%);
+            animation: mining-pulse 1.5s infinite;
+            pointer-events: none;
+        }
+        
+        /* ЭФФЕКТ ЭНЕРГИИ ДЛЯ ЭЛЕКТРОСТАНЦИИ */
+        .power-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            background: radial-gradient(circle, rgba(0,255,255,0.3) 0%, rgba(0,255,255,0) 70%);
+            animation: power-pulse 1s infinite;
+            pointer-events: none;
+        }
+        
         .building-level-badge {
             position: absolute;
             top: -5px;
@@ -625,6 +704,100 @@
             font-size: 10px;
             font-weight: bold;
             border: 1px solid white;
+            z-index: 2;
+        }
+        
+        /* МЕНЮ УПРАВЛЕНИЯ ЗДАНИЕМ */
+        .building-context-menu {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #8B4513;
+            border-radius: 10px;
+            padding: 10px;
+            min-width: 150px;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        
+        .building-context-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #8B4513;
+        }
+        
+        .building-context-menu-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: gold;
+        }
+        
+        .building-context-menu-close {
+            background: none;
+            border: none;
+            color: #FF5555;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .building-context-menu-close:hover {
+            background: rgba(255,85,85,0.2);
+        }
+        
+        .building-context-menu-btn {
+            background: rgba(139, 69, 19, 0.3);
+            border: 1px solid #D2691E;
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: white;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+        
+        .building-context-menu-btn:hover {
+            background: rgba(139, 69, 19, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .building-context-menu-btn.delete {
+            background: rgba(255, 85, 85, 0.3);
+            border-color: #FF5555;
+            color: #FF9999;
+        }
+        
+        .building-context-menu-btn.delete:hover {
+            background: rgba(255, 85, 85, 0.5);
+        }
+        
+        .building-context-menu-btn.move {
+            background: rgba(70, 130, 180, 0.3);
+            border-color: #467CBE;
+            color: #99CCFF;
+        }
+        
+        .building-context-menu-btn.move:hover {
+            background: rgba(70, 130, 180, 0.5);
+        }
+        
+        .building-context-menu-btn.move.active {
+            background: rgba(70, 130, 180, 0.7);
+            animation: move-mode-pulse 1s infinite;
         }
         
         /* КАМНИ */
@@ -683,6 +856,7 @@
             animation: pulse-green 1.5s infinite;
         }
         
+        /* АНИМАЦИИ */
         @keyframes pulse-green {
             0% { opacity: 1; }
             50% { opacity: 0.7; }
@@ -701,6 +875,64 @@
             100% { box-shadow: 0 0 5px rgba(70, 130, 180, 0.5); }
         }
         
+        /* АНИМАЦИЯ ДОБЫЧИ */
+        @keyframes mining-pulse {
+            0% { 
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+            100% { 
+                opacity: 0.3;
+                transform: scale(1);
+            }
+        }
+        
+        /* АНИМАЦИЯ ЭНЕРГИИ */
+        @keyframes power-pulse {
+            0% { 
+                opacity: 0.2;
+                transform: scale(1);
+                box-shadow: 0 0 10px rgba(0,255,255,0.5);
+            }
+            50% { 
+                opacity: 0.8;
+                transform: scale(1.15);
+                box-shadow: 0 0 20px rgba(0,255,255,0.8);
+            }
+            100% { 
+                opacity: 0.2;
+                transform: scale(1);
+                box-shadow: 0 0 10px rgba(0,255,255,0.5);
+            }
+        }
+        
+        /* АНИМАЦИЯ СЧЕТЧИКА ДОБЫЧИ */
+        @keyframes pulse-counter {
+            0% { box-shadow: 0 0 5px rgba(139, 69, 19, 0.3); }
+            50% { box-shadow: 0 0 15px rgba(139, 69, 19, 0.6); }
+            100% { box-shadow: 0 0 5px rgba(139, 69, 19, 0.3); }
+        }
+        
+        /* АНИМАЦИЯ РЕЖИМА ПЕРЕМЕЩЕНИЯ */
+        @keyframes move-mode-pulse {
+            0% { 
+                border-color: #467CBE;
+                box-shadow: 0 0 10px rgba(70, 130, 180, 0.5);
+            }
+            50% { 
+                border-color: #00FF00;
+                box-shadow: 0 0 20px rgba(70, 130, 180, 0.8);
+            }
+            100% { 
+                border-color: #467CBE;
+                box-shadow: 0 0 10px rgba(70, 130, 180, 0.5);
+            }
+        }
+        
         /* LOADING SPINNER */
         .spinner {
             display: inline-block;
@@ -714,6 +946,105 @@
         
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        
+        /* BACKEND CONNECTION STATUS */
+        .connection-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 1000;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .status-connected { background: #00ff00; }
+        .status-disconnected { background: #ff0000; }
+        .status-connecting { background: #ffff00; animation: pulse 1s infinite; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        /* ПРЕДУПРЕЖДЕНИЕ ПРИ УДАЛЕНИИ */
+        .delete-confirm {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #FF5555;
+            border-radius: 15px;
+            padding: 20px;
+            width: 300px;
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 0 30px rgba(255,0,0,0.5);
+        }
+        
+        .delete-confirm-header {
+            text-align: center;
+            color: #FF5555;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .delete-confirm-message {
+            text-align: center;
+            font-size: 14px;
+            color: #ccc;
+            line-height: 1.4;
+        }
+        
+        .delete-confirm-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .confirm-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .confirm-btn.yes {
+            background: linear-gradient(135deg, #FF5555, #FF0000);
+            color: white;
+        }
+        
+        .confirm-btn.yes:hover {
+            background: linear-gradient(135deg, #FF0000, #CC0000);
+        }
+        
+        .confirm-btn.no {
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            color: white;
+        }
+        
+        .confirm-btn.no:hover {
+            background: linear-gradient(135deg, #3CB371, #66CDAA);
         }
     </style>
 </head>
@@ -739,11 +1070,17 @@
                 <span>🏗️</span>
                 <span class="stat-value" id="building-count">0</span>
             </div>
+            <!-- СЧЕТЧИК ДОБЫЧИ В РЕАЛЬНОМ ВРЕМЕНИ -->
+            <div class="mining-counter" id="mining-counter">
+                <span>⛏️</span>
+                <span>Добыча:</span>
+                <span class="mining-counter-value" id="mining-rate">0.000/сек</span>
+            </div>
         </div>
         
         <button class="collect-btn" onclick="collectFromBase()" id="collect-btn" disabled>
             <span>💰</span>
-            <span>Собрать в игру</span>
+            <span>Собрать на баланс</span>
         </button>
     </div>
     
@@ -782,6 +1119,16 @@
             
             <div class="tab-content" id="tab-2">
                 <div id="wallet-tab">
+                    <!-- TELEGRAM USER INFO -->
+                    <div id="telegram-user-info" class="user-info" style="display: none;">
+                        <div class="user-avatar" id="user-avatar">👤</div>
+                        <div class="user-details">
+                            <div class="user-name" id="user-name">Игрок</div>
+                            <div class="user-id" id="user-id">ID: —</div>
+                        </div>
+                    </div>
+                    
+                    <!-- КОШЕЛЕК -->
                     <div class="wallet-info">
                         <div class="wallet-section">
                             <div class="wallet-section-title">
@@ -928,18 +1275,728 @@
         </div>
     </div>
     
+    <!-- МЕНЮ УПРАВЛЕНИЯ ЗДАНИЕМ -->
+    <div id="building-context-menu" class="building-context-menu">
+        <div class="building-context-menu-header">
+            <div class="building-context-menu-title" id="context-menu-title">Здание #0</div>
+            <button class="building-context-menu-close" onclick="closeContextMenu()">✕</button>
+        </div>
+        <button class="building-context-menu-btn move" id="move-building-btn" onclick="toggleMoveMode()">
+            <span>📍</span>
+            <span>Переместить</span>
+        </button>
+        <button class="building-context-menu-btn delete" onclick="confirmDeleteBuilding()">
+            <span>🗑️</span>
+            <span>Удалить здание</span>
+        </button>
+    </div>
+    
+    <!-- ПОДТВЕРЖДЕНИЕ УДАЛЕНИЯ -->
+    <div id="delete-confirm" class="delete-confirm">
+        <div class="delete-confirm-header">⚠️ Удаление здания</div>
+        <div class="delete-confirm-message" id="delete-confirm-message">
+            Вы уверены, что хотите удалить это здание? Это действие нельзя отменить.
+        </div>
+        <div class="delete-confirm-buttons">
+            <button class="confirm-btn yes" onclick="deleteBuildingConfirmed()">Да, удалить</button>
+            <button class="confirm-btn no" onclick="cancelDeleteBuilding()">Отмена</button>
+        </div>
+    </div>
+    
     <!-- СООБЩЕНИЯ -->
     <div id="message"></div>
+    
+    <!-- CONNECTION STATUS -->
+    <div id="connection-status" class="connection-status" style="display: none;">
+        <div class="status-dot status-connecting"></div>
+        <span>Подключение к серверу...</span>
+    </div>
 
+    <!-- TELEGRAM WEB APP SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <script>
         // ============================
-        // КОНСТАНТЫ ИГРЫ
+        // ТЕЛЕГРАМ WEB APP ИНИЦИАЛИЗАЦИЯ
         // ============================
+        let TelegramWebApp = window.Telegram.WebApp;
+        // ЗАМЕНИТЕ НА ВАШ БЭКЕНД URL
+        let backendUrl = "https://your-backend-url.com"; 
+        
+        // Глобальные переменные
+        let telegramUser = null;
+        let backendConnected = false;
+        let lastAutoSave = Date.now();
+        
+        // Новые переменные для управления зданиями
+        let selectedBuildingId = null;
+        let movingBuildingId = null;
+        let buildingToDeleteId = null;
+        let currentMiningRate = 0;
+        
+        // Инициализация Telegram Web App
+        function initTelegramWebApp() {
+            if (typeof TelegramWebApp !== 'undefined') {
+                console.log('Telegram Web App SDK загружен');
+                
+                // Расширяем Web App на весь экран
+                TelegramWebApp.expand();
+                
+                // Включаем кнопку "Назад"
+                TelegramWebApp.BackButton.show();
+                TelegramWebApp.BackButton.onClick(() => {
+                    TelegramWebApp.close();
+                });
+                
+                // Устанавливаем тему
+                TelegramWebApp.setHeaderColor('#8B4513');
+                TelegramWebApp.setBackgroundColor('#0a0a1a');
+                
+                // Получаем данные пользователя
+                const user = TelegramWebApp.initDataUnsafe?.user;
+                
+                if (user) {
+                    console.log('Данные пользователя получены:', user);
+                    
+                    // Сохраняем данные пользователя
+                    telegramUser = {
+                        id: user.id,
+                        username: user.username,
+                        firstName: user.first_name,
+                        lastName: user.last_name,
+                        languageCode: user.language_code,
+                        photoUrl: user.photo_url
+                    };
+                    
+                    // Показываем информацию о пользователе
+                    document.getElementById('telegram-user-info').style.display = 'flex';
+                    document.getElementById('user-name').textContent = 
+                        user.first_name + (user.last_name ? ' ' + user.last_name : '') || 'Игрок';
+                    document.getElementById('user-id').textContent = `ID: ${user.id}`;
+                    
+                    // Устанавливаем аватар
+                    const avatarEl = document.getElementById('user-avatar');
+                    if (user.photo_url) {
+                        avatarEl.style.backgroundImage = `url(${user.photo_url})`;
+                        avatarEl.style.backgroundSize = 'cover';
+                        avatarEl.style.backgroundPosition = 'center';
+                        avatarEl.textContent = '';
+                    } else {
+                        // Используем первую букву имени или эмодзи
+                        const firstName = user.first_name || 'И';
+                        avatarEl.textContent = firstName.charAt(0).toUpperCase();
+                    }
+                    
+                    // Инициализируем игру с данными пользователя
+                    initGame();
+                    
+                    // Подключаемся к бэкенду
+                    connectToBackend();
+                    
+                } else {
+                    console.warn('Данные пользователя не получены - тестовый режим');
+                    // Тестовый режим
+                    telegramUser = {
+                        id: Date.now(),
+                        username: 'test_user',
+                        firstName: 'Тестовый',
+                        lastName: 'Пользователь'
+                    };
+                    initGame();
+                }
+            } else {
+                console.warn('Telegram Web App SDK не найден - тестовый режим');
+                // Тестовый режим без Telegram
+                telegramUser = {
+                    id: Date.now(),
+                    username: 'test_user',
+                    firstName: 'Тестовый',
+                    lastName: 'Пользователь'
+                };
+                initGame();
+            }
+        }
+        
+        // Отправка данных обратно в бота
+        function sendDataToBot(data) {
+            if (typeof TelegramWebApp !== 'undefined' && TelegramWebApp.sendData) {
+                try {
+                    TelegramWebApp.sendData(JSON.stringify(data));
+                    console.log('Данные отправлены в бота:', data);
+                } catch (error) {
+                    console.error('Ошибка отправки данных в бота:', error);
+                }
+            }
+        }
+        
+        // ============================
+        // BACKEND CONNECTION SYSTEM
+        // ============================
+        function updateConnectionStatus(status, message) {
+            const statusEl = document.getElementById('connection-status');
+            
+            statusEl.style.display = 'flex';
+            statusEl.innerHTML = '';
+            
+            const dot = document.createElement('div');
+            dot.className = 'status-dot';
+            
+            switch(status) {
+                case 'connected':
+                    dot.classList.add('status-connected');
+                    statusEl.innerHTML = '<div class="status-dot status-connected"></div><span>Подключено</span>';
+                    backendConnected = true;
+                    break;
+                case 'connecting':
+                    dot.classList.add('status-connecting');
+                    statusEl.innerHTML = '<div class="status-dot status-connecting"></div><span>' + (message || 'Подключение...') + '</span>';
+                    backendConnected = false;
+                    break;
+                case 'disconnected':
+                    dot.classList.add('status-disconnected');
+                    statusEl.innerHTML = '<div class="status-dot status-disconnected"></div><span>Нет соединения</span>';
+                    backendConnected = false;
+                    break;
+            }
+        }
+        
+        async function connectToBackend() {
+            updateConnectionStatus('connecting', 'Подключение к серверу...');
+            
+            try {
+                // Проверяем соединение с бэкендом через /api/health
+                const response = await fetch(`${backendUrl}/api/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    updateConnectionStatus('connected');
+                    console.log('Бэкенд подключен');
+                    
+                    // Загружаем данные пользователя
+                    await loadUserData();
+                    
+                    // Загружаем игровой прогресс
+                    await loadGameProgress();
+                    
+                    // Загружаем адрес кошелька
+                    await loadWalletAddress();
+                    
+                    // Загружаем статистику
+                    await loadLeaderboard();
+                    
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.log('Бэкенд недоступен, работаем в автономном режиме:', error.message);
+                updateConnectionStatus('disconnected');
+                
+                // Загружаем локальные данные
+                loadLocalGameProgress();
+                loadLocalWalletAddress();
+                
+                // Показываем тестовую статистику
+                showTestLeaderboard();
+                
+                showMessage('Сервер недоступен. Игра в автономном режиме.', 'error');
+            }
+        }
+        
+        // ============================
+        // BACKEND API FUNCTIONS
+        // ============================
+        
+        // 1. Проверка работы сервера
+        async function checkBackendHealth() {
+            try {
+                const response = await fetch(`${backendUrl}/api/health`);
+                return response.ok;
+            } catch (error) {
+                return false;
+            }
+        }
+        
+        // 2. Получение данных пользователя
+        async function loadUserData() {
+            if (!backendUrl || !telegramUser) return;
+            
+            try {
+                const response = await fetch(`${backendUrl}/api/user/${telegramUser.id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Telegram-User-Id': telegramUser.id.toString()
+                    }
+                });
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    console.log('Данные пользователя загружены:', userData);
+                    
+                    // Обновляем состояние игры данными из бэкенда
+                    if (userData.gameBalance !== undefined) {
+                        gameState.gameBalance = userData.gameBalance;
+                    }
+                    if (userData.lastWithdrawal) {
+                        gameState.lastWithdrawal = new Date(userData.lastWithdrawal).getTime();
+                    }
+                    
+                    updateUI();
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки данных пользователя:', error);
+            }
+        }
+        
+        // 3. Сохранение прогресса игры
+        async function saveGameProgress() {
+            if (!backendUrl || !telegramUser || !backendConnected) {
+                // Сохраняем локально если бэкенд недоступен
+                saveLocalGameProgress();
+                return;
+            }
+            
+            const gameData = {
+                telegramId: telegramUser.id,
+                gameBalance: gameState.gameBalance,
+                baseStorage: gameState.baseStorage,
+                totalMinedAllTime: gameState.totalMinedAllTime,
+                buildings: gameState.buildings,
+                hasBase: gameState.hasBase,
+                freeBuildingsUsed: gameState.freeBuildingsUsed,
+                statistics: gameState.statistics,
+                lastUpdate: new Date().toISOString()
+            };
+            
+            try {
+                const response = await fetch(`${backendUrl}/api/game/save`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Telegram-User-Id': telegramUser.id.toString()
+                    },
+                    body: JSON.stringify(gameData)
+                });
+                
+                if (response.ok) {
+                    console.log('Прогресс игры сохранен на сервере');
+                    // Также сохраняем локально для надежности
+                    saveLocalGameProgress();
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Ошибка сохранения прогресса на сервере, сохраняем локально:', error);
+                saveLocalGameProgress();
+            }
+        }
+        
+        // 4. Загрузка прогресса игры
+        async function loadGameProgress() {
+            if (!backendUrl || !telegramUser || !backendConnected) {
+                loadLocalGameProgress();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${backendUrl}/api/game/${telegramUser.id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Telegram-User-Id': telegramUser.id.toString()
+                    }
+                });
+                
+                if (response.ok) {
+                    const gameData = await response.json();
+                    console.log('Прогресс игры загружен с сервера:', gameData);
+                    
+                    // Восстанавливаем состояние игры
+                    if (gameData.gameBalance !== undefined) {
+                        gameState.gameBalance = gameData.gameBalance;
+                    }
+                    if (gameData.baseStorage !== undefined) {
+                        gameState.baseStorage = gameData.baseStorage;
+                    }
+                    if (gameData.totalMinedAllTime !== undefined) {
+                        gameState.totalMinedAllTime = gameData.totalMinedAllTime;
+                    }
+                    if (gameData.buildings) {
+                        gameState.buildings = gameData.buildings;
+                        gameState.hasBase = gameData.buildings.some(b => b.type === 'base');
+                    }
+                    if (gameData.freeBuildingsUsed) {
+                        gameState.freeBuildingsUsed = gameData.freeBuildingsUsed;
+                    }
+                    if (gameData.statistics) {
+                        gameState.statistics = gameData.statistics;
+                    }
+                    
+                    // Восстанавливаем следующий ID
+                    if (gameState.buildings.length > 0) {
+                        gameState.nextId = Math.max(...gameState.buildings.map(b => b.id)) + 1;
+                    }
+                    
+                    updateUI();
+                    renderBuildings();
+                    
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки прогресса с сервера, загружаем локально:', error);
+                loadLocalGameProgress();
+            }
+        }
+        
+        // 5. Сохранение BSC адреса
+        async function saveBSCAddress() {
+            const addressInput = document.getElementById('bsc-address-input');
+            const address = addressInput.value.trim();
+            
+            // Валидация BSC адреса
+            if (!address.startsWith('0x') || address.length !== 42) {
+                showMessage('Неверный формат BSC адреса. Должен начинаться с 0x и быть 42 символа', 'error');
+                addressInput.focus();
+                return;
+            }
+            
+            const saveBtn = document.getElementById('edit-address-btn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<div class="spinner"></div><span>Сохранение...</span>';
+            saveBtn.disabled = true;
+            
+            try {
+                if (backendUrl && telegramUser && backendConnected) {
+                    // Сохраняем в бэкенд
+                    const response = await fetch(`${backendUrl}/api/wallet/save`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Telegram-User-Id': telegramUser.id.toString()
+                        },
+                        body: JSON.stringify({
+                            telegramId: telegramUser.id,
+                            bscAddress: address
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        gameState.walletAddress = address;
+                        updateWalletDisplay();
+                        showMessage('✅ BSC адрес сохранен на сервере!', 'success');
+                        
+                        // Отправляем уведомление в бота
+                        sendDataToBot({
+                            type: 'wallet_address_saved',
+                            address: address,
+                            timestamp: new Date().toISOString()
+                        });
+                        
+                    } else {
+                        throw new Error('Ошибка сервера');
+                    }
+                } else {
+                    // Локальное сохранение
+                    gameState.walletAddress = address;
+                    localStorage.setItem(`mars_wallet_${telegramUser.id}`, address);
+                    updateWalletDisplay();
+                    showMessage('✅ BSC адрес сохранен локально!', 'success');
+                }
+                
+                toggleAddressInput(); // Возвращаемся к отображению
+                
+            } catch (error) {
+                console.error('Ошибка сохранения адреса:', error);
+                showMessage('❌ Ошибка сохранения адреса. Сохраняем локально.', 'error');
+                
+                // Все равно сохраняем локально
+                gameState.walletAddress = address;
+                localStorage.setItem(`mars_wallet_${telegramUser.id}`, address);
+                updateWalletDisplay();
+                toggleAddressInput();
+            } finally {
+                saveBtn.innerHTML = originalText;
+                saveBtn.disabled = false;
+            }
+        }
+        
+        // 6. Загрузка адреса кошелька
+        async function loadWalletAddress() {
+            if (!backendUrl || !telegramUser || !backendConnected) {
+                loadLocalWalletAddress();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${backendUrl}/api/wallet/${telegramUser.id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Telegram-User-Id': telegramUser.id.toString()
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.address) {
+                        gameState.walletAddress = data.address;
+                        updateWalletDisplay();
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки адреса с сервера:', error);
+                loadLocalWalletAddress();
+            }
+        }
+        
+        // 7. Инициирование вывода
+        async function withdrawFunds() {
+            const amountInput = document.getElementById('withdraw-amount');
+            const amount = parseFloat(amountInput.value);
+            
+            // Валидация
+            if (!amount || amount <= 0) {
+                showMessage('Введите корректную сумму', 'error');
+                return;
+            }
+            
+            if (amount < CONFIG.WITHDRAWAL_MIN) {
+                showMessage(`Минимальная сумма вывода: ${CONFIG.WITHDRAWAL_MIN} MNRT`, 'error');
+                return;
+            }
+            
+            if (amount > gameState.gameBalance) {
+                showMessage('Недостаточно средств на балансе', 'error');
+                return;
+            }
+            
+            if (!gameState.walletAddress) {
+                showMessage('Сначала введите и сохраните BSC адрес', 'error');
+                return;
+            }
+            
+            // Проверка кулдауна
+            if (gameState.lastWithdrawal) {
+                const timeSinceLast = Date.now() - gameState.lastWithdrawal;
+                if (timeSinceLast < CONFIG.WITHDRAWAL_COOLDOWN) {
+                    const remaining = CONFIG.WITHDRAWAL_COOLDOWN - timeSinceLast;
+                    const hours = Math.floor(remaining / (1000 * 60 * 60));
+                    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    showMessage(`Вывод возможен через: ${hours}ч ${minutes}м`, 'error');
+                    return;
+                }
+            }
+            
+            const withdrawBtn = document.getElementById('withdraw-btn');
+            const originalText = withdrawBtn.innerHTML;
+            withdrawBtn.innerHTML = '<div class="spinner"></div><span>Обработка...</span>';
+            withdrawBtn.disabled = true;
+            
+            try {
+                if (backendUrl && telegramUser && backendConnected) {
+                    // Отправляем запрос на вывод через бэкенд
+                    const response = await fetch(`${backendUrl}/api/withdraw`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Telegram-User-Id': telegramUser.id.toString()
+                        },
+                        body: JSON.stringify({
+                            telegramId: telegramUser.id,
+                            amount: amount,
+                            bscAddress: gameState.walletAddress
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            gameState.gameBalance -= amount;
+                            gameState.lastWithdrawal = Date.now();
+                            
+                            // Сохраняем транзакцию
+                            if (result.txHash) {
+                                const txData = {
+                                    type: 'withdrawal',
+                                    amount: amount,
+                                    txHash: result.txHash,
+                                    address: gameState.walletAddress,
+                                    timestamp: new Date().toISOString()
+                                };
+                                localStorage.setItem(`mars_tx_${Date.now()}`, JSON.stringify(txData));
+                            }
+                            
+                            showMessage(`✅ Вывод ${amount} MNRT инициирован! Транзакция: ${result.txHash || 'ожидание'}`, 'success');
+                            
+                            // Отправляем уведомление в бота
+                            sendDataToBot({
+                                type: 'withdrawal_initiated',
+                                amount: amount,
+                                txHash: result.txHash,
+                                address: gameState.walletAddress,
+                                timestamp: new Date().toISOString()
+                            });
+                            
+                            updateUI();
+                            amountInput.value = '';
+                            
+                            // Сохраняем прогресс
+                            saveGameProgress();
+                            
+                        } else {
+                            throw new Error(result.message || 'Ошибка вывода');
+                        }
+                    } else {
+                        throw new Error('Ошибка сервера');
+                    }
+                } else {
+                    // Автономный режим - симуляция
+                    showMessage('⏳ Бэкенд недоступен. В тестовом режиме вывод эмулируется.', 'success');
+                    
+                    setTimeout(() => {
+                        gameState.gameBalance -= amount;
+                        gameState.lastWithdrawal = Date.now();
+                        
+                        const testTxHash = '0x' + Array.from({length: 64}, () => 
+                            Math.floor(Math.random() * 16).toString(16)).join('');
+                        
+                        // Сохраняем транзакцию
+                        const txData = {
+                            type: 'withdrawal',
+                            amount: amount,
+                            txHash: testTxHash,
+                            address: gameState.walletAddress,
+                            timestamp: new Date().toISOString(),
+                            test: true
+                        };
+                        localStorage.setItem(`mars_tx_${Date.now()}`, JSON.stringify(txData));
+                        
+                        showMessage(`✅ Тест: Вывод ${amount} MNRT на адрес ${gameState.walletAddress.slice(0, 10)}... (${testTxHash.slice(0, 10)}...)`, 'success');
+                        
+                        // Отправляем уведомление в бота
+                        sendDataToBot({
+                            type: 'withdrawal_simulated',
+                            amount: amount,
+                            txHash: testTxHash,
+                            address: gameState.walletAddress,
+                            timestamp: new Date().toISOString(),
+                            test: true
+                        });
+                        
+                        updateUI();
+                        amountInput.value = '';
+                        
+                        // Сохраняем локально
+                        saveLocalGameProgress();
+                        
+                        withdrawBtn.innerHTML = originalText;
+                        withdrawBtn.disabled = false;
+                    }, 2000);
+                    return;
+                }
+                
+            } catch (error) {
+                console.error('Ошибка вывода:', error);
+                showMessage(`❌ Ошибка вывода: ${error.message}`, 'error');
+            } finally {
+                if (backendUrl && backendConnected) {
+                    withdrawBtn.innerHTML = originalText;
+                    withdrawBtn.disabled = false;
+                }
+            }
+        }
+        
+        // ============================
+        // LOCAL STORAGE FUNCTIONS
+        // ============================
+        function saveLocalGameProgress() {
+            const gameData = {
+                gameBalance: gameState.gameBalance,
+                baseStorage: gameState.baseStorage,
+                totalMinedAllTime: gameState.totalMinedAllTime,
+                buildings: gameState.buildings,
+                hasBase: gameState.hasBase,
+                freeBuildingsUsed: gameState.freeBuildingsUsed,
+                statistics: gameState.statistics,
+                lastWithdrawal: gameState.lastWithdrawal,
+                lastUpdate: new Date().toISOString()
+            };
+            
+            const key = telegramUser ? `mars_game_${telegramUser.id}` : 'mars_game_local';
+            localStorage.setItem(key, JSON.stringify(gameData));
+            console.log('Прогресс сохранен локально');
+        }
+        
+        function loadLocalGameProgress() {
+            const key = telegramUser ? `mars_game_${telegramUser.id}` : 'mars_game_local';
+            const savedData = localStorage.getItem(key);
+            
+            if (savedData) {
+                try {
+                    const gameData = JSON.parse(savedData);
+                    console.log('Локальный прогресс загружен:', gameData);
+                    
+                    // Восстанавливаем состояние игры
+                    if (gameData.gameBalance !== undefined) {
+                        gameState.gameBalance = gameData.gameBalance;
+                    }
+                    if (gameData.baseStorage !== undefined) {
+                        gameState.baseStorage = gameData.baseStorage;
+                    }
+                    if (gameData.totalMinedAllTime !== undefined) {
+                        gameState.totalMinedAllTime = gameData.totalMinedAllTime;
+                    }
+                    if (gameData.buildings) {
+                        gameState.buildings = gameData.buildings;
+                        gameState.hasBase = gameData.buildings.some(b => b.type === 'base');
+                    }
+                    if (gameData.freeBuildingsUsed) {
+                        gameState.freeBuildingsUsed = gameData.freeBuildingsUsed;
+                    }
+                    if (gameData.statistics) {
+                        gameState.statistics = gameData.statistics;
+                    }
+                    if (gameData.lastWithdrawal) {
+                        gameState.lastWithdrawal = new Date(gameData.lastWithdrawal).getTime();
+                    }
+                    
+                    // Восстанавливаем следующий ID
+                    if (gameState.buildings.length > 0) {
+                        gameState.nextId = Math.max(...gameState.buildings.map(b => b.id)) + 1;
+                    }
+                    
+                } catch (error) {
+                    console.error('Ошибка загрузки локального прогресса:', error);
+                }
+            }
+        }
+        
+        function loadLocalWalletAddress() {
+            if (telegramUser) {
+                const savedAddress = localStorage.getItem(`mars_wallet_${telegramUser.id}`);
+                if (savedAddress) {
+                    gameState.walletAddress = savedAddress;
+                    updateWalletDisplay();
+                }
+            }
+        }
+        
+        // ============================
+        // ОСТАВШАЯСЯ ЛОГИКА ИГРЫ
+        // ============================
+        
+        // Конфигурация игры
         const CONFIG = {
             MINING_RATE: 0.001,
             BASE_STORAGE_CAPACITY: 100,
             
-            // Бесплатные здания для новых игроков
             FREE_BUILDINGS: {
                 base: true,
                 mining: true,
@@ -966,8 +2023,8 @@
             
             BUILDING_COSTS: {
                 base: 100,
-                mining: 200,
-                power: 200
+                mining: 400,
+                power: 400
             },
             
             ENERGY_CONSUMPTION: {
@@ -993,11 +2050,9 @@
             GAS_FEE: 0.001
         };
 
-        // ============================
-        // СОСТОЯНИЕ ИГРЫ
-        // ============================
+        // Состояние игры
         let gameState = {
-            balance: 0.0, // Убрали начальные 500 MNRT
+            balance: 0.0,
             baseStorage: 0.0,
             totalMinedAllTime: 0.0,
             buildings: [],
@@ -1016,14 +2071,12 @@
             gameStartTime: Date.now(),
             playTime: 0,
             
-            // Счетчик бесплатных построек
             freeBuildingsUsed: {
                 base: false,
                 mining: false,
                 power: false
             },
             
-            // Статистика
             statistics: {
                 totalMined: 0,
                 totalBuildings: 0,
@@ -1031,9 +2084,7 @@
             }
         };
 
-        // ============================
-        // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-        // ============================
+        // Вспомогательные функции
         function getBuildingName(type) {
             const names = {
                 base: 'База',
@@ -1063,9 +2114,7 @@
             }, 3000);
         }
 
-        // ============================
-        // СИСТЕМА ВКЛАДОК
-        // ============================
+        // Система вкладок
         function switchTab(tabIndex) {
             document.querySelectorAll('.tab').forEach((tab, index) => {
                 tab.classList.toggle('active', index === tabIndex);
@@ -1075,7 +2124,6 @@
                 content.classList.toggle('active', index === tabIndex);
             });
             
-            // Обновляем контент при переключении
             if (tabIndex === 1) {
                 updateMyBuildingsTab();
             } else if (tabIndex === 2) {
@@ -1103,11 +2151,8 @@
             }
         }
 
-        // ============================
-        // ОБНОВЛЕНИЕ ИНТЕРФЕЙСА
-        // ============================
+        // Обновление интерфейса
         function updateUI() {
-            // Обновляем верхнюю панель
             document.getElementById('balance').textContent = gameState.gameBalance.toFixed(2);
             
             document.getElementById('storage').textContent = 
@@ -1126,27 +2171,55 @@
             
             document.getElementById('building-count').textContent = gameState.buildings.length;
             
+            // Обновляем счетчик добычи
+            updateMiningCounter();
+            
             const collectBtn = document.getElementById('collect-btn');
             collectBtn.disabled = gameState.baseStorage <= 0;
             
-            // Обновляем все вкладки
             updateBuildingsTab();
             updateMyBuildingsTab();
             updateWalletTab();
             updateStatsTab();
             
-            // Автосохранение прогресса
+            // Автосохранение каждые 30 секунд
             if (Date.now() - lastAutoSave > 30000) {
                 saveGameProgress();
                 lastAutoSave = Date.now();
             }
             
-            // Обновляем время игры
             gameState.playTime = Math.floor((Date.now() - gameState.gameStartTime) / 1000);
         }
-        
-        let lastAutoSave = Date.now();
 
+        // Обновление счетчика добычи
+        function updateMiningCounter() {
+            const activeMiningBuildings = gameState.buildings.filter(b => 
+                b.type === 'mining' && b.hasPower
+            );
+            
+            currentMiningRate = 0;
+            activeMiningBuildings.forEach(building => {
+                currentMiningRate += calculateMiningRate(building);
+            });
+            
+            // Вычитаем расходы
+            const upkeepPerSecond = calculateUpkeep();
+            const netMiningRate = currentMiningRate - upkeepPerSecond;
+            
+            const counterEl = document.getElementById('mining-rate');
+            if (netMiningRate > 0) {
+                counterEl.textContent = `+${netMiningRate.toFixed(3)}/сек`;
+                counterEl.style.color = '#00FF00';
+            } else if (netMiningRate < 0) {
+                counterEl.textContent = `${netMiningRate.toFixed(3)}/сек`;
+                counterEl.style.color = '#FF5555';
+            } else {
+                counterEl.textContent = '0.000/сек';
+                counterEl.style.color = '#ccc';
+            }
+        }
+
+        // Остальные функции игры
         function updateBuildingsTab() {
             const container = document.getElementById('buildings-tab');
             container.innerHTML = '';
@@ -1158,7 +2231,6 @@
                 const maxLevel = ownedCount > 0 ? 
                     Math.max(...gameState.buildings.filter(b => b.type === type).map(b => b.level)) : -1;
                 
-                // Проверяем, доступна ли бесплатная постройка
                 const isFirstBuildingFree = CONFIG.FREE_BUILDINGS[type] && !gameState.freeBuildingsUsed[type];
                 const cost = isFirstBuildingFree ? 0 : CONFIG.BUILDING_COSTS[type];
                 
@@ -1175,7 +2247,6 @@
                     `🏗️ Построить БЕСПЛАТНО!` : 
                     `🏗️ Построить (${cost} MNRT)`;
                 
-                // Информация о здании
                 let buildingInfo = '';
                 if (type === 'base') {
                     buildingInfo = 'Хранилище: 100 MNRT<br>Расходы: 0.0002 MNRT/сек';
@@ -1235,7 +2306,6 @@
             container.innerHTML = '<div class="buildings-grid" id="my-buildings-grid"></div>';
             const grid = document.getElementById('my-buildings-grid');
             
-            // Группируем здания по типам
             const buildingGroups = {};
             gameState.buildings.forEach(building => {
                 if (!buildingGroups[building.type]) {
@@ -1244,13 +2314,10 @@
                 buildingGroups[building.type].push(building);
             });
             
-            // Создаем карточки для каждого типа зданий
             Object.entries(buildingGroups).forEach(([type, buildings]) => {
-                // Считаем количество зданий каждого уровня
                 const levelCounts = {0: 0, 1: 0, 2: 0, 3: 0};
                 buildings.forEach(b => levelCounts[b.level]++);
                 
-                // Считаем статистику
                 let totalMining = 0;
                 let totalEnergy = 0;
                 let totalUpkeep = 0;
@@ -1332,18 +2399,14 @@
         }
 
         function updateWalletTab() {
-            // Обновляем баланс
             document.getElementById('wallet-game-balance').textContent = 
                 gameState.gameBalance.toFixed(2) + ' MNRT';
             
-            // Обновляем минимальный вывод и комиссию
             document.getElementById('min-withdraw').textContent = CONFIG.WITHDRAWAL_MIN;
             document.getElementById('gas-fee').textContent = CONFIG.GAS_FEE;
             
-            // Обновляем отображение адреса
             updateWalletDisplay();
             
-            // Проверяем возможность вывода
             const withdrawBtn = document.getElementById('withdraw-btn');
             const withdrawAmount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
             
@@ -1352,7 +2415,6 @@
                                  withdrawAmount < CONFIG.WITHDRAWAL_MIN ||
                                  withdrawAmount > gameState.gameBalance;
             
-            // Проверяем кулдаун вывода
             if (gameState.lastWithdrawal) {
                 const timeSinceLast = Date.now() - gameState.lastWithdrawal;
                 if (timeSinceLast < CONFIG.WITHDRAWAL_COOLDOWN) {
@@ -1377,7 +2439,6 @@
         function updateWalletDisplay() {
             const addressDisplay = document.getElementById('bsc-address-display');
             if (gameState.walletAddress) {
-                // Сокращаем адрес для отображения
                 const shortAddress = gameState.walletAddress.slice(0, 8) + '...' + gameState.walletAddress.slice(-6);
                 addressDisplay.innerHTML = `
                     ${shortAddress}
@@ -1396,7 +2457,6 @@
             const editBtn = document.getElementById('edit-address-btn');
             
             if (addressInput.style.display === 'none') {
-                // Переходим в режим редактирования
                 addressDisplay.style.display = 'none';
                 addressInput.style.display = 'block';
                 addressInput.value = gameState.walletAddress || '';
@@ -1404,7 +2464,6 @@
                 editBtn.innerHTML = '<span>💾</span><span>Сохранить адрес</span>';
                 editBtn.onclick = saveBSCAddress;
             } else {
-                // Выходим из режима редактирования
                 addressInput.style.display = 'none';
                 addressDisplay.style.display = 'block';
                 editBtn.innerHTML = '<span>✏️</span><span>Изменить адрес</span>';
@@ -1424,101 +2483,21 @@
                 });
         }
 
-        function saveBSCAddress() {
-            const addressInput = document.getElementById('bsc-address-input');
-            const address = addressInput.value.trim();
-            
-            // Валидация BSC адреса
-            if (!address.startsWith('0x') || address.length !== 42) {
-                showMessage('Неверный формат BSC адреса. Должен начинаться с 0x и быть 42 символа', 'error');
-                addressInput.focus();
-                return;
-            }
-            
-            const saveBtn = document.getElementById('edit-address-btn');
-            const originalText = saveBtn.innerHTML;
-            saveBtn.innerHTML = '<div class="spinner"></div><span>Сохранение...</span>';
-            saveBtn.disabled = true;
-            
-            setTimeout(() => {
-                gameState.walletAddress = address;
-                localStorage.setItem('mars_wallet_address', address);
-                
-                updateWalletDisplay();
-                showMessage('✅ BSC адрес сохранен!', 'success');
-                toggleAddressInput(); // Возвращаемся к отображению
-                
-                saveBtn.innerHTML = originalText;
-                saveBtn.disabled = false;
-            }, 1000);
-        }
-
-        function withdrawFunds() {
-            const amountInput = document.getElementById('withdraw-amount');
-            const amount = parseFloat(amountInput.value);
-            
-            // Валидация
-            if (!amount || amount <= 0) {
-                showMessage('Введите корректную сумму', 'error');
-                return;
-            }
-            
-            if (amount < CONFIG.WITHDRAWAL_MIN) {
-                showMessage(`Минимальная сумма вывода: ${CONFIG.WITHDRAWAL_MIN} MNRT`, 'error');
-                return;
-            }
-            
-            if (amount > gameState.gameBalance) {
-                showMessage('Недостаточно средств на балансе', 'error');
-                return;
-            }
-            
-            if (!gameState.walletAddress) {
-                showMessage('Сначала введите и сохраните BSC адрес', 'error');
-                return;
-            }
-            
-            const withdrawBtn = document.getElementById('withdraw-btn');
-            const originalText = withdrawBtn.innerHTML;
-            withdrawBtn.innerHTML = '<div class="spinner"></div><span>Обработка...</span>';
-            withdrawBtn.disabled = true;
-            
-            // Симуляция вывода (в реальном проекте здесь будет запрос к бэкенду)
-            setTimeout(() => {
-                gameState.gameBalance -= amount;
-                gameState.lastWithdrawal = Date.now();
-                
-                const testTxHash = '0x' + Array.from({length: 64}, () => 
-                    Math.floor(Math.random() * 16).toString(16)).join('');
-                
-                showMessage(`✅ Вывод ${amount} MNRT на адрес ${gameState.walletAddress.slice(0, 10)}... успешно инициирован! Транзакция: ${testTxHash.slice(0, 10)}...`, 'success');
-                
-                updateUI();
-                amountInput.value = '';
-                
-                withdrawBtn.innerHTML = originalText;
-                withdrawBtn.disabled = false;
-            }, 2000);
-        }
-
+        // Статистика и таблица лидеров
         function updateStatsTab() {
             updatePersonalStats();
         }
 
         function updatePersonalStats() {
-            // Обновляем персональную статистику
             document.getElementById('stat-total-mined').textContent = gameState.totalMinedAllTime.toFixed(2);
             document.getElementById('stat-buildings-count').textContent = gameState.buildings.length;
             
-            // Вычисляем время игры
             const playTimeHours = Math.floor(gameState.playTime / 3600);
             document.getElementById('stat-play-time').textContent = playTimeHours + 'ч';
             
-            // Вычисляем среднюю добычу
             const avgMining = playTimeHours > 0 ? gameState.totalMinedAllTime / playTimeHours : 0;
             document.getElementById('stat-avg-mining').textContent = avgMining.toFixed(2);
             
-            // Обновляем таблицу лидеров
             loadLeaderboard();
         }
 
@@ -1526,7 +2505,8 @@
             const tableBody = document.getElementById('leaderboard-body');
             const loadingEl = document.getElementById('leaderboard-loading');
             
-            // Тестовые данные для таблицы лидеров
+            // В реальном проекте здесь будет запрос к бэкенду
+            // /api/leaderboard
             const testData = [
                 { rank: 1, name: "Космический Магнат", coins: 12540.75, buildings: 24, avatar: "👑" },
                 { rank: 2, name: "Марсианский Барон", coins: 9870.25, buildings: 18, avatar: "🚀" },
@@ -1540,7 +2520,6 @@
                 { rank: 10, name: "Анна В.", coins: 3420.10, buildings: 8, avatar: "👱‍♀️" }
             ];
             
-            // Находим позицию текущего игрока в рейтинге
             const playerCoins = gameState.totalMinedAllTime;
             let playerRank = '—';
             let percentOfLeader = 0;
@@ -1551,7 +2530,6 @@
                 if (playerCoins > 0) {
                     percentOfLeader = Math.min(100, (playerCoins / topPlayerCoins) * 100);
                     
-                    // Находим позицию в рейтинге
                     for (let i = 0; i < testData.length; i++) {
                         if (playerCoins >= testData[i].coins) {
                             playerRank = testData[i].rank;
@@ -1565,11 +2543,9 @@
                 }
             }
             
-            // Обновляем данные игрока
             document.getElementById('stat-player-rank').textContent = playerRank;
             document.getElementById('stat-percent-of-leader').textContent = percentOfLeader.toFixed(1) + '%';
             
-            // Рендерим таблицу
             tableBody.innerHTML = '';
             testData.forEach(player => {
                 const row = document.createElement('tr');
@@ -1606,14 +2582,17 @@
             loadingEl.style.display = 'none';
         }
 
+        function showTestLeaderboard() {
+            // Та же логика что и в loadLeaderboard, но для автономного режима
+            loadLeaderboard();
+        }
+
         function refreshStats() {
             updateStatsTab();
             showMessage('📊 Статистика обновлена', 'success');
         }
 
-        // ============================
-        // СИСТЕМА УЛУЧШЕНИЙ
-        // ============================
+        // Остальные функции игры...
         function getUpgradeCost(type, targetLevel) {
             if (targetLevel >= 1 && targetLevel <= 3) {
                 return CONFIG.UPGRADE_COSTS[type][targetLevel - 1];
@@ -1655,11 +2634,7 @@
             renderBuildings();
         }
 
-        // ============================
-        // СТРОИТЕЛЬСТВО ЗДАНИЙ С БЕСПЛАТНОЙ ПЕРВОЙ ПОСТРОЙКОЙ
-        // ============================
         function startBuilding(type) {
-            // Проверяем, доступна ли бесплатная постройка
             const isFirstBuildingFree = CONFIG.FREE_BUILDINGS[type] && !gameState.freeBuildingsUsed[type];
             const cost = isFirstBuildingFree ? 0 : CONFIG.BUILDING_COSTS[type];
             
@@ -1680,6 +2655,11 @@
             
             gameState.placingBuilding = type;
             showMessage(`🏗️ Кликните на карту для размещения ${getBuildingName(type)}${isFirstBuildingFree ? ' (БЕСПЛАТНО!)' : ''}`, 'success');
+            
+            // Если мы в режиме перемещения, выключаем его
+            if (movingBuildingId !== null) {
+                exitMoveMode();
+            }
         }
 
         function selectBuildingForAction(type) {
@@ -1687,9 +2667,6 @@
             updateBuildingsTab();
         }
 
-        // ============================
-        // ИГРОВАЯ ЛОГИКА
-        // ============================
         function calculateEnergy() {
             let production = 0;
             let consumption = 0;
@@ -1805,9 +2782,6 @@
             updateUI();
         }
 
-        // ============================
-        // СИСТЕМА ХРАНЕНИЯ И СБОРА
-        // ============================
         function collectFromBase() {
             if (gameState.baseStorage <= 0) {
                 showMessage('⛏️ Нет ресурсов в хранилище базы', 'error');
@@ -1822,13 +2796,26 @@
             gameState.storageFull = false;
             gameState.miningActive = true;
             
-            showMessage(`💰 Собрано ${collected.toFixed(4)} MNRT в баланс игры!`, 'success');
+            // ИЗМЕНЕНО: Добавлено имя игрока и ID в сообщение
+            const playerName = telegramUser ? 
+                (telegramUser.firstName + (telegramUser.lastName ? ' ' + telegramUser.lastName : '')) : 'Игрок';
+            const playerId = telegramUser ? telegramUser.id : '—';
+            
+            showMessage(`💰 ${playerName} (ID: ${playerId}) собрал ${collected.toFixed(4)} MNRT на баланс!`, 'success');
+            
+            // Отправляем данные в бота
+            sendDataToBot({
+                type: 'resources_collected',
+                playerName: playerName,
+                playerId: playerId,
+                amount: collected,
+                totalMined: gameState.totalMinedAllTime,
+                timestamp: new Date().toISOString()
+            });
+            
             updateUI();
         }
 
-        // ============================
-        // РЕНДЕРИНГ ЗДАНИЙ НА КАРТЕ
-        // ============================
         function generateMarsSurface() {
             const surface = document.getElementById('mars-surface');
             surface.innerHTML = '';
@@ -1859,12 +2846,31 @@
             icon.textContent = getBuildingIcon(building.type);
             div.appendChild(icon);
             
+            // Добавляем эффекты в зависимости от типа здания
+            if (building.type === 'mining' && building.hasPower) {
+                const miningEffect = document.createElement('div');
+                miningEffect.className = 'mining-effect';
+                div.appendChild(miningEffect);
+            }
+            
+            if (building.type === 'power') {
+                const powerEffect = document.createElement('div');
+                powerEffect.className = 'power-effect';
+                div.appendChild(powerEffect);
+            }
+            
             if (building.level > 0) {
                 const levelBadge = document.createElement('div');
                 levelBadge.className = 'building-level-badge';
                 levelBadge.textContent = building.level + 1;
                 div.appendChild(levelBadge);
             }
+            
+            // Добавляем обработчик клика для контекстного меню
+            div.addEventListener('click', function(e) {
+                e.stopPropagation();
+                showBuildingContextMenu(building.id, e.clientX, e.clientY);
+            });
             
             return div;
         }
@@ -1879,8 +2885,197 @@
             });
         }
 
+        // ============================
+        // УПРАВЛЕНИЕ ЗДАНИЯМИ
+        // ============================
+        
+        // Показать контекстное меню для здания
+        function showBuildingContextMenu(buildingId, x, y) {
+            const building = gameState.buildings.find(b => b.id === buildingId);
+            if (!building) return;
+            
+            selectedBuildingId = buildingId;
+            
+            const menu = document.getElementById('building-context-menu');
+            const title = document.getElementById('context-menu-title');
+            
+            title.textContent = `${getBuildingName(building.type)} #${building.id}`;
+            
+            // Позиционируем меню
+            menu.style.left = x + 'px';
+            menu.style.top = y + 'px';
+            menu.style.display = 'flex';
+            
+            // Закрываем предыдущее меню если есть
+            closeContextMenu();
+            
+            // Показываем текущее меню
+            menu.style.display = 'flex';
+            
+            // Если мы в режиме перемещения, выходим из него
+            if (movingBuildingId !== null) {
+                exitMoveMode();
+            }
+        }
+        
+        // Закрыть контекстное меню
+        function closeContextMenu() {
+            const menu = document.getElementById('building-context-menu');
+            menu.style.display = 'none';
+            selectedBuildingId = null;
+        }
+        
+        // Включить/выключить режим перемещения
+        function toggleMoveMode() {
+            if (movingBuildingId === selectedBuildingId) {
+                exitMoveMode();
+            } else {
+                enterMoveMode(selectedBuildingId);
+            }
+            closeContextMenu();
+        }
+        
+        // Войти в режим перемещения
+        function enterMoveMode(buildingId) {
+            movingBuildingId = buildingId;
+            const moveBtn = document.getElementById('move-building-btn');
+            moveBtn.classList.add('active');
+            moveBtn.innerHTML = '<span>📍</span><span>Режим перемещения активен</span>';
+            
+            const buildingEl = document.getElementById(`building-${buildingId}`);
+            if (buildingEl) {
+                buildingEl.style.cursor = 'move';
+                buildingEl.style.boxShadow = '0 0 20px #00FF00';
+                buildingEl.style.zIndex = '1000';
+            }
+            
+            showMessage('📍 Режим перемещения: кликните на новое место для здания', 'success');
+        }
+        
+        // Выйти из режима перемещения
+        function exitMoveMode() {
+            if (movingBuildingId !== null) {
+                const buildingEl = document.getElementById(`building-${movingBuildingId}`);
+                if (buildingEl) {
+                    buildingEl.style.cursor = 'pointer';
+                    buildingEl.style.boxShadow = '';
+                    buildingEl.style.zIndex = '';
+                }
+                
+                const moveBtn = document.getElementById('move-building-btn');
+                moveBtn.classList.remove('active');
+                moveBtn.innerHTML = '<span>📍</span><span>Переместить</span>';
+                
+                movingBuildingId = null;
+                showMessage('📍 Режим перемещения отключен', 'success');
+            }
+        }
+        
+        // Подтверждение удаления здания
+        function confirmDeleteBuilding() {
+            const building = gameState.buildings.find(b => b.id === selectedBuildingId);
+            if (!building) return;
+            
+            buildingToDeleteId = selectedBuildingId;
+            
+            const confirmEl = document.getElementById('delete-confirm');
+            const messageEl = document.getElementById('delete-confirm-message');
+            
+            messageEl.textContent = `Вы уверены, что хотите удалить ${getBuildingName(building.type)} #${building.id}? Это действие нельзя отменить.`;
+            
+            confirmEl.style.display = 'flex';
+            closeContextMenu();
+        }
+        
+        // Отмена удаления
+        function cancelDeleteBuilding() {
+            const confirmEl = document.getElementById('delete-confirm');
+            confirmEl.style.display = 'none';
+            buildingToDeleteId = null;
+        }
+        
+        // Удаление здания после подтверждения
+        function deleteBuildingConfirmed() {
+            if (buildingToDeleteId === null) return;
+            
+            const buildingIndex = gameState.buildings.findIndex(b => b.id === buildingToDeleteId);
+            if (buildingIndex === -1) return;
+            
+            const building = gameState.buildings[buildingIndex];
+            const buildingName = getBuildingName(building.type);
+            
+            // Удаляем здание из массива
+            gameState.buildings.splice(buildingIndex, 1);
+            
+            // Проверяем, есть ли еще база
+            gameState.hasBase = gameState.buildings.some(b => b.type === 'base');
+            
+            // Обновляем статистику
+            gameState.statistics.totalBuildings = gameState.buildings.length;
+            
+            // Обновляем интерфейс
+            updateUI();
+            renderBuildings();
+            
+            // Закрываем подтверждение
+            const confirmEl = document.getElementById('delete-confirm');
+            confirmEl.style.display = 'none';
+            buildingToDeleteId = null;
+            
+            showMessage(`🗑️ ${buildingName} #${building.id} удалена`, 'success');
+            
+            // Сохраняем прогресс
+            saveGameProgress();
+        }
+        
+        // Переместить здание на новую позицию
+        function moveBuildingToPosition(buildingId, x, y) {
+            const building = gameState.buildings.find(b => b.id === buildingId);
+            if (!building) return;
+            
+            // Проверяем, что новое место не слишком близко к другим зданиям
+            for (const otherBuilding of gameState.buildings) {
+                if (otherBuilding.id === buildingId) continue;
+                
+                const distance = Math.sqrt(
+                    Math.pow(x - otherBuilding.x, 2) + 
+                    Math.pow(y - otherBuilding.y, 2)
+                );
+                if (distance < 70) {
+                    showMessage('⚠️ Слишком близко к другому зданию!', 'error');
+                    return false;
+                }
+            }
+            
+            // Обновляем позицию здания
+            building.x = x;
+            building.y = y;
+            
+            // Обновляем отображение
+            renderBuildings();
+            
+            // Сохраняем прогресс
+            saveGameProgress();
+            
+            return true;
+        }
+
         // Обработчик клика по карте
         document.getElementById('mars-surface').addEventListener('click', function(e) {
+            // Если мы в режиме перемещения, перемещаем здание
+            if (movingBuildingId !== null) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                if (moveBuildingToPosition(movingBuildingId, x, y)) {
+                    exitMoveMode();
+                    showMessage('✅ Здание успешно перемещено', 'success');
+                }
+                return;
+            }
+            
+            // Если мы размещаем новое здание
             if (!gameState.placingBuilding) return;
             
             const rect = this.getBoundingClientRect();
@@ -1907,12 +3102,10 @@
                 return;
             }
             
-            // Списание стоимости (если не бесплатно)
             if (!isFirstBuildingFree) {
                 gameState.gameBalance -= cost;
             }
             
-            // Отмечаем, что бесплатная постройка использована
             if (isFirstBuildingFree) {
                 gameState.freeBuildingsUsed[type] = true;
             }
@@ -1941,6 +3134,31 @@
                 `✅ ${getBuildingName(type)} построена БЕСПЛАТНО!` : 
                 `✅ ${getBuildingName(type)} построена!`;
             showMessage(message, 'success');
+            
+            // Отправляем данные в бота
+            sendDataToBot({
+                type: 'building_built',
+                buildingType: type,
+                isFree: isFirstBuildingFree,
+                cost: cost,
+                totalBuildings: gameState.buildings.length,
+                timestamp: new Date().toISOString()
+            });
+        });
+
+        // Закрытие контекстного меню при клике вне его
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('building-context-menu');
+            const deleteConfirm = document.getElementById('delete-confirm');
+            
+            if (menu.style.display === 'flex' && !menu.contains(e.target)) {
+                closeContextMenu();
+            }
+            
+            // Если клик вне меню удаления и не по кнопке удаления
+            if (deleteConfirm.style.display === 'flex' && !deleteConfirm.contains(e.target)) {
+                cancelDeleteBuilding();
+            }
         });
 
         // Обновление поля ввода вывода
@@ -1948,18 +3166,11 @@
             updateWalletTab();
         });
 
-        // ============================
-        // ИНИЦИАЛИЗАЦИЯ ИГРЫ
-        // ============================
+        // Инициализация игры
         function initGame() {
-            // Загружаем сохраненные данные
-            loadGameProgress();
-            
-            // Загружаем сохраненный адрес кошелька
-            const savedAddress = localStorage.getItem('mars_wallet_address');
-            if (savedAddress) {
-                gameState.walletAddress = savedAddress;
-            }
+            // Загружаем локальные данные
+            loadLocalGameProgress();
+            loadLocalWalletAddress();
             
             // Создаем поверхность Марса
             generateMarsSurface();
@@ -1978,56 +3189,8 @@
             }, 1000);
         }
 
-        function saveGameProgress() {
-            const gameData = {
-                gameBalance: gameState.gameBalance,
-                baseStorage: gameState.baseStorage,
-                totalMinedAllTime: gameState.totalMinedAllTime,
-                buildings: gameState.buildings,
-                hasBase: gameState.hasBase,
-                freeBuildingsUsed: gameState.freeBuildingsUsed,
-                statistics: gameState.statistics
-            };
-            
-            localStorage.setItem('mars_game_progress', JSON.stringify(gameData));
-        }
-
-        function loadGameProgress() {
-            const savedData = localStorage.getItem('mars_game_progress');
-            if (savedData) {
-                try {
-                    const gameData = JSON.parse(savedData);
-                    
-                    // Восстанавливаем состояние игры
-                    gameState.gameBalance = gameData.gameBalance || 0;
-                    gameState.baseStorage = gameData.baseStorage || 0;
-                    gameState.totalMinedAllTime = gameData.totalMinedAllTime || 0;
-                    gameState.buildings = gameData.buildings || [];
-                    gameState.hasBase = gameData.hasBase || false;
-                    gameState.freeBuildingsUsed = gameData.freeBuildingsUsed || {
-                        base: false,
-                        mining: false,
-                        power: false
-                    };
-                    gameState.statistics = gameData.statistics || {
-                        totalMined: 0,
-                        totalBuildings: 0,
-                        totalUpgrades: 0
-                    };
-                    
-                    // Восстанавливаем следующий ID
-                    if (gameState.buildings.length > 0) {
-                        gameState.nextId = Math.max(...gameState.buildings.map(b => b.id)) + 1;
-                    }
-                    
-                } catch (error) {
-                    console.error('Ошибка загрузки сохраненной игры:', error);
-                }
-            }
-        }
-
-        // Запуск игры при загрузке страницы
-        window.addEventListener('load', initGame);
+        // Запуск игры
+        window.addEventListener('load', initTelegramWebApp);
     </script>
 </body>
 </html>
