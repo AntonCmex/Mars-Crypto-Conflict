@@ -30,6 +30,7 @@
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
+            z-index: 100;
         }
         
         .stats-row {
@@ -51,7 +52,7 @@
             font-size: 14px;
         }
         
-        /* НОВЫЙ СЧЕТЧИК ДОБЫЧИ В РЕАЛЬНОМ ВРЕМЕНИ */
+        /* СЧЕТЧИК ДОБЫЧИ В РЕАЛЬНОМ ВРЕМЕНИ */
         .mining-counter {
             background: rgba(139, 69, 19, 0.3);
             border: 1px solid #D2691E;
@@ -95,13 +96,15 @@
             transform: none;
         }
         
-        /* ИГРОВОЕ ПОЛЕ */
+        /* КОНТЕЙНЕР ИГРЫ */
         #game-container {
             display: flex;
             flex-direction: column;
             height: calc(100vh - 110px);
+            position: relative;
         }
         
+        /* ОСНОВНОЙ ЭКРАН - МАРС */
         #mars-surface {
             flex: 1;
             background: linear-gradient(135deg, #8B4513, #A0522D, #D2691E);
@@ -114,9 +117,10 @@
         #bottom-panel {
             background: rgba(20, 15, 10, 0.95);
             border-top: 3px solid #8B4513;
-            height: 200px;
+            height: 60px;
             display: flex;
             flex-direction: column;
+            z-index: 100;
         }
         
         /* ТАБЫ */
@@ -124,6 +128,7 @@
             display: flex;
             background: rgba(139, 69, 19, 0.3);
             border-bottom: 2px solid #8B4513;
+            height: 60px;
         }
         
         .tab {
@@ -137,6 +142,11 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
         
         .tab.active {
@@ -145,15 +155,66 @@
             border-bottom: 3px solid gold;
         }
         
-        .tab-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            display: none;
+        .tab-icon {
+            font-size: 18px;
         }
         
-        .tab-content.active {
-            display: block;
+        .tab-text {
+            font-size: 11px;
+        }
+        
+        /* КОНТЕНТ ВКЛАДОК НА ВЕСЬ ЭКРАН */
+        .fullscreen-tab {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 60px; /* Высота нижней панели */
+            background: rgba(10, 10, 26, 0.98);
+            z-index: 50;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .fullscreen-tab.active {
+            display: flex;
+        }
+        
+        .tab-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #8B4513;
+        }
+        
+        .tab-title {
+            font-size: 18px;
+            color: gold;
+            font-weight: bold;
+        }
+        
+        .close-tab-btn {
+            background: rgba(255, 85, 85, 0.2);
+            border: 1px solid #FF5555;
+            color: #FF9999;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .close-tab-btn:hover {
+            background: rgba(255, 85, 85, 0.4);
+            transform: scale(1.1);
         }
         
         /* ВКЛАДКА 1: СТРОИТЕЛЬСТВО И УЛУЧШЕНИЯ */
@@ -641,6 +702,7 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
+            z-index: 10;
         }
         
         .building:hover {
@@ -667,15 +729,16 @@
             box-shadow: 0 0 20px red;
         }
         
-        /* ЭФФЕКТ ДОБЫЧИ ДЛЯ БУРОВОЙ */
+        /* УЛУЧШЕННЫЙ ЭФФЕКТ ДОБЫЧИ ДЛЯ БУРОВОЙ */
         .mining-effect {
             position: absolute;
             width: 100%;
             height: 100%;
             border-radius: 8px;
-            background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, rgba(255,215,0,0) 70%);
+            background: radial-gradient(circle, rgba(255,140,0,0.4) 0%, rgba(255,140,0,0) 70%);
             animation: mining-pulse 1.5s infinite;
             pointer-events: none;
+            box-shadow: 0 0 20px rgba(255,140,0,0.5);
         }
         
         /* ЭФФЕКТ ЭНЕРГИИ ДЛЯ ЭЛЕКТРОСТАНЦИИ */
@@ -684,9 +747,10 @@
             width: 100%;
             height: 100%;
             border-radius: 8px;
-            background: radial-gradient(circle, rgba(0,255,255,0.3) 0%, rgba(0,255,255,0) 70%);
+            background: radial-gradient(circle, rgba(0,200,255,0.4) 0%, rgba(0,200,255,0) 70%);
             animation: power-pulse 1s infinite;
             pointer-events: none;
+            box-shadow: 0 0 20px rgba(0,200,255,0.5);
         }
         
         .building-level-badge {
@@ -709,7 +773,7 @@
         
         /* МЕНЮ УПРАВЛЕНИЯ ЗДАНИЕМ */
         .building-context-menu {
-            position: absolute;
+            position: fixed;
             background: rgba(0, 0, 0, 0.95);
             border: 2px solid #8B4513;
             border-radius: 10px;
@@ -720,6 +784,8 @@
             flex-direction: column;
             gap: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            max-width: 90vw;
+            max-height: 90vh;
         }
         
         .building-context-menu-header {
@@ -875,38 +941,41 @@
             100% { box-shadow: 0 0 5px rgba(70, 130, 180, 0.5); }
         }
         
-        /* АНИМАЦИЯ ДОБЫЧИ */
+        /* УЛУЧШЕННАЯ АНИМАЦИЯ ДОБЫЧИ */
         @keyframes mining-pulse {
             0% { 
-                opacity: 0.3;
+                opacity: 0.4;
                 transform: scale(1);
+                box-shadow: 0 0 15px rgba(255,140,0,0.5);
             }
             50% { 
-                opacity: 0.7;
+                opacity: 0.8;
                 transform: scale(1.1);
+                box-shadow: 0 0 25px rgba(255,140,0,0.8);
             }
             100% { 
-                opacity: 0.3;
+                opacity: 0.4;
                 transform: scale(1);
+                box-shadow: 0 0 15px rgba(255,140,0,0.5);
             }
         }
         
         /* АНИМАЦИЯ ЭНЕРГИИ */
         @keyframes power-pulse {
             0% { 
-                opacity: 0.2;
+                opacity: 0.4;
                 transform: scale(1);
-                box-shadow: 0 0 10px rgba(0,255,255,0.5);
+                box-shadow: 0 0 15px rgba(0,200,255,0.5);
             }
             50% { 
                 opacity: 0.8;
                 transform: scale(1.15);
-                box-shadow: 0 0 20px rgba(0,255,255,0.8);
+                box-shadow: 0 0 25px rgba(0,200,255,0.8);
             }
             100% { 
-                opacity: 0.2;
+                opacity: 0.4;
                 transform: scale(1);
-                box-shadow: 0 0 10px rgba(0,255,255,0.5);
+                box-shadow: 0 0 15px rgba(0,200,255,0.5);
             }
         }
         
@@ -991,6 +1060,7 @@
             border-radius: 15px;
             padding: 20px;
             width: 300px;
+            max-width: 90vw;
             z-index: 2000;
             display: none;
             flex-direction: column;
@@ -1086,192 +1156,214 @@
     
     <!-- ИГРОВОЕ ПОЛЕ -->
     <div id="game-container">
+        <!-- ОСНОВНОЙ ЭКРАН - МАРС -->
         <div id="mars-surface"></div>
         
-        <!-- НИЖНЯЯ ПАНЕЛЬ С ВКЛАДКАМИ -->
-        <div id="bottom-panel">
-            <!-- ТАБЫ -->
-            <div class="tabs">
-                <button class="tab active" onclick="switchTab(0)">🏗️ Строительство</button>
-                <button class="tab" onclick="switchTab(1)">📊 Мои здания</button>
-                <button class="tab" onclick="switchTab(2)">👛 Кошелек</button>
-                <button class="tab" onclick="switchTab(3)">📈 Статистика</button>
+        <!-- ВКЛАДКИ НА ВЕСЬ ЭКРАН -->
+        <!-- ВКЛАДКА 2: МОИ ЗДАНИЯ -->
+        <div id="fullscreen-my-buildings" class="fullscreen-tab">
+            <div class="tab-header">
+                <div class="tab-title">📊 Мои здания</div>
+                <button class="close-tab-btn" onclick="closeFullscreenTab()">✕</button>
             </div>
-            
-            <!-- СОДЕРЖИМОЕ ВКЛАДОК -->
-            <div class="tab-content active" id="tab-0">
-                <div id="buildings-tab">
-                    <!-- Здания будут добавляться сюда динамически -->
+            <div id="my-buildings-tab-content">
+                <div class="my-buildings-header">
+                    <div style="font-weight: bold; font-size: 14px;">Статистика зданий</div>
+                    <div class="total-buildings" id="total-buildings-count">Всего: 0</div>
+                </div>
+                <div id="my-buildings-container">
+                    <div class="no-buildings">Нет построенных зданий</div>
                 </div>
             </div>
-            
-            <div class="tab-content" id="tab-1">
-                <div id="my-buildings-tab">
-                    <div class="my-buildings-header">
-                        <div style="font-weight: bold; font-size: 14px;">Мои здания</div>
-                        <div class="total-buildings" id="total-buildings-count">Всего: 0</div>
-                    </div>
-                    <div id="my-buildings-container">
-                        <div class="no-buildings">Нет построенных зданий</div>
+        </div>
+        
+        <!-- ВКЛАДКА 3: КОШЕЛЕК -->
+        <div id="fullscreen-wallet" class="fullscreen-tab">
+            <div class="tab-header">
+                <div class="tab-title">👛 Кошелек</div>
+                <button class="close-tab-btn" onclick="closeFullscreenTab()">✕</button>
+            </div>
+            <div id="wallet-tab-content">
+                <!-- TELEGRAM USER INFO -->
+                <div id="telegram-user-info" class="user-info" style="display: none;">
+                    <div class="user-avatar" id="user-avatar">👤</div>
+                    <div class="user-details">
+                        <div class="user-name" id="user-name">Игрок</div>
+                        <div class="user-id" id="user-id">ID: —</div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="tab-content" id="tab-2">
-                <div id="wallet-tab">
-                    <!-- TELEGRAM USER INFO -->
-                    <div id="telegram-user-info" class="user-info" style="display: none;">
-                        <div class="user-avatar" id="user-avatar">👤</div>
-                        <div class="user-details">
-                            <div class="user-name" id="user-name">Игрок</div>
-                            <div class="user-id" id="user-id">ID: —</div>
+                
+                <!-- КОШЕЛЕК -->
+                <div class="wallet-info">
+                    <div class="wallet-section">
+                        <div class="wallet-section-title">
+                            <span>📊</span>
+                            <span>Баланс в игре</span>
                         </div>
+                        <div class="wallet-balance" id="wallet-game-balance">0.00 MNRT</div>
                     </div>
                     
-                    <!-- КОШЕЛЕК -->
-                    <div class="wallet-info">
-                        <div class="wallet-section">
-                            <div class="wallet-section-title">
-                                <span>📊</span>
-                                <span>Баланс в игре</span>
-                            </div>
-                            <div class="wallet-balance" id="wallet-game-balance">0.00 MNRT</div>
+                    <div class="wallet-section">
+                        <div class="wallet-section-title">
+                            <span>💳</span>
+                            <span>Ваш BSC адрес</span>
                         </div>
-                        
-                        <div class="wallet-section">
-                            <div class="wallet-section-title">
-                                <span>💳</span>
-                                <span>Ваш BSC адрес</span>
-                            </div>
-                            <div class="wallet-address" id="bsc-address-display">
-                                Адрес не указан
-                            </div>
-                            <input type="text" 
-                                   class="withdraw-input" 
-                                   id="bsc-address-input" 
-                                   placeholder="Введите ваш BSC адрес (0x...)"
-                                   maxlength="42"
-                                   style="display: none;">
-                            <div class="wallet-notice">
-                                Введите ваш адрес BSC кошелька для получения выплат
-                            </div>
-                            <button class="withdraw-btn" onclick="toggleAddressInput()" id="edit-address-btn">
-                                <span>✏️</span>
-                                <span>Указать адрес</span>
-                            </button>
+                        <div class="wallet-address" id="bsc-address-display">
+                            Адрес не указан
                         </div>
-                        
-                        <div class="wallet-section">
-                            <div class="wallet-section-title">
-                                <span>🚀</span>
-                                <span>Вывод средств</span>
-                            </div>
-                            <input type="number" 
-                                   class="withdraw-input" 
-                                   id="withdraw-amount" 
-                                   placeholder="Введите количество MNRT"
-                                   min="10"
-                                   step="0.01">
-                            <div class="wallet-notice">
-                                Минимальный вывод: <span id="min-withdraw">10</span> MNRT<br>
-                                Комиссия сети: <span id="gas-fee">0.001</span> BNB
-                            </div>
-                            <button class="withdraw-btn" onclick="withdrawFunds()" id="withdraw-btn" disabled>
-                                <span>🔄</span>
-                                <span>Отправить ресурсы</span>
-                            </button>
+                        <input type="text" 
+                               class="withdraw-input" 
+                               id="bsc-address-input" 
+                               placeholder="Введите ваш BSC адрес (0x...)"
+                               maxlength="42"
+                               style="display: none;">
+                        <div class="wallet-notice">
+                            Введите ваш адрес BSC кошелька для получения выплат
                         </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="tab-content" id="tab-3">
-                <div id="stats-tab">
-                    <div class="stats-header">
-                        <div class="stats-title">📊 Статистика игроков</div>
-                        <div class="stats-subtitle">Топ игроков по добыче MNRT</div>
-                    </div>
-                    
-                    <div class="stats-tabs">
-                        <button class="stats-tab-btn active" onclick="switchStatsTab('leaderboard')">
-                            🏆 Таблица лидеров
-                        </button>
-                        <button class="stats-tab-btn" onclick="switchStatsTab('personal')">
-                            👤 Моя статистика
+                        <button class="withdraw-btn" onclick="toggleAddressInput()" id="edit-address-btn">
+                            <span>✏️</span>
+                            <span>Указать адрес</span>
                         </button>
                     </div>
                     
-                    <!-- ТАБЛИЦА ЛИДЕРОВ -->
-                    <div id="leaderboard-content" class="stats-content">
-                        <table class="leaderboard-table" id="leaderboard-table">
-                            <thead>
-                                <tr>
-                                    <th class="rank-cell">#</th>
-                                    <th>Игрок</th>
-                                    <th style="text-align: right;">Добыто MNRT</th>
-                                    <th style="text-align: right;">Здания</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leaderboard-body">
-                                <!-- Данные будут загружены динамически -->
-                            </tbody>
-                        </table>
-                        <div style="text-align: center; padding: 20px; color: #888; font-size: 12px;" id="leaderboard-loading">
-                            <div class="spinner" style="margin: 0 auto 10px;"></div>
-                            Загрузка данных...
+                    <div class="wallet-section">
+                        <div class="wallet-section-title">
+                            <span>🚀</span>
+                            <span>Вывод средств</span>
                         </div>
-                    </div>
-                    
-                    <!-- ЛИЧНАЯ СТАТИСТИКА -->
-                    <div id="personal-stats-content" class="stats-content" style="display: none;">
-                        <div class="personal-stats">
-                            <div class="personal-stats-title">
-                                <span>📈</span>
-                                <span>Моя статистика</span>
-                            </div>
-                            <div class="stats-grid" id="personal-stats-grid">
-                                <div class="stat-card">
-                                    <div class="stat-label">Всего добыто</div>
-                                    <div class="stat-value-large" id="stat-total-mined">0.00</div>
-                                    <div class="stat-label">MNRT</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="stat-label">Построено зданий</div>
-                                    <div class="stat-value-large" id="stat-buildings-count">0</div>
-                                    <div class="stat-label">шт.</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="stat-label">Мой ранг</div>
-                                    <div class="stat-value-large" id="stat-player-rank">—</div>
-                                    <div class="stat-label">место</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="stat-label">Время в игре</div>
-                                    <div class="stat-value-large" id="stat-play-time">0ч</div>
-                                    <div class="stat-label">часов</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="stat-label">Средняя добыча</div>
-                                    <div class="stat-value-large" id="stat-avg-mining">0.00</div>
-                                    <div class="stat-label">MNRT/час</div>
-                                </div>
-                                <div class="stat-card">
-                                    <div class="stat-label">Процент от лидера</div>
-                                    <div class="stat-value-large" id="stat-percent-of-leader">0%</div>
-                                    <div class="stat-label">от топ-1</div>
-                                </div>
-                            </div>
+                        <input type="number" 
+                               class="withdraw-input" 
+                               id="withdraw-amount" 
+                               placeholder="Введите количество MNRT"
+                               min="10"
+                               step="0.01">
+                        <div class="wallet-notice">
+                            Минимальный вывод: <span id="min-withdraw">10</span> MNRT<br>
+                            Комиссия сети: <span id="gas-fee">0.001</span> BNB
                         </div>
-                        
-                        <div style="margin-top: 15px; text-align: center;">
-                            <button class="withdraw-btn" onclick="refreshStats()" style="padding: 8px; font-size: 12px;">
-                                <span>🔄</span>
-                                <span>Обновить статистику</span>
-                            </button>
-                        </div>
+                        <button class="withdraw-btn" onclick="withdrawFunds()" id="withdraw-btn" disabled>
+                            <span>🔄</span>
+                            <span>Отправить ресурсы</span>
+                        </button>
                     </div>
                 </div>
             </div>
+        </div>
+        
+        <!-- ВКЛАДКА 4: СТАТИСТИКА -->
+        <div id="fullscreen-stats" class="fullscreen-tab">
+            <div class="tab-header">
+                <div class="tab-title">📈 Статистика</div>
+                <button class="close-tab-btn" onclick="closeFullscreenTab()">✕</button>
+            </div>
+            <div id="stats-tab-content">
+                <div class="stats-header">
+                    <div class="stats-title">📊 Статистика игроков</div>
+                    <div class="stats-subtitle">Топ игроков по добыче MNRT</div>
+                </div>
+                
+                <div class="stats-tabs">
+                    <button class="stats-tab-btn active" onclick="switchStatsTab('leaderboard')">
+                        🏆 Таблица лидеров
+                    </button>
+                    <button class="stats-tab-btn" onclick="switchStatsTab('personal')">
+                        👤 Моя статистика
+                    </button>
+                </div>
+                
+                <!-- ТАБЛИЦА ЛИДЕРОВ -->
+                <div id="leaderboard-content" class="stats-content">
+                    <table class="leaderboard-table" id="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th class="rank-cell">#</th>
+                                <th>Игрок</th>
+                                <th style="text-align: right;">Добыто MNRT</th>
+                                <th style="text-align: right;">Здания</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <!-- Данные будут загружены динамически -->
+                        </tbody>
+                    </table>
+                    <div style="text-align: center; padding: 20px; color: #888; font-size: 12px;" id="leaderboard-loading">
+                        <div class="spinner" style="margin: 0 auto 10px;"></div>
+                        Загрузка данных...
+                    </div>
+                </div>
+                
+                <!-- ЛИЧНАЯ СТАТИСТИКА -->
+                <div id="personal-stats-content" class="stats-content" style="display: none;">
+                    <div class="personal-stats">
+                        <div class="personal-stats-title">
+                            <span>📈</span>
+                            <span>Моя статистика</span>
+                        </div>
+                        <div class="stats-grid" id="personal-stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Всего добыто</div>
+                                <div class="stat-value-large" id="stat-total-mined">0.00</div>
+                                <div class="stat-label">MNRT</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Построено зданий</div>
+                                <div class="stat-value-large" id="stat-buildings-count">0</div>
+                                <div class="stat-label">шт.</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Мой ранг</div>
+                                <div class="stat-value-large" id="stat-player-rank">—</div>
+                                <div class="stat-label">место</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Время в игре</div>
+                                <div class="stat-value-large" id="stat-play-time">0ч</div>
+                                <div class="stat-label">часов</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Средняя добыча</div>
+                                <div class="stat-value-large" id="stat-avg-mining">0.00</div>
+                                <div class="stat-label">MNRT/час</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Процент от лидера</div>
+                                <div class="stat-value-large" id="stat-percent-of-leader">0%</div>
+                                <div class="stat-label">от топ-1</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 15px; text-align: center;">
+                        <button class="withdraw-btn" onclick="refreshStats()" style="padding: 8px; font-size: 12px;">
+                            <span>🔄</span>
+                            <span>Обновить статистику</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- НИЖНЯЯ ПАНЕЛЬ С ВКЛАДКАМИ -->
+    <div id="bottom-panel">
+        <!-- ТАБЫ -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('mars')">
+                <div class="tab-icon">🌋</div>
+                <div class="tab-text">Марс</div>
+            </button>
+            <button class="tab" onclick="showTab('my-buildings')">
+                <div class="tab-icon">📊</div>
+                <div class="tab-text">Мои здания</div>
+            </button>
+            <button class="tab" onclick="showTab('wallet')">
+                <div class="tab-icon">👛</div>
+                <div class="tab-text">Кошелек</div>
+            </button>
+            <button class="tab" onclick="showTab('stats')">
+                <div class="tab-icon">📈</div>
+                <div class="tab-text">Статистика</div>
+            </button>
         </div>
     </div>
     
@@ -1333,6 +1425,8 @@
         let movingBuildingId = null;
         let buildingToDeleteId = null;
         let currentMiningRate = 0;
+        let currentUpkeepRate = 0;
+        let currentTab = 'mars';
         
         // Инициализация Telegram Web App
         function initTelegramWebApp() {
@@ -1345,7 +1439,11 @@
                 // Включаем кнопку "Назад"
                 TelegramWebApp.BackButton.show();
                 TelegramWebApp.BackButton.onClick(() => {
-                    TelegramWebApp.close();
+                    if (currentTab !== 'mars') {
+                        showTab('mars');
+                    } else {
+                        TelegramWebApp.close();
+                    }
                 });
                 
                 // Устанавливаем тему
@@ -2115,22 +2213,57 @@
         }
 
         // Система вкладок
-        function switchTab(tabIndex) {
-            document.querySelectorAll('.tab').forEach((tab, index) => {
-                tab.classList.toggle('active', index === tabIndex);
+        function showTab(tabName) {
+            // Обновляем активные табы
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
             });
             
-            document.querySelectorAll('.tab-content').forEach((content, index) => {
-                content.classList.toggle('active', index === tabIndex);
-            });
+            // Показываем/скрываем соответствующий экран
+            document.getElementById('mars-surface').style.display = 'none';
+            document.getElementById('fullscreen-my-buildings').classList.remove('active');
+            document.getElementById('fullscreen-wallet').classList.remove('active');
+            document.getElementById('fullscreen-stats').classList.remove('active');
             
-            if (tabIndex === 1) {
+            // Устанавливаем активный таб
+            if (tabName === 'mars') {
+                document.querySelector('.tab:nth-child(1)').classList.add('active');
+                document.getElementById('mars-surface').style.display = 'block';
+                currentTab = 'mars';
+                // Прячем кнопку "Назад" на главном экране
+                if (TelegramWebApp && TelegramWebApp.BackButton) {
+                    TelegramWebApp.BackButton.hide();
+                }
+            } else if (tabName === 'my-buildings') {
+                document.querySelector('.tab:nth-child(2)').classList.add('active');
+                document.getElementById('fullscreen-my-buildings').classList.add('active');
+                currentTab = 'my-buildings';
                 updateMyBuildingsTab();
-            } else if (tabIndex === 2) {
+                // Показываем кнопку "Назад"
+                if (TelegramWebApp && TelegramWebApp.BackButton) {
+                    TelegramWebApp.BackButton.show();
+                }
+            } else if (tabName === 'wallet') {
+                document.querySelector('.tab:nth-child(3)').classList.add('active');
+                document.getElementById('fullscreen-wallet').classList.add('active');
+                currentTab = 'wallet';
                 updateWalletTab();
-            } else if (tabIndex === 3) {
+                if (TelegramWebApp && TelegramWebApp.BackButton) {
+                    TelegramWebApp.BackButton.show();
+                }
+            } else if (tabName === 'stats') {
+                document.querySelector('.tab:nth-child(4)').classList.add('active');
+                document.getElementById('fullscreen-stats').classList.add('active');
+                currentTab = 'stats';
                 updateStatsTab();
+                if (TelegramWebApp && TelegramWebApp.BackButton) {
+                    TelegramWebApp.BackButton.show();
+                }
             }
+        }
+        
+        function closeFullscreenTab() {
+            showTab('mars');
         }
 
         function switchStatsTab(tabName) {
@@ -2178,9 +2311,6 @@
             collectBtn.disabled = gameState.baseStorage <= 0;
             
             updateBuildingsTab();
-            updateMyBuildingsTab();
-            updateWalletTab();
-            updateStatsTab();
             
             // Автосохранение каждые 30 секунд
             if (Date.now() - lastAutoSave > 30000) {
@@ -2191,7 +2321,7 @@
             gameState.playTime = Math.floor((Date.now() - gameState.gameStartTime) / 1000);
         }
 
-        // Обновление счетчика добычи
+        // Обновление счетчика добычи - ИСПРАВЛЕНО
         function updateMiningCounter() {
             const activeMiningBuildings = gameState.buildings.filter(b => 
                 b.type === 'mining' && b.hasPower
@@ -2202,9 +2332,11 @@
                 currentMiningRate += calculateMiningRate(building);
             });
             
-            // Вычитаем расходы
-            const upkeepPerSecond = calculateUpkeep();
-            const netMiningRate = currentMiningRate - upkeepPerSecond;
+            // Вычисляем расходы
+            currentUpkeepRate = calculateUpkeep();
+            
+            // Чистая добыча (добыча минус расходы)
+            const netMiningRate = currentMiningRate - currentUpkeepRate;
             
             const counterEl = document.getElementById('mining-rate');
             if (netMiningRate > 0) {
@@ -2217,80 +2349,21 @@
                 counterEl.textContent = '0.000/сек';
                 counterEl.style.color = '#ccc';
             }
+            
+            // Обновляем иконку счетчика в зависимости от статуса
+            const counterContainer = document.getElementById('mining-counter');
+            if (activeMiningBuildings.length === 0) {
+                counterContainer.style.background = 'rgba(139, 69, 19, 0.3)';
+            } else if (netMiningRate > 0) {
+                counterContainer.style.background = 'rgba(0, 100, 0, 0.3)';
+            } else {
+                counterContainer.style.background = 'rgba(139, 69, 19, 0.3)';
+            }
         }
 
         // Остальные функции игры
         function updateBuildingsTab() {
-            const container = document.getElementById('buildings-tab');
-            container.innerHTML = '';
-            
-            const buildingTypes = ['base', 'mining', 'power'];
-            
-            buildingTypes.forEach(type => {
-                const ownedCount = gameState.buildings.filter(b => b.type === type).length;
-                const maxLevel = ownedCount > 0 ? 
-                    Math.max(...gameState.buildings.filter(b => b.type === type).map(b => b.level)) : -1;
-                
-                const isFirstBuildingFree = CONFIG.FREE_BUILDINGS[type] && !gameState.freeBuildingsUsed[type];
-                const cost = isFirstBuildingFree ? 0 : CONFIG.BUILDING_COSTS[type];
-                
-                const card = document.createElement('div');
-                card.className = `building-card ${gameState.selectedBuilding === type ? 'selected' : ''}`;
-                card.onclick = () => selectBuildingForAction(type);
-                
-                const canBuild = (type === 'base' || gameState.hasBase) && 
-                                (isFirstBuildingFree || gameState.gameBalance >= CONFIG.BUILDING_COSTS[type]);
-                const canUpgrade = ownedCount > 0 && maxLevel < 3 && 
-                                 gameState.gameBalance >= getUpgradeCost(type, maxLevel + 1);
-                
-                const buildButtonText = isFirstBuildingFree && ownedCount === 0 ? 
-                    `🏗️ Построить БЕСПЛАТНО!` : 
-                    `🏗️ Построить (${cost} MNRT)`;
-                
-                let buildingInfo = '';
-                if (type === 'base') {
-                    buildingInfo = 'Хранилище: 100 MNRT<br>Расходы: 0.0002 MNRT/сек';
-                } else if (type === 'mining') {
-                    buildingInfo = 'Добыча: 0.001 MNRT/сек<br>Расходы: 0.0002 MNRT/сек<br>Потребление: 2⚡';
-                } else if (type === 'power') {
-                    buildingInfo = 'Производство: 5⚡<br>Расходы: 0.0002 MNRT/сек';
-                }
-                
-                card.innerHTML = `
-                    <div class="building-header">
-                        <div class="building-icon">${getBuildingIcon(type)}</div>
-                        <div>
-                            <div class="building-name">${getBuildingName(type)}</div>
-                            <div class="building-level">
-                                Уровень: ${maxLevel >= 0 ? maxLevel + 1 : 'Не построено'}
-                                ${isFirstBuildingFree && ownedCount === 0 ? '<span class="free-badge">БЕСПЛАТНО</span>' : ''}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="building-cost">
-                        Построено: ${ownedCount} шт.<br>
-                        ${isFirstBuildingFree && ownedCount === 0 ? 
-                          'Стоимость: <span style="color: #00FF00">БЕСПЛАТНО!</span><br>' : 
-                          `Стоимость: <span style="color: gold">${CONFIG.BUILDING_COSTS[type]} MNRT</span><br>`}
-                        ${buildingInfo}
-                    </div>
-                    <div class="building-actions">
-                        <button class="action-btn build-btn" 
-                                onclick="startBuilding('${type}'); event.stopPropagation();"
-                                ${canBuild ? '' : 'disabled'}
-                                style="${isFirstBuildingFree && ownedCount === 0 ? 'background: linear-gradient(135deg, #00AA00, #00FF00);' : ''}">
-                            ${buildButtonText}
-                        </button>
-                        <button class="action-btn upgrade-btn" 
-                                onclick="upgradeBuildingType('${type}'); event.stopPropagation();"
-                                ${canUpgrade ? '' : 'disabled'}>
-                            ⬆️ Улучшить (${getUpgradeCost(type, maxLevel + 1)} MNRT)
-                        </button>
-                    </div>
-                `;
-                
-                container.appendChild(card);
-            });
+            // Эта функция теперь не используется, так как вкладки на весь экран
         }
 
         function updateMyBuildingsTab() {
@@ -2664,7 +2737,7 @@
 
         function selectBuildingForAction(type) {
             gameState.selectedBuilding = gameState.selectedBuilding === type ? null : type;
-            updateBuildingsTab();
+            // Эта функция теперь не используется для вкладок
         }
 
         function calculateEnergy() {
@@ -2886,10 +2959,10 @@
         }
 
         // ============================
-        // УПРАВЛЕНИЕ ЗДАНИЯМИ
+        // УПРАВЛЕНИЕ ЗДАНИЯМИ - ИСПРАВЛЕНО
         // ============================
         
-        // Показать контекстное меню для здания
+        // Показать контекстное меню для здания - ИСПРАВЛЕНО
         function showBuildingContextMenu(buildingId, x, y) {
             const building = gameState.buildings.find(b => b.id === buildingId);
             if (!building) return;
@@ -2901,15 +2974,37 @@
             
             title.textContent = `${getBuildingName(building.type)} #${building.id}`;
             
-            // Позиционируем меню
-            menu.style.left = x + 'px';
-            menu.style.top = y + 'px';
-            menu.style.display = 'flex';
+            // Позиционируем меню с учетом границ экрана
+            const menuWidth = 150;
+            const menuHeight = 120;
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
             
-            // Закрываем предыдущее меню если есть
-            closeContextMenu();
+            let finalX = x;
+            let finalY = y;
             
-            // Показываем текущее меню
+            // Проверяем, чтобы меню не выходило за правую границу
+            if (finalX + menuWidth > screenWidth - 10) {
+                finalX = screenWidth - menuWidth - 10;
+            }
+            
+            // Проверяем, чтобы меню не выходило за нижнюю границу
+            if (finalY + menuHeight > screenHeight - 70) { // 70px для нижней панели
+                finalY = screenHeight - menuHeight - 70;
+            }
+            
+            // Проверяем, чтобы меню не выходило за верхнюю границу
+            if (finalY < 10) {
+                finalY = 10;
+            }
+            
+            // Проверяем, чтобы меню не выходило за левую границу
+            if (finalX < 10) {
+                finalX = 10;
+            }
+            
+            menu.style.left = finalX + 'px';
+            menu.style.top = finalY + 'px';
             menu.style.display = 'flex';
             
             // Если мы в режиме перемещения, выходим из него
@@ -2925,7 +3020,7 @@
             selectedBuildingId = null;
         }
         
-        // Включить/выключить режим перемещения
+        // Включить/выключить режим перемещения - ИСПРАВЛЕНО
         function toggleMoveMode() {
             if (movingBuildingId === selectedBuildingId) {
                 exitMoveMode();
@@ -2935,7 +3030,7 @@
             closeContextMenu();
         }
         
-        // Войти в режим перемещения
+        // Войти в режим перемещения - ИСПРАВЛЕНО
         function enterMoveMode(buildingId) {
             movingBuildingId = buildingId;
             const moveBtn = document.getElementById('move-building-btn');
@@ -2952,14 +3047,14 @@
             showMessage('📍 Режим перемещения: кликните на новое место для здания', 'success');
         }
         
-        // Выйти из режима перемещения
+        // Выйти из режима перемещения - ИСПРАВЛЕНО
         function exitMoveMode() {
             if (movingBuildingId !== null) {
                 const buildingEl = document.getElementById(`building-${movingBuildingId}`);
                 if (buildingEl) {
                     buildingEl.style.cursor = 'pointer';
                     buildingEl.style.boxShadow = '';
-                    buildingEl.style.zIndex = '';
+                    buildingEl.style.zIndex = '10';
                 }
                 
                 const moveBtn = document.getElementById('move-building-btn');
@@ -2967,7 +3062,6 @@
                 moveBtn.innerHTML = '<span>📍</span><span>Переместить</span>';
                 
                 movingBuildingId = null;
-                showMessage('📍 Режим перемещения отключен', 'success');
             }
         }
         
@@ -2994,7 +3088,7 @@
             buildingToDeleteId = null;
         }
         
-        // Удаление здания после подтверждения
+        // Удаление здания после подтверждения - ИСПРАВЛЕНО
         function deleteBuildingConfirmed() {
             if (buildingToDeleteId === null) return;
             
@@ -3013,9 +3107,15 @@
             // Обновляем статистику
             gameState.statistics.totalBuildings = gameState.buildings.length;
             
+            // Если удаляемое здание было в режиме перемещения - выходим из режима
+            if (movingBuildingId === buildingToDeleteId) {
+                exitMoveMode();
+            }
+            
             // Обновляем интерфейс
             updateUI();
             renderBuildings();
+            updateMyBuildingsTab();
             
             // Закрываем подтверждение
             const confirmEl = document.getElementById('delete-confirm');
@@ -3028,10 +3128,10 @@
             saveGameProgress();
         }
         
-        // Переместить здание на новую позицию
+        // Переместить здание на новую позицию - ИСПРАВЛЕНО
         function moveBuildingToPosition(buildingId, x, y) {
             const building = gameState.buildings.find(b => b.id === buildingId);
-            if (!building) return;
+            if (!building) return false;
             
             // Проверяем, что новое место не слишком близко к другим зданиям
             for (const otherBuilding of gameState.buildings) {
@@ -3060,7 +3160,7 @@
             return true;
         }
 
-        // Обработчик клика по карте
+        // Обработчик клика по карте - ИСПРАВЛЕНО
         document.getElementById('mars-surface').addEventListener('click', function(e) {
             // Если мы в режиме перемещения, перемещаем здание
             if (movingBuildingId !== null) {
@@ -3146,7 +3246,7 @@
             });
         });
 
-        // Закрытие контекстного меню при клике вне его
+        // Закрытие контекстного меню при клике вне его - ИСПРАВЛЕНО
         document.addEventListener('click', function(e) {
             const menu = document.getElementById('building-context-menu');
             const deleteConfirm = document.getElementById('delete-confirm');
@@ -3158,6 +3258,16 @@
             // Если клик вне меню удаления и не по кнопке удаления
             if (deleteConfirm.style.display === 'flex' && !deleteConfirm.contains(e.target)) {
                 cancelDeleteBuilding();
+            }
+            
+            // Если клик по карте и не по зданию, снимаем выделение с зданий
+            if (e.target.id === 'mars-surface') {
+                closeContextMenu();
+                if (movingBuildingId !== null) {
+                    // Если кликнули на карту в режиме перемещения - отменяем перемещение
+                    exitMoveMode();
+                    showMessage('📍 Режим перемещения отменен', 'success');
+                }
             }
         });
 
