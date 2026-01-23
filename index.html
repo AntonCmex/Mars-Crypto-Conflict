@@ -63,23 +63,30 @@
             font-size: 13px;
         }
         
-        /* СЧЕТЧИК ДОБЫЧИ */
-        .mining-counter {
-            background: rgba(139, 69, 19, 0.3);
-            border: 1px solid #D2691E;
-            border-radius: 6px;
-            padding: 5px 10px;
-            font-size: 11px;
+        /* СЧЕТЧИК ДОБЫЧИ ВНУТРИ ХРАНИЛИЩА */
+        .storage-with-rate {
             display: flex;
-            align-items: center;
-            gap: 5px;
-            animation: pulse-counter 2s infinite;
+            flex-direction: column;
+            gap: 2px;
         }
         
-        .mining-counter-value {
+        .storage-rate {
+            font-size: 9px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        
+        .rate-positive {
             color: #00FF00;
-            font-weight: bold;
-            font-size: 11px;
+        }
+        
+        .rate-negative {
+            color: #FF5555;
+        }
+        
+        .rate-neutral {
+            color: #ccc;
         }
         
         .collect-btn {
@@ -1168,12 +1175,6 @@
             }
         }
         
-        @keyframes pulse-counter {
-            0% { box-shadow: 0 0 4px rgba(139, 69, 19, 0.3); }
-            50% { box-shadow: 0 0 12px rgba(139, 69, 19, 0.6); }
-            100% { box-shadow: 0 0 4px rgba(139, 69, 19, 0.3); }
-        }
-        
         @keyframes tap-pulse {
             0% {
                 transform: translate(-50%, -50%) scale(0.5);
@@ -1296,8 +1297,14 @@
                 </div>
                 <div class="stat-item">
                     <span>🏠</span>
-                    <span class="stat-value" id="storage">0/100</span>
-                    <span>MNRT</span>
+                    <div class="storage-with-rate">
+                        <div class="stat-value" id="storage-value">0.000/100</div>
+                        <div class="storage-rate" id="storage-rate">
+                            <span id="rate-value">0.000</span>
+                            <span id="rate-icon">⏱️</span>
+                            <span>MNRT/сек</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="stat-item">
                     <span>⚡</span>
@@ -1306,12 +1313,6 @@
                 <div class="stat-item">
                     <span>🏗️</span>
                     <span class="stat-value" id="building-count">0</span>
-                </div>
-                <!-- СЧЕТЧИК ДОБЫЧИ -->
-                <div class="mining-counter" id="mining-counter">
-                    <span>⛏️</span>
-                    <span>Добыча:</span>
-                    <span class="mining-counter-value" id="mining-rate">0.000/сек</span>
                 </div>
             </div>
             
@@ -2032,24 +2033,14 @@
             // Обновляем верхнюю панель
             document.getElementById('balance').textContent = gameState.gameBalance.toFixed(2);
             
-            document.getElementById('storage').textContent = 
-                `${gameState.baseStorage.toFixed(1)}/${CONFIG.BASE_STORAGE_CAPACITY}`;
-            
-            const storageEl = document.getElementById('storage');
-            if (gameState.storageFull) {
-                storageEl.style.color = '#FF5555';
-            } else {
-                storageEl.style.color = 'gold';
-            }
+            // Обновляем отображение хранилища с учетом скорости добычи
+            updateStorageDisplay();
             
             const energy = calculateEnergy();
             document.getElementById('energy').textContent = `${energy.production}/${energy.consumption}`;
             document.getElementById('energy').style.color = energy.production >= energy.consumption ? '#00FF00' : '#FF5555';
             
             document.getElementById('building-count').textContent = gameState.buildings.length;
-            
-            // Обновляем счетчик добычи
-            updateMiningCounter();
             
             // Обновляем кнопку сбора
             const collectBtn = document.getElementById('collect-btn');
@@ -2059,8 +2050,9 @@
             gameState.playTime = Math.floor((Date.now() - gameState.gameStartTime) / 1000);
         }
 
-        // Обновление счетчика добычи
-        function updateMiningCounter() {
+        // Обновление отображения хранилища с учетом скорости добычи
+        function updateStorageDisplay() {
+            // Вычисляем текущую скорость добычи
             const activeMiningBuildings = gameState.buildings.filter(b => 
                 b.type === 'mining' && b.hasPower
             );
@@ -2073,35 +2065,43 @@
             // Вычисляем расходы
             currentUpkeepRate = calculateUpkeep();
             
-            // Чистая добыча (добыча минус расходы)
-            const netMiningRate = currentMiningRate - currentUpkeepRate;
+            // Чистая скорость (добыча минус расходы)
+            const netRate = currentMiningRate - currentUpkeepRate;
             
-            const counterEl = document.getElementById('mining-rate');
-            if (netMiningRate > 0) {
-                counterEl.textContent = `+${netMiningRate.toFixed(3)}/сек`;
-                counterEl.style.color = '#00FF00';
-            } else if (netMiningRate < 0) {
-                counterEl.textContent = `${netMiningRate.toFixed(3)}/сек`;
-                counterEl.style.color = '#FF5555';
+            // Форматируем текущее значение в хранилище
+            const storageValue = gameState.baseStorage.toFixed(3);
+            
+            // Обновляем основное отображение
+            document.getElementById('storage-value').textContent = 
+                `${storageValue}/${CONFIG.BASE_STORAGE_CAPACITY}`;
+            
+            // Обновляем скорость добычи
+            const rateValueEl = document.getElementById('rate-value');
+            const rateIconEl = document.getElementById('rate-icon');
+            const rateContainer = document.getElementById('storage-rate');
+            
+            if (netRate > 0) {
+                rateValueEl.textContent = `+${netRate.toFixed(3)}`;
+                rateIconEl.textContent = '⏫';
+                rateContainer.className = 'storage-rate rate-positive';
+            } else if (netRate < 0) {
+                rateValueEl.textContent = netRate.toFixed(3);
+                rateIconEl.textContent = '⏬';
+                rateContainer.className = 'storage-rate rate-negative';
             } else {
-                counterEl.textContent = '0.000/сек';
-                counterEl.style.color = '#ccc';
+                rateValueEl.textContent = '0.000';
+                rateIconEl.textContent = '⏱️';
+                rateContainer.className = 'storage-rate rate-neutral';
             }
             
-            // Обновляем иконку счетчика
-            const counterContainer = document.getElementById('mining-counter');
-            if (activeMiningBuildings.length === 0) {
-                counterContainer.style.background = 'rgba(139, 69, 19, 0.3)';
-                counterContainer.style.borderColor = '#D2691E';
-            } else if (netMiningRate > 0) {
-                counterContainer.style.background = 'rgba(0, 100, 0, 0.3)';
-                counterContainer.style.borderColor = '#00FF00';
-            } else if (netMiningRate < 0) {
-                counterContainer.style.background = 'rgba(100, 0, 0, 0.3)';
-                counterContainer.style.borderColor = '#FF5555';
+            // Подсвечиваем хранилище при заполнении
+            const storageEl = document.getElementById('storage-value');
+            if (gameState.storageFull) {
+                storageEl.style.color = '#FF5555';
+                storageEl.style.animation = 'pulse-red 0.5s infinite';
             } else {
-                counterContainer.style.background = 'rgba(139, 69, 19, 0.3)';
-                counterContainer.style.borderColor = '#D2691E';
+                storageEl.style.color = 'gold';
+                storageEl.style.animation = 'none';
             }
         }
 
@@ -3137,7 +3137,7 @@
         }
 
         // ============================
-        // ИСПРАВЛЕНИЕ ПРОБЛЕМЫ СО СЧЕТЧИКОМ ДОБЫЧИ
+        // ЗАПУСК ЦИКЛА ОБНОВЛЕНИЯ
         // ============================
         function startMiningUpdateLoop() {
             // Убеждаемся, что gameState.lastUpdate инициализирован
