@@ -63,32 +63,6 @@
             font-size: 13px;
         }
         
-        /* СЧЕТЧИК ДОБЫЧИ ВНУТРИ ХРАНИЛИЩА */
-        .storage-with-rate {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        
-        .storage-rate {
-            font-size: 9px;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-        }
-        
-        .rate-positive {
-            color: #00FF00;
-        }
-        
-        .rate-negative {
-            color: #FF5555;
-        }
-        
-        .rate-neutral {
-            color: #ccc;
-        }
-        
         .collect-btn {
             background: linear-gradient(135deg, #2E8B57, #3CB371);
             color: white;
@@ -518,6 +492,307 @@
             flex-direction: column;
             gap: 15px;
             height: 100%;
+        }
+        
+        /* ВКЛАДКА 5: РЕФЕРАЛЬНАЯ ПРОГРАММА */
+        #referral-tab {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+        
+        .referral-header {
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(139, 69, 19, 0.5);
+            flex-shrink: 0;
+        }
+        
+        .referral-title {
+            font-size: 22px;
+            color: gold;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .referral-subtitle {
+            font-size: 14px;
+            color: #ccc;
+        }
+        
+        .referral-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(139, 69, 19, 0.2);
+            border: 1px solid #D2691E;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.3);
+        }
+        
+        .stat-value-large {
+            font-size: 28px;
+            font-weight: bold;
+            color: gold;
+            margin: 8px 0;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #ccc;
+        }
+        
+        .bonus-badge {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 5px;
+            animation: pulse-gold 2s infinite;
+        }
+        
+        .referral-link-container {
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.3), rgba(210, 105, 30, 0.3));
+            border: 2px solid #D2691E;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .referral-link-title {
+            font-size: 16px;
+            color: gold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .referral-link-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #8B4513;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .referral-link {
+            font-family: monospace;
+            font-size: 14px;
+            word-break: break-all;
+            color: #4CAF50;
+            padding-right: 40px;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #0088cc, #006699);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: linear-gradient(135deg, #006699, #004466);
+            transform: translateY(-50%) scale(1.05);
+        }
+        
+        .copy-btn.copied {
+            background: linear-gradient(135deg, #00AA00, #008800);
+        }
+        
+        .referral-note {
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+        
+        .referrals-list {
+            background: rgba(139, 69, 19, 0.1);
+            border: 1px solid #8B4513;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+        
+        .referrals-title {
+            font-size: 18px;
+            color: gold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .referrals-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        
+        .referrals-table th {
+            background: rgba(139, 69, 19, 0.3);
+            padding: 12px;
+            text-align: left;
+            color: gold;
+            font-weight: bold;
+            border-bottom: 2px solid #8B4513;
+        }
+        
+        .referrals-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+        }
+        
+        .referrals-table tr:hover {
+            background: rgba(139, 69, 19, 0.1);
+        }
+        
+        .referral-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .referral-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .referral-name {
+            font-weight: bold;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .referral-date {
+            color: #888;
+            font-size: 11px;
+        }
+        
+        .no-referrals {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+            font-size: 16px;
+        }
+        
+        .referral-bonus-info {
+            background: rgba(70, 130, 180, 0.2);
+            border: 1px solid #467CBE;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .bonus-info-title {
+            font-size: 16px;
+            color: #467CBE;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .bonus-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .bonus-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        
+        .bonus-icon {
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(139, 69, 19, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .bonus-text {
+            flex: 1;
+        }
+        
+        .bonus-amount {
+            color: gold;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .invite-btn {
+            background: linear-gradient(135deg, #2E8B57, #3CB371);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+        
+        .invite-btn:hover {
+            background: linear-gradient(135deg, #3CB371, #66CDAA);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(46, 139, 87, 0.4);
         }
         
         /* TELEGRAM USER INFO */
@@ -1210,6 +1485,12 @@
             100% { box-shadow: 0 0 8px rgba(255, 0, 0, 0.5); }
         }
         
+        @keyframes pulse-gold {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
         /* АДАПТИВНЫЕ СТИЛИ ДЛЯ МОБИЛЬНЫХ */
         @media (max-width: 480px) {
             .stats-row {
@@ -1237,6 +1518,10 @@
             }
             
             .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .referral-stats {
                 grid-template-columns: 1fr;
             }
             
@@ -1297,14 +1582,8 @@
                 </div>
                 <div class="stat-item">
                     <span>🏠</span>
-                    <div class="storage-with-rate">
-                        <div class="stat-value" id="storage-value">0.000/100</div>
-                        <div class="storage-rate" id="storage-rate">
-                            <span id="rate-value">0.000</span>
-                            <span id="rate-icon">⏱️</span>
-                            <span>MNRT/сек</span>
-                        </div>
-                    </div>
+                    <span class="stat-value" id="storage">0/100</span>
+                    <span>MNRT</span>
                 </div>
                 <div class="stat-item">
                     <span>⚡</span>
@@ -1512,6 +1791,118 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- ВКЛАДКА 5: РЕФЕРАЛЬНАЯ ПРОГРАММА -->
+            <div id="fullscreen-referral" class="fullscreen-tab">
+                <div class="tab-content">
+                    <div class="tab-header">
+                        <div class="tab-title">👥 Реферальная программа</div>
+                        <button class="close-tab-btn" id="close-referral">✕</button>
+                    </div>
+                    <div id="referral-tab">
+                        <!-- ЗАГОЛОВОК -->
+                        <div class="referral-header">
+                            <div class="referral-title">🚀 Приглашай друзей и получай бонусы!</div>
+                            <div class="referral-subtitle">Приглашайте друзей и получайте 10% от их добычи навсегда!</div>
+                        </div>
+                        
+                        <!-- СТАТИСТИКА -->
+                        <div class="referral-stats">
+                            <div class="stat-card">
+                                <div class="stat-label">Приглашено друзей</div>
+                                <div class="stat-value-large" id="referral-count">0</div>
+                                <div class="bonus-badge">👥</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Заработано бонусов</div>
+                                <div class="stat-value-large" id="referral-earned">0.00</div>
+                                <div class="stat-label">MNRT</div>
+                                <div class="bonus-badge">💰</div>
+                            </div>
+                        </div>
+                        
+                        <!-- ССЫЛКА ДЛЯ ПРИГЛАШЕНИЯ -->
+                        <div class="referral-link-container">
+                            <div class="referral-link-title">
+                                <span>🔗</span>
+                                <span>Ваша реферальная ссылка</span>
+                            </div>
+                            <div class="referral-link-box">
+                                <div class="referral-link" id="referral-link-text">
+                                    https://t.me/MarsCC_Bot?start=ref_000000
+                                </div>
+                                <button class="copy-btn" id="copy-referral-link">
+                                    <span>📋</span>
+                                    <span>Копировать</span>
+                                </button>
+                            </div>
+                            <div class="referral-note">
+                                Отправьте эту ссылку друзьям. При переходе они автоматически станут вашими рефералами!
+                            </div>
+                        </div>
+                        
+                        <!-- СПИСОК ПРИГЛАШЕННЫХ -->
+                        <div class="referrals-list">
+                            <div class="referrals-title">
+                                <span>👥</span>
+                                <span>Приглашенные друзья</span>
+                            </div>
+                            <div id="referrals-container">
+                                <div class="no-referrals" id="no-referrals-message">
+                                    У вас пока нет приглашенных друзей.<br>
+                                    Пригласите друзей по ссылке выше!
+                                </div>
+                                <table class="referrals-table" id="referrals-table" style="display: none;">
+                                    <thead>
+                                        <tr>
+                                            <th>Друг</th>
+                                            <th>Дата приглашения</th>
+                                            <th style="text-align: right;">Бонусов заработано</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="referrals-body">
+                                        <!-- Список рефералов будет здесь -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- ИНФОРМАЦИЯ О БОНУСАХ -->
+                        <div class="referral-bonus-info">
+                            <div class="bonus-info-title">
+                                <span>💰</span>
+                                <span>Как работают бонусы?</span>
+                            </div>
+                            <div class="bonus-list">
+                                <div class="bonus-item">
+                                    <div class="bonus-icon">🎁</div>
+                                    <div class="bonus-text">
+                                        <strong>Бонус за приглашение:</strong> Получайте <span class="bonus-amount">10%</span> от добычи каждого приглашенного друга
+                                    </div>
+                                </div>
+                                <div class="bonus-item">
+                                    <div class="bonus-icon">⚡</div>
+                                    <div class="bonus-text">
+                                        <strong>Пассивный доход:</strong> Бонусы начисляются автоматически каждую минуту
+                                    </div>
+                                </div>
+                                <div class="bonus-item">
+                                    <div class="bonus-icon">🔗</div>
+                                    <div class="bonus-text">
+                                        <strong>Ссылка друзей:</strong> Каждый друг может также приглашать своих друзей, увеличивая ваш доход
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- КНОПКА ПРИГЛАШЕНИЯ -->
+                        <a href="https://t.me/MarsCC_Bot" target="_blank" class="invite-btn" id="invite-telegram-btn">
+                            <span>📱</span>
+                            <span>Пригласить в Telegram</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- НИЖНЕЕ МЕНЮ С ВКЛАДКАМИ -->
@@ -1533,6 +1924,10 @@
                     <div class="menu-tab-icon">📈</div>
                     <div class="menu-tab-text">Статистика</div>
                 </button>
+                <button class="menu-tab" id="referral-tab-btn">
+                    <div class="menu-tab-icon">👥</div>
+                    <div class="menu-tab-text">Пригласить</div>
+                </button>
             </div>
         </div>
         
@@ -1548,7 +1943,7 @@
             </button>
             <button class="building-context-menu-btn delete" id="delete-building-btn">
                 <span>🗑️</span>
-                <span>Удалить здание</span>
+                    <span>Удалить здание</span>
             </button>
         </div>
         
@@ -1612,6 +2007,7 @@
         let lastTapX = 0;
         let lastTapY = 0;
         let miningUpdateInterval = null;
+        let referralUpdateInterval = null;
         
         // Инициализация Telegram Web App
         function initTelegramWebApp() {
@@ -1659,6 +2055,9 @@
                         avatarEl.textContent = firstName.charAt(0).toUpperCase();
                     }
                     
+                    // Обновляем реферальную ссылку
+                    updateReferralLink();
+                    
                     // Инициализируем игру
                     initGame();
                     
@@ -1670,6 +2069,10 @@
                         firstName: 'Тестовый',
                         lastName: 'Пользователь'
                     };
+                    
+                    // Обновляем реферальную ссылку
+                    updateReferralLink();
+                    
                     initGame();
                 }
             } else {
@@ -1680,6 +2083,10 @@
                     firstName: 'Тестовый',
                     lastName: 'Пользователь'
                 };
+                
+                // Обновляем реферальную ссылку
+                updateReferralLink();
+                
                 initGame();
             }
         }
@@ -1704,15 +2111,15 @@
             },
             
             UPGRADE_BONUSES: {
-                base: [50, 100, 150],
-                mining: [0.2, 0.4, 0.8],
+                base: [0.5, 1.0, 2.0],
+                mining: [0.5, 1.0, 2.0],
                 power: [2, 4, 8]
             },
             
             UPGRADE_UPKEEP_MULTIPLIERS: {
-                base: [2.0, 4.0, 6.0],
-                mining: [2.0, 4.0, 6.0],
-                power: [2.0, 4.0, 6.0]
+                base: [1.5, 2.0, 2.5],
+                mining: [1.5, 2.0, 2.5],
+                power: [1.5, 2.0, 2.5]
             },
             
             BUILDING_COSTS: {
@@ -1741,7 +2148,13 @@
             
             WITHDRAWAL_MIN: 10,
             WITHDRAWAL_COOLDOWN: 24 * 60 * 60 * 1000,
-            GAS_FEE: 0.001
+            GAS_FEE: 0.001,
+            
+            // Реферальная система
+            REFERRAL_BONUS_PERCENT: 0.10, // 10% от добычи реферала
+            REFERRAL_BONUS_INTERVAL: 60000, // Обновление бонусов каждую минуту
+            REFERRAL_BONUS_LIMIT: 1000, // Максимальный бонус за одного реферала
+            REFERRAL_BONUS_MIN: 0.001 // Минимальный бонус для начисления
         };
 
         // Состояние игры
@@ -1763,6 +2176,7 @@
             storageFull: false,
             gameStartTime: Date.now(),
             playTime: 0,
+            baseCapacity: CONFIG.BASE_STORAGE_CAPACITY,
             
             freeBuildingsUsed: {
                 base: false,
@@ -1774,9 +2188,188 @@
                 totalMined: 0,
                 totalBuildings: 0,
                 totalUpgrades: 0
+            },
+            
+            // Реферальная система
+            referral: {
+                code: null,
+                referrals: [],
+                totalEarned: 0.0,
+                lastBonusUpdate: Date.now()
             }
         };
 
+        // ============================
+        // РЕФЕРАЛЬНАЯ СИСТЕМА
+        // ============================
+        function updateReferralLink() {
+            if (!telegramUser) return;
+            
+            // Создаем уникальный реферальный код на основе ID пользователя
+            const referralCode = `ref_${telegramUser.id}`;
+            gameState.referral.code = referralCode;
+            
+            const referralLink = `https://t.me/MarsCC_Bot?start=${referralCode}`;
+            document.getElementById('referral-link-text').textContent = referralLink;
+            
+            // Загружаем тестовые данные рефералов
+            loadTestReferrals();
+        }
+        
+        function copyReferralLink() {
+            const linkText = document.getElementById('referral-link-text').textContent;
+            const copyBtn = document.getElementById('copy-referral-link');
+            
+            navigator.clipboard.writeText(linkText)
+                .then(() => {
+                    copyBtn.innerHTML = '<span>✅</span><span>Скопировано!</span>';
+                    copyBtn.classList.add('copied');
+                    
+                    showMessage('✅ Реферальная ссылка скопирована в буфер обмена!', 'success');
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<span>📋</span><span>Копировать</span>';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                })
+                .catch(() => {
+                    showMessage('❌ Не удалось скопировать ссылку', 'error');
+                });
+        }
+        
+        function loadTestReferrals() {
+            // Тестовые данные для демонстрации
+            const testReferrals = [
+                {
+                    id: 1,
+                    name: "Александр К.",
+                    avatar: "👨‍🚀",
+                    date: "2024-03-15",
+                    earned: 45.75,
+                    level: 1
+                },
+                {
+                    id: 2,
+                    name: "Мария С.",
+                    avatar: "👩‍🚀",
+                    date: "2024-03-18",
+                    earned: 28.30,
+                    level: 1
+                },
+                {
+                    id: 3,
+                    name: "Дмитрий П.",
+                    avatar: "🧑‍💼",
+                    date: "2024-03-20",
+                    earned: 12.15,
+                    level: 1
+                }
+            ];
+            
+            gameState.referral.referrals = testReferrals;
+            gameState.referral.totalEarned = testReferrals.reduce((sum, ref) => sum + ref.earned, 0);
+            
+            updateReferralTab();
+        }
+        
+        function updateReferralTab() {
+            const referralCount = gameState.referral.referrals.length;
+            const totalEarned = gameState.referral.totalEarned;
+            
+            document.getElementById('referral-count').textContent = referralCount;
+            document.getElementById('referral-earned').textContent = totalEarned.toFixed(2);
+            
+            const referralsBody = document.getElementById('referrals-body');
+            const noReferralsMsg = document.getElementById('no-referrals-message');
+            const referralsTable = document.getElementById('referrals-table');
+            
+            if (referralCount > 0) {
+                noReferralsMsg.style.display = 'none';
+                referralsTable.style.display = 'table';
+                
+                referralsBody.innerHTML = '';
+                
+                gameState.referral.referrals.forEach(ref => {
+                    const row = document.createElement('tr');
+                    
+                    // Форматируем дату
+                    const date = new Date(ref.date);
+                    const formattedDate = date.toLocaleDateString('ru-RU', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    });
+                    
+                    row.innerHTML = `
+                        <td>
+                            <div class="referral-user">
+                                <div class="referral-avatar">${ref.avatar || '👤'}</div>
+                                <div>
+                                    <div class="referral-name">${ref.name}</div>
+                                    <div class="referral-date">${formattedDate}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${formattedDate}</td>
+                        <td style="text-align: right; color: gold; font-weight: bold;">${ref.earned.toFixed(2)} MNRT</td>
+                    `;
+                    
+                    referralsBody.appendChild(row);
+                });
+            } else {
+                noReferralsMsg.style.display = 'block';
+                referralsTable.style.display = 'none';
+            }
+        }
+        
+        function calculateReferralBonuses() {
+            const now = Date.now();
+            const elapsedMinutes = (now - gameState.referral.lastBonusUpdate) / 60000;
+            
+            if (elapsedMinutes < 1) return; // Обновляем раз в минуту
+            
+            let totalBonus = 0;
+            
+            // Симулируем начисление бонусов от рефералов
+            gameState.referral.referrals.forEach(ref => {
+                // Бонус зависит от уровня реферала и времени
+                const minuteBonus = 0.01 + (ref.level * 0.005);
+                const bonus = minuteBonus * elapsedMinutes;
+                
+                if (bonus > CONFIG.REFERRAL_BONUS_MIN) {
+                    ref.earned += bonus;
+                    totalBonus += bonus;
+                }
+            });
+            
+            if (totalBonus > 0) {
+                gameState.referral.totalEarned += totalBonus;
+                gameState.gameBalance += totalBonus;
+                
+                // Обновляем время последнего начисления
+                gameState.referral.lastBonusUpdate = now;
+                
+                // Обновляем интерфейс
+                updateReferralTab();
+                updateUI();
+                
+                // Показываем сообщение о начислении
+                if (totalBonus > 0.1) { // Показываем только значительные начисления
+                    showMessage(`💰 Получено ${totalBonus.toFixed(3)} MNRT от рефералов!`, 'success');
+                }
+            }
+        }
+        
+        function startReferralBonusLoop() {
+            if (referralUpdateInterval) {
+                clearInterval(referralUpdateInterval);
+            }
+            
+            referralUpdateInterval = setInterval(() => {
+                calculateReferralBonuses();
+            }, CONFIG.REFERRAL_BONUS_INTERVAL);
+        }
+        
         // ============================
         // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
         // ============================
@@ -1838,6 +2431,7 @@
             document.getElementById('fullscreen-my-buildings').classList.remove('active');
             document.getElementById('fullscreen-wallet').classList.remove('active');
             document.getElementById('fullscreen-stats').classList.remove('active');
+            document.getElementById('fullscreen-referral').classList.remove('active');
             
             // Скрываем меню строительства
             closeBuildMenu();
@@ -1862,6 +2456,11 @@
                 document.getElementById('fullscreen-stats').classList.add('active');
                 currentTab = 'stats';
                 updateStatsTab();
+            } else if (tabName === 'referral') {
+                document.getElementById('referral-tab-btn').classList.add('active');
+                document.getElementById('fullscreen-referral').classList.add('active');
+                currentTab = 'referral';
+                updateReferralTab();
             }
         }
         
@@ -2033,8 +2632,17 @@
             // Обновляем верхнюю панель
             document.getElementById('balance').textContent = gameState.gameBalance.toFixed(2);
             
-            // Обновляем отображение хранилища с учетом скорости добычи
-            updateStorageDisplay();
+            // Обновляем хранилище с правильной вместимостью
+            const currentCapacity = gameState.baseCapacity;
+            document.getElementById('storage').textContent = 
+                `${gameState.baseStorage.toFixed(1)}/${currentCapacity}`;
+            
+            const storageEl = document.getElementById('storage');
+            if (gameState.storageFull) {
+                storageEl.style.color = '#FF5555';
+            } else {
+                storageEl.style.color = 'gold';
+            }
             
             const energy = calculateEnergy();
             document.getElementById('energy').textContent = `${energy.production}/${energy.consumption}`;
@@ -2048,61 +2656,6 @@
             
             // Обновляем время игры
             gameState.playTime = Math.floor((Date.now() - gameState.gameStartTime) / 1000);
-        }
-
-        // Обновление отображения хранилища с учетом скорости добычи
-        function updateStorageDisplay() {
-            // Вычисляем текущую скорость добычи
-            const activeMiningBuildings = gameState.buildings.filter(b => 
-                b.type === 'mining' && b.hasPower
-            );
-            
-            currentMiningRate = 0;
-            activeMiningBuildings.forEach(building => {
-                currentMiningRate += calculateMiningRate(building);
-            });
-            
-            // Вычисляем расходы
-            currentUpkeepRate = calculateUpkeep();
-            
-            // Чистая скорость (добыча минус расходы)
-            const netRate = currentMiningRate - currentUpkeepRate;
-            
-            // Форматируем текущее значение в хранилище
-            const storageValue = gameState.baseStorage.toFixed(3);
-            
-            // Обновляем основное отображение
-            document.getElementById('storage-value').textContent = 
-                `${storageValue}/${CONFIG.BASE_STORAGE_CAPACITY}`;
-            
-            // Обновляем скорость добычи
-            const rateValueEl = document.getElementById('rate-value');
-            const rateIconEl = document.getElementById('rate-icon');
-            const rateContainer = document.getElementById('storage-rate');
-            
-            if (netRate > 0) {
-                rateValueEl.textContent = `+${netRate.toFixed(3)}`;
-                rateIconEl.textContent = '⏫';
-                rateContainer.className = 'storage-rate rate-positive';
-            } else if (netRate < 0) {
-                rateValueEl.textContent = netRate.toFixed(3);
-                rateIconEl.textContent = '⏬';
-                rateContainer.className = 'storage-rate rate-negative';
-            } else {
-                rateValueEl.textContent = '0.000';
-                rateIconEl.textContent = '⏱️';
-                rateContainer.className = 'storage-rate rate-neutral';
-            }
-            
-            // Подсвечиваем хранилище при заполнении
-            const storageEl = document.getElementById('storage-value');
-            if (gameState.storageFull) {
-                storageEl.style.color = '#FF5555';
-                storageEl.style.animation = 'pulse-red 0.5s infinite';
-            } else {
-                storageEl.style.color = 'gold';
-                storageEl.style.animation = 'none';
-            }
         }
 
         // ============================
@@ -2502,6 +3055,13 @@
                 if (building.type === type && building.level === minLevel) {
                     building.level++;
                     upgradedCount++;
+                    
+                    // Если улучшаем базу - увеличиваем вместимость
+                    if (building.type === 'base') {
+                        const bonus = CONFIG.UPGRADE_BONUSES.base[building.level - 1] || 0;
+                        const additionalCapacity = CONFIG.BASE_STORAGE_CAPACITY * bonus;
+                        gameState.baseCapacity += additionalCapacity;
+                    }
                 }
             });
             
@@ -2558,14 +3118,14 @@
             
             gameState.buildings.forEach(building => {
                 if (CONFIG.ENERGY_PRODUCTION[building.type]) {
-                    production += CONFIG.ENERGY_PRODUCTION[building.type];
+                    let energy = CONFIG.ENERGY_PRODUCTION[building.type];
+                    if (building.level > 0 && building.type === 'power') {
+                        energy += CONFIG.UPGRADE_BONUSES.power[building.level - 1] || 0;
+                    }
+                    production += energy;
                 }
                 if (CONFIG.ENERGY_CONSUMPTION[building.type]) {
                     consumption += CONFIG.ENERGY_CONSUMPTION[building.type];
-                }
-                
-                if (building.level > 0 && building.type === 'power') {
-                    production += CONFIG.UPGRADE_BONUSES.power[building.level - 1] || 0;
                 }
             });
             
@@ -2642,7 +3202,7 @@
             if (netMiningPerSecond > 0) {
                 // Есть положительная добыча
                 const minedThisTick = netMiningPerSecond * elapsedSeconds;
-                const availableStorage = CONFIG.BASE_STORAGE_CAPACITY - gameState.baseStorage;
+                const availableStorage = gameState.baseCapacity - gameState.baseStorage;
                 const actualMined = Math.min(minedThisTick, availableStorage);
                 
                 if (actualMined > 0) {
@@ -2650,7 +3210,7 @@
                     gameState.totalMinedAllTime += actualMined;
                     gameState.statistics.totalMined += actualMined;
                     
-                    if (gameState.baseStorage >= CONFIG.BASE_STORAGE_CAPACITY) {
+                    if (gameState.baseStorage >= gameState.baseCapacity) {
                         gameState.storageFull = true;
                         gameState.miningActive = false;
                         showMessage('⚠️ Хранилище заполнено! Соберите ресурсы.', 'error');
@@ -2894,6 +3454,11 @@
             const building = gameState.buildings[buildingIndex];
             const buildingName = getBuildingName(building.type);
             
+            // Если удаляем базу - сбрасываем вместимость
+            if (building.type === 'base') {
+                gameState.baseCapacity = CONFIG.BASE_STORAGE_CAPACITY;
+            }
+            
             // Удаляем здание из массива
             gameState.buildings.splice(buildingIndex, 1);
             
@@ -3070,11 +3635,13 @@
             document.getElementById('my-buildings-tab-btn').addEventListener('click', () => showTab('my-buildings'));
             document.getElementById('wallet-tab-btn').addEventListener('click', () => showTab('wallet'));
             document.getElementById('stats-tab-btn').addEventListener('click', () => showTab('stats'));
+            document.getElementById('referral-tab-btn').addEventListener('click', () => showTab('referral'));
             
             // Закрытие вкладок
             document.getElementById('close-my-buildings').addEventListener('click', () => showTab('mars'));
             document.getElementById('close-wallet').addEventListener('click', () => showTab('mars'));
             document.getElementById('close-stats').addEventListener('click', () => showTab('mars'));
+            document.getElementById('close-referral').addEventListener('click', () => showTab('mars'));
             
             // Статистика
             document.getElementById('leaderboard-tab').addEventListener('click', () => switchStatsTab('leaderboard'));
@@ -3093,6 +3660,9 @@
             document.getElementById('edit-address-btn').addEventListener('click', toggleAddressInput);
             document.getElementById('withdraw-btn').addEventListener('click', withdrawFunds);
             document.getElementById('withdraw-amount').addEventListener('input', updateWalletTab);
+            
+            // Реферальная система
+            document.getElementById('copy-referral-link').addEventListener('click', copyReferralLink);
             
             // Закрытие меню при клике вне
             document.addEventListener('click', function(e) {
@@ -3137,7 +3707,7 @@
         }
 
         // ============================
-        // ЗАПУСК ЦИКЛА ОБНОВЛЕНИЯ
+        // ЗАПУСК ЦИКЛОВ ОБНОВЛЕНИЯ
         // ============================
         function startMiningUpdateLoop() {
             // Убеждаемся, что gameState.lastUpdate инициализирован
@@ -3180,6 +3750,9 @@
             
             // Запускаем цикл обновления добычи
             startMiningUpdateLoop();
+            
+            // Запускаем цикл обновления реферальных бонусов
+            startReferralBonusLoop();
             
             // Приветственное сообщение
             setTimeout(() => {
