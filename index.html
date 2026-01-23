@@ -1610,6 +1610,7 @@
         let isLongTap = false;
         let lastTapX = 0;
         let lastTapY = 0;
+        let miningUpdateInterval = null;
         
         // Инициализация Telegram Web App
         function initTelegramWebApp() {
@@ -2091,10 +2092,16 @@
             const counterContainer = document.getElementById('mining-counter');
             if (activeMiningBuildings.length === 0) {
                 counterContainer.style.background = 'rgba(139, 69, 19, 0.3)';
+                counterContainer.style.borderColor = '#D2691E';
             } else if (netMiningRate > 0) {
                 counterContainer.style.background = 'rgba(0, 100, 0, 0.3)';
+                counterContainer.style.borderColor = '#00FF00';
+            } else if (netMiningRate < 0) {
+                counterContainer.style.background = 'rgba(100, 0, 0, 0.3)';
+                counterContainer.style.borderColor = '#FF5555';
             } else {
                 counterContainer.style.background = 'rgba(139, 69, 19, 0.3)';
+                counterContainer.style.borderColor = '#D2691E';
             }
         }
 
@@ -2625,20 +2632,23 @@
                 return;
             }
             
-            let totalMining = 0;
+            let totalMiningPerSecond = 0;
             activeMiningBuildings.forEach(building => {
-                totalMining += calculateMiningRate(building);
+                totalMiningPerSecond += calculateMiningRate(building);
             });
             
-            const netMiningPerSecond = totalMining - upkeepPerSecond;
+            const netMiningPerSecond = totalMiningPerSecond - upkeepPerSecond;
             
             if (netMiningPerSecond > 0) {
+                // Есть положительная добыча
                 const minedThisTick = netMiningPerSecond * elapsedSeconds;
                 const availableStorage = CONFIG.BASE_STORAGE_CAPACITY - gameState.baseStorage;
                 const actualMined = Math.min(minedThisTick, availableStorage);
                 
                 if (actualMined > 0) {
                     gameState.baseStorage += actualMined;
+                    gameState.totalMinedAllTime += actualMined;
+                    gameState.statistics.totalMined += actualMined;
                     
                     if (gameState.baseStorage >= CONFIG.BASE_STORAGE_CAPACITY) {
                         gameState.storageFull = true;
@@ -2646,7 +2656,8 @@
                         showMessage('⚠️ Хранилище заполнено! Соберите ресурсы.', 'error');
                     }
                 }
-            } else {
+            } else if (netMiningPerSecond < 0) {
+                // Расходы превышают добычу
                 const lossPerSecond = -netMiningPerSecond;
                 const lossThisTick = lossPerSecond * elapsedSeconds;
                 
@@ -3128,15 +3139,25 @@
         // ============================
         // ИСПРАВЛЕНИЕ ПРОБЛЕМЫ СО СЧЕТЧИКОМ ДОБЫЧИ
         // ============================
-        function fixMiningUpdate() {
+        function startMiningUpdateLoop() {
             // Убеждаемся, что gameState.lastUpdate инициализирован
             if (!gameState.lastUpdate) {
                 gameState.lastUpdate = Date.now();
             }
             
+            // Останавливаем предыдущий интервал, если он есть
+            if (miningUpdateInterval) {
+                clearInterval(miningUpdateInterval);
+            }
+            
             // Устанавливаем интервал для обновления добычи
-            setInterval(() => {
+            miningUpdateInterval = setInterval(() => {
                 updateMining();
+            }, 100); // Обновляем каждые 100 мс для плавности
+            
+            // Также обновляем UI каждую секунду
+            setInterval(() => {
+                updateUI();
             }, 1000);
         }
 
@@ -3157,8 +3178,8 @@
             gameState.lastUpdate = Date.now();
             gameState.gameStartTime = Date.now();
             
-            // Исправляем проблему со счетчиком добычи
-            fixMiningUpdate();
+            // Запускаем цикл обновления добычи
+            startMiningUpdateLoop();
             
             // Приветственное сообщение
             setTimeout(() => {
