@@ -32,18 +32,18 @@
         #top-panel {
             background: rgba(20, 15, 10, 0.95);
             border-bottom: 2px solid #8B4513;
-            padding: 8px 10px;
+            padding: 10px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
             z-index: 100;
-            min-height: 50px;
+            min-height: 55px;
         }
         
         .stats-row {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
             flex: 1;
             min-width: 0;
@@ -52,15 +52,15 @@
         .stat-item {
             display: flex;
             align-items: center;
-            gap: 3px;
-            font-size: 11px;
+            gap: 4px;
+            font-size: 12px;
             white-space: nowrap;
         }
         
         .stat-value {
             color: gold;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 13px;
         }
         
         /* СЧЕТЧИК ДОБЫЧИ */
@@ -68,34 +68,35 @@
             background: rgba(139, 69, 19, 0.3);
             border: 1px solid #D2691E;
             border-radius: 6px;
-            padding: 4px 8px;
-            font-size: 10px;
+            padding: 5px 10px;
+            font-size: 11px;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
             animation: pulse-counter 2s infinite;
         }
         
         .mining-counter-value {
             color: #00FF00;
             font-weight: bold;
-            font-size: 10px;
+            font-size: 11px;
         }
         
         .collect-btn {
             background: linear-gradient(135deg, #2E8B57, #3CB371);
             color: white;
             border: none;
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 11px;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             transition: all 0.2s;
             flex-shrink: 0;
+            min-height: 40px;
         }
         
         .collect-btn:hover:not(:disabled) {
@@ -114,16 +115,17 @@
             background: linear-gradient(135deg, #8B4513, #D2691E);
             color: white;
             border: none;
-            border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 11px;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             transition: all 0.2s;
             flex-shrink: 0;
+            min-height: 40px;
         }
         
         .build-btn:hover {
@@ -175,6 +177,12 @@
             overflow-y: auto;
             padding-right: 5px;
             max-height: calc(70vh - 80px);
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE и Edge */
+        }
+        
+        .build-menu-content::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
         
         .build-menu-header {
@@ -187,7 +195,7 @@
         }
         
         .build-menu-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             color: gold;
         }
@@ -196,11 +204,11 @@
             background: none;
             border: none;
             color: #FF5555;
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
             padding: 0;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -214,8 +222,8 @@
         
         .build-options-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
             margin: 10px 0;
         }
         
@@ -223,7 +231,7 @@
             background: rgba(139, 69, 19, 0.2);
             border: 1px solid #D2691E;
             border-radius: 8px;
-            padding: 12px;
+            padding: 14px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
@@ -249,24 +257,24 @@
         }
         
         .build-option-icon {
-            font-size: 26px;
+            font-size: 28px;
             margin-bottom: 5px;
         }
         
         .build-option-name {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: bold;
             color: white;
         }
         
         .build-option-desc {
-            font-size: 10px;
+            font-size: 11px;
             color: #ccc;
             line-height: 1.3;
         }
         
         .build-option-cost {
-            font-size: 11px;
+            font-size: 12px;
             color: gold;
             font-weight: bold;
             margin-top: 5px;
@@ -278,7 +286,7 @@
         }
         
         .build-hint {
-            font-size: 11px;
+            font-size: 12px;
             color: #888;
             text-align: center;
             margin-top: 10px;
@@ -305,7 +313,7 @@
             top: 0;
             left: 0;
             right: 0;
-            bottom: 60px; /* Учитываем высоту нижнего меню */
+            bottom: 70px; /* Учитываем высоту нижнего меню */
             background: rgba(10, 10, 26, 0.98);
             z-index: 50;
             display: none;
@@ -322,13 +330,19 @@
             overflow-y: auto;
             padding: 15px;
             padding-bottom: 20px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE и Edge */
+        }
+        
+        .tab-content::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
         
         /* НИЖНЕЕ МЕНЮ */
         #bottom-menu {
             background: rgba(20, 15, 10, 0.95);
             border-top: 2px solid #8B4513;
-            height: 60px;
+            height: 70px;
             display: flex;
             z-index: 200;
             flex-shrink: 0;
@@ -342,19 +356,19 @@
         
         .menu-tab {
             flex: 1;
-            padding: 8px;
+            padding: 10px 5px;
             text-align: center;
             background: none;
             border: none;
             color: #aaa;
-            font-size: 11px;
+            font-size: 12px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 6px;
         }
         
         .menu-tab.active {
@@ -364,11 +378,12 @@
         }
         
         .menu-tab-icon {
-            font-size: 16px;
+            font-size: 20px;
         }
         
         .menu-tab-text {
-            font-size: 9px;
+            font-size: 11px;
+            font-weight: 500;
         }
         
         /* ЗАГОЛОВОК ВКЛАДКИ */
@@ -376,14 +391,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
+            padding: 15px 0;
             margin-bottom: 15px;
             border-bottom: 2px solid #8B4513;
             flex-shrink: 0;
         }
         
         .tab-title {
-            font-size: 18px;
+            font-size: 20px;
             color: gold;
             font-weight: bold;
         }
@@ -393,12 +408,12 @@
             border: 1px solid #FF5555;
             color: #FF9999;
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
             transition: all 0.2s;
             flex-shrink: 0;
@@ -428,16 +443,16 @@
         }
         
         .total-buildings {
-            font-size: 12px;
+            font-size: 14px;
             color: #ccc;
             background: rgba(139, 69, 19, 0.2);
-            padding: 4px 8px;
-            border-radius: 6px;
+            padding: 6px 10px;
+            border-radius: 8px;
         }
         
         .buildings-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 12px;
             margin-bottom: 20px;
         }
@@ -445,25 +460,25 @@
         .owned-building {
             background: rgba(70, 130, 180, 0.2);
             border: 1px solid #467CBE;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 12px;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 13px;
         }
         
         .owned-building-header {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
+            gap: 12px;
+            margin-bottom: 10px;
         }
         
         .building-stats {
-            margin-top: 6px;
-            font-size: 11px;
+            margin-top: 8px;
+            font-size: 12px;
             color: #aaa;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 5px;
         }
         
         .building-stat {
@@ -482,12 +497,12 @@
         
         .no-buildings {
             text-align: center;
-            padding: 30px;
+            padding: 40px;
             color: #888;
-            font-size: 14px;
+            font-size: 16px;
             background: rgba(139, 69, 19, 0.1);
-            border-radius: 8px;
-            margin: 15px 0;
+            border-radius: 10px;
+            margin: 20px 0;
         }
         
         /* ВКЛАДКА 3: КОШЕЛЕК */
@@ -496,31 +511,30 @@
             flex-direction: column;
             gap: 15px;
             height: 100%;
-            overflow-y: auto;
         }
         
         /* TELEGRAM USER INFO */
         .user-info {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 15px;
-            padding: 12px;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
             background: rgba(139, 69, 19, 0.2);
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid #D2691E;
             flex-shrink: 0;
         }
         
         .user-avatar {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 22px;
             background-size: cover;
             background-position: center;
             flex-shrink: 0;
@@ -533,28 +547,28 @@
         
         .user-name {
             font-weight: bold;
-            font-size: 15px;
-            margin-bottom: 3px;
+            font-size: 16px;
+            margin-bottom: 5px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         
         .user-id {
-            font-size: 11px;
+            font-size: 12px;
             color: #888;
         }
         
         .wallet-info {
             background: rgba(139, 69, 19, 0.2);
             border: 1px solid #D2691E;
-            border-radius: 10px;
-            padding: 15px;
+            border-radius: 12px;
+            padding: 20px;
             flex-shrink: 0;
         }
         
         .wallet-section {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .wallet-section:last-child {
@@ -562,43 +576,43 @@
         }
         
         .wallet-section-title {
-            font-size: 13px;
+            font-size: 15px;
             color: #ccc;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
         
         .wallet-address {
             background: rgba(0,0,0,0.3);
-            padding: 10px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 8px;
             font-family: monospace;
-            font-size: 11px;
+            font-size: 12px;
             word-break: break-all;
-            margin-top: 6px;
+            margin-top: 8px;
             color: #4CAF50;
         }
         
         .wallet-balance {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             color: gold;
             text-align: center;
-            margin: 12px 0;
+            margin: 15px 0;
         }
         
         .withdraw-input {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: 2px solid #8B4513;
-            border-radius: 8px;
+            border-radius: 10px;
             background: rgba(0,0,0,0.3);
             color: white;
-            font-size: 14px;
+            font-size: 16px;
             text-align: center;
-            margin: 8px 0;
+            margin: 10px 0;
         }
         
         .withdraw-input:focus {
@@ -610,18 +624,18 @@
             background: linear-gradient(135deg, #F6851B, #F6851B);
             color: white;
             border: none;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 14px;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             transition: all 0.3s;
             width: 100%;
-            margin-top: 8px;
+            margin-top: 10px;
         }
         
         .withdraw-btn:hover:not(:disabled) {
@@ -635,10 +649,10 @@
         }
         
         .wallet-notice {
-            font-size: 11px;
+            font-size: 12px;
             color: #888;
             text-align: center;
-            margin-top: 12px;
+            margin-top: 15px;
             line-height: 1.5;
         }
         
@@ -646,15 +660,15 @@
             background: #0088cc;
             color: white;
             border: none;
-            border-radius: 5px;
-            padding: 6px 12px;
-            margin-top: 6px;
+            border-radius: 6px;
+            padding: 8px 15px;
+            margin-top: 8px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
         }
         
         .copy-btn:hover {
@@ -665,44 +679,43 @@
         #stats-tab {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 15px;
             height: 100%;
-            overflow-y: auto;
         }
         
         .stats-header {
             text-align: center;
-            padding-bottom: 12px;
+            padding-bottom: 15px;
             border-bottom: 1px solid rgba(139, 69, 19, 0.5);
             flex-shrink: 0;
         }
         
         .stats-title {
-            font-size: 16px;
+            font-size: 18px;
             color: gold;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         
         .stats-subtitle {
-            font-size: 13px;
+            font-size: 14px;
             color: #ccc;
         }
         
         .stats-tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: 10px;
+            margin-bottom: 15px;
             flex-shrink: 0;
         }
         
         .stats-tab-btn {
             flex: 1;
-            padding: 10px;
+            padding: 12px;
             background: rgba(139, 69, 19, 0.2);
             border: 1px solid #8B4513;
-            border-radius: 6px;
+            border-radius: 8px;
             color: #ccc;
-            font-size: 13px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.3s;
         }
@@ -716,12 +729,12 @@
         .leaderboard-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 11px;
+            font-size: 12px;
         }
         
         .leaderboard-table th {
             background: rgba(139, 69, 19, 0.3);
-            padding: 10px;
+            padding: 12px;
             text-align: left;
             color: gold;
             font-weight: bold;
@@ -729,7 +742,7 @@
         }
         
         .leaderboard-table td {
-            padding: 8px;
+            padding: 10px;
             border-bottom: 1px solid rgba(139, 69, 19, 0.2);
         }
         
@@ -738,7 +751,7 @@
         }
         
         .rank-cell {
-            width: 40px;
+            width: 45px;
             text-align: center;
             font-weight: bold;
         }
@@ -746,24 +759,24 @@
         .player-cell {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         .player-avatar {
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            font-size: 14px;
             flex-shrink: 0;
         }
         
         .player-name {
             font-weight: bold;
-            max-width: 100px;
+            max-width: 120px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -782,52 +795,52 @@
         .personal-stats {
             background: rgba(70, 130, 180, 0.2);
             border: 1px solid #467CBE;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 12px;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
         }
         
         .personal-stats-title {
-            font-size: 15px;
+            font-size: 16px;
             color: #467CBE;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
         
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 15px;
         }
         
         .stat-card {
             background: rgba(0,0,0,0.2);
-            border-radius: 6px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 15px;
             text-align: center;
         }
         
         .stat-value-large {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             color: gold;
-            margin: 6px 0;
+            margin: 8px 0;
         }
         
         .stat-label {
-            font-size: 11px;
+            font-size: 12px;
             color: #ccc;
         }
         
         /* ЗДАНИЯ НА КАРТЕ */
         .building {
             position: absolute;
-            width: 50px;
-            height: 50px;
+            width: 55px;
+            height: 55px;
             border: 2px solid white;
-            border-radius: 6px;
+            border-radius: 8px;
             transform: translate(-50%, -50%);
             cursor: pointer;
             transition: all 0.3s;
@@ -835,14 +848,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 22px;
             z-index: 10;
             touch-action: none;
         }
         
         .building:hover {
             transform: translate(-50%, -50%) scale(1.1);
-            box-shadow: 0 0 12px white;
+            box-shadow: 0 0 15px white;
             z-index: 100;
         }
         
@@ -861,7 +874,7 @@
         
         .building.base.storage-full {
             animation: pulse-red 0.5s infinite;
-            box-shadow: 0 0 15px red;
+            box-shadow: 0 0 20px red;
         }
         
         /* ЭФФЕКТЫ ДЛЯ ЗДАНИЙ */
@@ -869,7 +882,7 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            border-radius: 6px;
+            border-radius: 8px;
             background: radial-gradient(circle, rgba(255,140,0,0.4) 0%, rgba(255,140,0,0) 70%);
             animation: mining-pulse 1.5s infinite;
             pointer-events: none;
@@ -880,7 +893,7 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            border-radius: 6px;
+            border-radius: 8px;
             background: radial-gradient(circle, rgba(0,200,255,0.4) 0%, rgba(0,200,255,0) 70%);
             animation: power-pulse 1s infinite;
             pointer-events: none;
@@ -889,17 +902,17 @@
         
         .building-level-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
+            top: -6px;
+            right: -6px;
             background: gold;
             color: black;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 9px;
+            font-size: 10px;
             font-weight: bold;
             border: 1px solid white;
             z-index: 2;
@@ -918,13 +931,13 @@
             position: fixed;
             background: rgba(0, 0, 0, 0.95);
             border: 2px solid #8B4513;
-            border-radius: 8px;
-            padding: 8px;
-            min-width: 130px;
+            border-radius: 10px;
+            padding: 10px;
+            min-width: 140px;
             z-index: 1000;
             display: none;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             max-width: 90vw;
             max-height: 90vh;
@@ -934,12 +947,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 6px;
+            padding-bottom: 8px;
             border-bottom: 1px solid #8B4513;
         }
         
         .building-context-menu-title {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
             color: gold;
         }
@@ -948,11 +961,11 @@
             background: none;
             border: none;
             color: #FF5555;
-            font-size: 14px;
+            font-size: 16px;
             cursor: pointer;
             padding: 0;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -966,15 +979,15 @@
         .building-context-menu-btn {
             background: rgba(139, 69, 19, 0.3);
             border: 1px solid #D2691E;
-            border-radius: 5px;
-            padding: 6px 10px;
+            border-radius: 6px;
+            padding: 8px 12px;
             color: white;
-            font-size: 10px;
+            font-size: 12px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 6px;
             transition: all 0.2s;
         }
         
@@ -1011,14 +1024,14 @@
         /* СООБЩЕНИЯ */
         #message {
             position: fixed;
-            top: 60px;
+            top: 65px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.9);
             color: white;
-            padding: 8px 15px;
+            padding: 10px 20px;
             border-radius: 15px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: bold;
             text-align: center;
             z-index: 1000;
@@ -1030,7 +1043,7 @@
         .message-success { border: 2px solid #00FF00; }
         .message-error { border: 2px solid #FF5555; }
         
-        /* СКРОЛЛБАР */
+        /* СКРОЛЛБАР - ОСТАВЛЯЕМ ТОЛЬКО ОДИН */
         ::-webkit-scrollbar {
             width: 4px;
         }
@@ -1053,42 +1066,42 @@
             background: rgba(0, 0, 0, 0.95);
             border: 2px solid #FF5555;
             border-radius: 12px;
-            padding: 15px;
-            width: 280px;
+            padding: 20px;
+            width: 300px;
             max-width: 90vw;
             z-index: 2000;
             display: none;
             flex-direction: column;
-            gap: 12px;
+            gap: 15px;
             box-shadow: 0 0 30px rgba(255,0,0,0.5);
         }
         
         .delete-confirm-header {
             text-align: center;
             color: #FF5555;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: bold;
         }
         
         .delete-confirm-message {
             text-align: center;
-            font-size: 13px;
+            font-size: 14px;
             color: #ccc;
             line-height: 1.4;
         }
         
         .delete-confirm-buttons {
             display: flex;
-            gap: 8px;
-            margin-top: 8px;
+            gap: 10px;
+            margin-top: 10px;
         }
         
         .confirm-btn {
             flex: 1;
-            padding: 8px;
+            padding: 10px;
             border: none;
-            border-radius: 6px;
-            font-size: 13px;
+            border-radius: 8px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
@@ -1115,7 +1128,7 @@
         /* КНОПКИ ДЕЙСТВИЙ В ВЕРХНЕЙ ПАНЕЛИ */
         .top-actions {
             display: flex;
-            gap: 6px;
+            gap: 8px;
         }
         
         /* АНИМАЦИИ */
@@ -1199,15 +1212,15 @@
         /* АДАПТИВНЫЕ СТИЛИ ДЛЯ МОБИЛЬНЫХ */
         @media (max-width: 480px) {
             .stats-row {
-                gap: 6px;
+                gap: 8px;
             }
             
             .stat-item {
-                font-size: 10px;
+                font-size: 11px;
             }
             
             .stat-value {
-                font-size: 11px;
+                font-size: 12px;
             }
             
             .buildings-grid {
@@ -1219,7 +1232,7 @@
             }
             
             .build-option {
-                padding: 10px;
+                padding: 12px;
             }
             
             .stats-grid {
@@ -1227,28 +1240,46 @@
             }
             
             .top-actions {
-                flex-direction: column;
-                gap: 4px;
+                flex-direction: row;
+                gap: 6px;
             }
             
             .collect-btn, .build-btn {
-                padding: 4px 8px;
+                padding: 8px 12px;
+                font-size: 12px;
+                min-height: 36px;
+            }
+            
+            .menu-tab {
+                padding: 10px 3px;
+            }
+            
+            .menu-tab-icon {
+                font-size: 18px;
+            }
+            
+            .menu-tab-text {
                 font-size: 10px;
             }
         }
         
         @media (max-height: 600px) {
             #top-panel {
-                padding: 6px 8px;
-                min-height: 45px;
+                padding: 8px 10px;
+                min-height: 50px;
             }
             
             #bottom-menu {
-                height: 55px;
+                height: 65px;
             }
             
             .fullscreen-tab {
-                bottom: 55px;
+                bottom: 65px;
+            }
+            
+            .collect-btn, .build-btn {
+                padding: 6px 12px;
+                min-height: 34px;
             }
         }
     </style>
@@ -1312,7 +1343,7 @@
                     </div>
                     <div id="my-buildings-tab">
                         <div class="my-buildings-header">
-                            <div style="font-weight: bold; font-size: 15px;">Статистика зданий</div>
+                            <div style="font-weight: bold; font-size: 16px;">Статистика зданий</div>
                             <div class="total-buildings" id="total-buildings-count">Всего: 0</div>
                         </div>
                         <div id="my-buildings-container">
@@ -2125,10 +2156,10 @@
                 card.className = 'owned-building';
                 card.innerHTML = `
                     <div class="owned-building-header">
-                        <div style="font-size: 22px;">${getBuildingIcon(type)}</div>
+                        <div style="font-size: 24px;">${getBuildingIcon(type)}</div>
                         <div>
-                            <div style="font-weight: bold; font-size: 15px;">${getBuildingName(type)}</div>
-                            <div style="font-size: 11px; color: gold;">Всего: ${buildings.length} шт.</div>
+                            <div style="font-weight: bold; font-size: 16px;">${getBuildingName(type)}</div>
+                            <div style="font-size: 12px; color: gold;">Всего: ${buildings.length} шт.</div>
                         </div>
                     </div>
                     <div class="building-stats">
@@ -2736,7 +2767,7 @@
             title.textContent = `${getBuildingName(building.type)} #${building.id}`;
             
             // Позиционируем меню с учетом границ экрана
-            const menuWidth = 130;
+            const menuWidth = 140;
             const menuHeight = 100;
             const screenWidth = window.innerWidth;
             const screenHeight = window.innerHeight;
@@ -3095,6 +3126,21 @@
         }
 
         // ============================
+        // ИСПРАВЛЕНИЕ ПРОБЛЕМЫ СО СЧЕТЧИКОМ ДОБЫЧИ
+        // ============================
+        function fixMiningUpdate() {
+            // Убеждаемся, что gameState.lastUpdate инициализирован
+            if (!gameState.lastUpdate) {
+                gameState.lastUpdate = Date.now();
+            }
+            
+            // Устанавливаем интервал для обновления добычи
+            setInterval(() => {
+                updateMining();
+            }, 1000);
+        }
+
+        // ============================
         // ИНИЦИАЛИЗАЦИЯ ИГРЫ
         // ============================
         function initGame() {
@@ -3110,7 +3156,9 @@
             // Запускаем игровой цикл
             gameState.lastUpdate = Date.now();
             gameState.gameStartTime = Date.now();
-            setInterval(updateMining, 1000);
+            
+            // Исправляем проблему со счетчиком добычи
+            fixMiningUpdate();
             
             // Приветственное сообщение
             setTimeout(() => {
