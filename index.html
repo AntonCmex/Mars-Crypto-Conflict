@@ -795,6 +795,37 @@
             box-shadow: 0 5px 15px rgba(46, 139, 87, 0.4);
         }
         
+        .collect-referral-btn {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: black;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+        
+        .collect-referral-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #FFA500, #FF8C00);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 165, 0, 0.4);
+        }
+        
+        .collect-referral-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
         /* TELEGRAM USER INFO */
         .user-info {
             display: flex;
@@ -1814,12 +1845,18 @@
                                 <div class="bonus-badge">👥</div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-label">Заработано бонусов</div>
+                                <div class="stat-label">Накоплено бонусов</div>
                                 <div class="stat-value-large" id="referral-earned">0.00</div>
                                 <div class="stat-label">MNRT</div>
                                 <div class="bonus-badge">💰</div>
                             </div>
                         </div>
+                        
+                        <!-- КНОПКА СБОРА РЕФЕРАЛЬНЫХ БОНУСОВ -->
+                        <button class="collect-referral-btn" id="collect-referral-btn" disabled>
+                            <span>💰</span>
+                            <span>Собрать бонусы</span>
+                        </button>
                         
                         <!-- ССЫЛКА ДЛЯ ПРИГЛАШЕНИЯ -->
                         <div class="referral-link-container">
@@ -1857,7 +1894,7 @@
                                         <tr>
                                             <th>Друг</th>
                                             <th>Дата приглашения</th>
-                                            <th style="text-align: right;">Бонусов заработано</th>
+                                            <th style="text-align: right;">Накоплено бонусов</th>
                                         </tr>
                                     </thead>
                                     <tbody id="referrals-body">
@@ -2245,7 +2282,7 @@
                         name: "Александр К.",
                         avatar: "👨‍🚀",
                         date: "2024-03-15",
-                        earned: 45.75,
+                        earned: 0,
                         level: 1
                     },
                     {
@@ -2253,7 +2290,7 @@
                         name: "Мария С.",
                         avatar: "👩‍🚀",
                         date: "2024-03-18",
-                        earned: 28.30,
+                        earned: 0,
                         level: 1
                     },
                     {
@@ -2261,13 +2298,13 @@
                         name: "Дмитрий П.",
                         avatar: "🧑‍💼",
                         date: "2024-03-20",
-                        earned: 12.15,
+                        earned: 0,
                         level: 1
                     }
                 ];
                 
                 gameState.referral.referrals = testReferrals;
-                gameState.referral.totalEarned = testReferrals.reduce((sum, ref) => sum + ref.earned, 0);
+                gameState.referral.totalEarned = 0;
                 
                 updateReferralTab();
             }
@@ -2277,11 +2314,15 @@
                 const totalEarned = gameState.referral.totalEarned;
                 
                 document.getElementById('referral-count').textContent = referralCount;
-                document.getElementById('referral-earned').textContent = totalEarned.toFixed(2);
+                document.getElementById('referral-earned').textContent = totalEarned.toFixed(4);
                 
                 const referralsBody = document.getElementById('referrals-body');
                 const noReferralsMsg = document.getElementById('no-referrals-message');
                 const referralsTable = document.getElementById('referrals-table');
+                
+                // Обновляем кнопку сбора бонусов
+                const collectRefBtn = document.getElementById('collect-referral-btn');
+                collectRefBtn.disabled = totalEarned <= 0;
                 
                 if (referralCount > 0) {
                     noReferralsMsg.style.display = 'none';
@@ -2311,7 +2352,7 @@
                                 </div>
                             </td>
                             <td>${formattedDate}</td>
-                            <td style="text-align: right; color: gold; font-weight: bold;">${ref.earned.toFixed(2)} MNRT</td>
+                            <td style="text-align: right; color: gold; font-weight: bold;">${ref.earned.toFixed(4)} MNRT</td>
                         `;
                         
                         referralsBody.appendChild(row);
@@ -2345,22 +2386,41 @@
                 if (totalBonus > 0) {
                     gameState.referral.totalEarned += totalBonus;
                     
-                    // ВАЖНОЕ ИЗМЕНЕНИЕ: НЕ добавляем бонусы напрямую на баланс!
-                    // Вместо этого, будем накапливать их в отдельном поле
-                    // gameState.referral.pendingBonuses += totalBonus;
-                    
                     // Обновляем время последнего начисления
                     gameState.referral.lastBonusUpdate = now;
                     
                     // Обновляем интерфейс
                     updateReferralTab();
-                    updateUI();
                     
                     // Показываем сообщение о начислении
                     if (totalBonus > 0.1) { // Показываем только значительные начисления
-                        showMessage(`💰 Начислено ${totalBonus.toFixed(3)} MNRT от рефералов! Нажмите "Собрать" для получения.`, 'success');
+                        showMessage(`💰 Начислено ${totalBonus.toFixed(4)} MNRT реферальных бонусов!`, 'success');
                     }
                 }
+            }
+            
+            function collectReferralBonuses() {
+                const collected = gameState.referral.totalEarned;
+                
+                if (collected <= 0) {
+                    showMessage('💰 Нет реферальных бонусов для сбора', 'error');
+                    return;
+                }
+                
+                // Добавляем бонусы на баланс
+                gameState.gameBalance += collected;
+                gameState.totalMinedAllTime += collected;
+                
+                // Сбрасываем накопленные бонусы
+                gameState.referral.totalEarned = 0;
+                gameState.referral.referrals.forEach(ref => {
+                    ref.earned = 0;
+                });
+                
+                showMessage(`💰 Собрано ${collected.toFixed(4)} MNRT реферальных бонусов!`, 'success');
+                
+                updateUI();
+                updateReferralTab();
             }
             
             function startReferralBonusLoop() {
@@ -2653,9 +2713,9 @@
                 
                 document.getElementById('building-count').textContent = gameState.buildings.length;
                 
-                // Обновляем кнопку сбора
+                // Обновляем кнопку сбора (только из базы)
                 const collectBtn = document.getElementById('collect-btn');
-                collectBtn.disabled = gameState.baseStorage <= 0 && gameState.referral.totalEarned <= 0;
+                collectBtn.disabled = gameState.baseStorage <= 0;
                 
                 // Обновляем время игры
                 gameState.playTime = Math.floor((Date.now() - gameState.gameStartTime) / 1000);
@@ -3238,45 +3298,35 @@
             }
 
             function collectFromBase() {
-                let totalCollected = 0;
+                const collected = gameState.baseStorage;
                 
-                // Собираем из хранилища базы
-                if (gameState.baseStorage > 0) {
-                    totalCollected += gameState.baseStorage;
-                    gameState.baseStorage = 0;
-                    gameState.storageFull = false;
-                    gameState.miningActive = true;
-                }
-                
-                // Собираем реферальные бонусы
-                if (gameState.referral.totalEarned > 0) {
-                    totalCollected += gameState.referral.totalEarned;
-                    gameState.referral.totalEarned = 0;
-                    
-                    // Сбрасываем заработанные бонусы у каждого реферала
-                    gameState.referral.referrals.forEach(ref => {
-                        ref.earned = 0;
-                    });
-                }
-                
-                if (totalCollected <= 0) {
-                    showMessage('⛏️ Нет ресурсов для сбора', 'error');
+                if (collected <= 0) {
+                    showMessage('⛏️ Нет ресурсов в хранилище базы', 'error');
                     return;
                 }
                 
-                // ВАЖНОЕ ИЗМЕНЕНИЕ: Баланс пополняется ТОЛЬКО здесь
-                gameState.gameBalance += totalCollected;
-                gameState.totalMinedAllTime += totalCollected;
-                gameState.statistics.totalMined += totalCollected;
+                // Добавляем на баланс
+                gameState.gameBalance += collected;
+                gameState.totalMinedAllTime += collected;
+                gameState.statistics.totalMined += collected;
+                
+                // Полностью очищаем хранилище
+                gameState.baseStorage = 0;
+                gameState.storageFull = false;
+                gameState.miningActive = true;
                 
                 const playerName = telegramUser ? 
                     (telegramUser.firstName + (telegramUser.lastName ? ' ' + telegramUser.lastName : '')) : 'Игрок';
                 const playerId = telegramUser ? telegramUser.id : '—';
                 
-                showMessage(`💰 ${playerName} (ID: ${playerId}) собрал ${totalCollected.toFixed(4)} MNRT на баланс!`, 'success');
+                showMessage(`💰 ${playerName} (ID: ${playerId}) собрал ${collected.toFixed(4)} MNRT из базы!`, 'success');
                 
                 updateUI();
-                updateReferralTab();
+                
+                // Обновляем отображение баланса в кошельке
+                if (currentTab === 'wallet') {
+                    updateWalletTab();
+                }
             }
 
             function generateMarsSurface() {
@@ -3655,6 +3705,9 @@
                 document.getElementById('close-build-menu').addEventListener('click', closeBuildMenu);
                 document.getElementById('collect-btn').addEventListener('click', collectFromBase);
                 
+                // Реферальная кнопка сбора
+                document.getElementById('collect-referral-btn').addEventListener('click', collectReferralBonuses);
+                
                 // Вкладки
                 document.getElementById('mars-tab').addEventListener('click', () => showTab('mars'));
                 document.getElementById('my-buildings-tab-btn').addEventListener('click', () => showTab('my-buildings'));
@@ -3792,4 +3845,3 @@
         </script>
     </body>
 </html>
-
