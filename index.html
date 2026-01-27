@@ -1582,7 +1582,7 @@
                 </div>
                 <div class="stat-item">
                     <span>🏠</span>
-                    <span class="stat-value" id="storage">0/100</span>
+                    <span class="stat-value" id="storage">0.000/100</span>
                     <span>MNRT</span>
                 </div>
                 <div class="stat-item">
@@ -2085,1491 +2085,994 @@
                 };
                 
                 // Обновляем реферальную ссылку
-                updateReferralLink();
-                
-                initGame();
-            }
-        }
-        
-        // ============================
-        // КОНФИГУРАЦИЯ ИГРЫ
-        // ============================
-        const CONFIG = {
-            MINING_RATE: 0.001,
-            BASE_STORAGE_CAPACITY: 100,
-            
-            FREE_BUILDINGS: {
-                base: true,
-                mining: true,
-                power: true
-            },
-            
-            UPGRADE_COSTS: {
-                base: [50, 100, 200],
-                mining: [100, 200, 400],
-                power: [100, 200, 400]
-            },
-            
-            UPGRADE_BONUSES: {
-                base: [0.5, 1.0, 2.0],
-                mining: [0.5, 1.0, 2.0],
-                power: [2, 4, 8]
-            },
-            
-            UPGRADE_UPKEEP_MULTIPLIERS: {
-                base: [1.5, 2.0, 2.5],
-                mining: [1.5, 2.0, 2.5],
-                power: [1.5, 2.0, 2.5]
-            },
-            
-            BUILDING_COSTS: {
-                base: 100,
-                mining: 400,
-                power: 400
-            },
-            
-            ENERGY_CONSUMPTION: {
-                base: 0,
-                mining: 2,
-                power: 0
-            },
-            
-            ENERGY_PRODUCTION: {
-                base: 0,
-                mining: 0,
-                power: 5
-            },
-            
-            UPKEEP_COSTS: {
-                base: 0.0002,
-                mining: 0.0002,
-                power: 0.0002
-            },
-            
-            WITHDRAWAL_MIN: 10,
-            WITHDRAWAL_COOLDOWN: 24 * 60 * 60 * 1000,
-            GAS_FEE: 0.001,
-            
-            // Реферальная система
-            REFERRAL_BONUS_PERCENT: 0.10, // 10% от добычи реферала
-            REFERRAL_BONUS_INTERVAL: 60000, // Обновление бонусов каждую минуту
-            REFERRAL_BONUS_LIMIT: 1000, // Максимальный бонус за одного реферала
-            REFERRAL_BONUS_MIN: 0.001 // Минимальный бонус для начисления
-        };
-
-        // Состояние игры
-        let gameState = {
-            balance: 0.0,
-            baseStorage: 0.0,
-            totalMinedAllTime: 0.0,
-            buildings: [],
-            placingBuilding: null,
-            nextId: 1,
-            hasBase: false,
-            energy: { production: 0, consumption: 0 },
-            lastUpdate: Date.now(),
-            selectedBuilding: null,
-            walletAddress: null,
-            gameBalance: 0.0,
-            lastWithdrawal: null,
-            miningActive: true,
-            storageFull: false,
-            gameStartTime: Date.now(),
-            playTime: 0,
-            baseCapacity: CONFIG.BASE_STORAGE_CAPACITY,
-            
-            freeBuildingsUsed: {
-                base: false,
-                mining: false,
-                power: false
-            },
-            
-            statistics: {
-                totalMined: 0,
-                totalBuildings: 0,
-                totalUpgrades: 0
-            },
-            
-            // Реферальная система
-            referral: {
-                code: null,
-                referrals: [],
-                totalEarned: 0.0,
-                lastBonusUpdate: Date.now()
-            }
-        };
-
-        // ============================
-        // РЕФЕРАЛЬНАЯ СИСТЕМА
-        // ============================
-        function updateReferralLink() {
-            if (!telegramUser) return;
-            
-            // Создаем уникальный реферальный код на основе ID пользователя
-            const referralCode = `ref_${telegramUser.id}`;
-            gameState.referral.code = referralCode;
-            
-            const referralLink = `https://t.me/MarsCC_Bot?start=${referralCode}`;
-            document.getElementById('referral-link-text').textContent = referralLink;
-            
-            // Загружаем тестовые данные рефералов
-            loadTestReferrals();
-        }
-        
-        function copyReferralLink() {
-            const linkText = document.getElementById('referral-link-text').textContent;
-            const copyBtn = document.getElementById('copy-referral-link');
-            
-            navigator.clipboard.writeText(linkText)
-                .then(() => {
-                    copyBtn.innerHTML = '<span>✅</span><span>Скопировано!</span>';
-                    copyBtn.classList.add('copied');
+                    updateReferralLink();
                     
-                    showMessage('✅ Реферальная ссылка скопирована в буфер обмена!', 'success');
-                    
-                    setTimeout(() => {
-                        copyBtn.innerHTML = '<span>📋</span><span>Копировать</span>';
-                        copyBtn.classList.remove('copied');
-                    }, 2000);
-                })
-                .catch(() => {
-                    showMessage('❌ Не удалось скопировать ссылку', 'error');
-                });
-        }
-        
-        function loadTestReferrals() {
-            // Тестовые данные для демонстрации
-            const testReferrals = [
-                {
-                    id: 1,
-                    name: "Александр К.",
-                    avatar: "👨‍🚀",
-                    date: "2024-03-15",
-                    earned: 45.75,
-                    level: 1
-                },
-                {
-                    id: 2,
-                    name: "Мария С.",
-                    avatar: "👩‍🚀",
-                    date: "2024-03-18",
-                    earned: 28.30,
-                    level: 1
-                },
-                {
-                    id: 3,
-                    name: "Дмитрий П.",
-                    avatar: "🧑‍💼",
-                    date: "2024-03-20",
-                    earned: 12.15,
-                    level: 1
+                    initGame();
                 }
-            ];
+            }
             
-            gameState.referral.referrals = testReferrals;
-            gameState.referral.totalEarned = testReferrals.reduce((sum, ref) => sum + ref.earned, 0);
-            
-            updateReferralTab();
-        }
-        
-        function updateReferralTab() {
-            const referralCount = gameState.referral.referrals.length;
-            const totalEarned = gameState.referral.totalEarned;
-            
-            document.getElementById('referral-count').textContent = referralCount;
-            document.getElementById('referral-earned').textContent = totalEarned.toFixed(2);
-            
-            const referralsBody = document.getElementById('referrals-body');
-            const noReferralsMsg = document.getElementById('no-referrals-message');
-            const referralsTable = document.getElementById('referrals-table');
-            
-            if (referralCount > 0) {
-                noReferralsMsg.style.display = 'none';
-                referralsTable.style.display = 'table';
+            // ============================
+            // КОНФИГУРАЦИЯ ИГРЫ
+            // ============================
+            const CONFIG = {
+                MINING_RATE: 0.001,
+                BASE_STORAGE_CAPACITY: 100,
                 
-                referralsBody.innerHTML = '';
+                FREE_BUILDINGS: {
+                    base: true,
+                    mining: true,
+                    power: true
+                },
                 
-                gameState.referral.referrals.forEach(ref => {
-                    const row = document.createElement('tr');
+                UPGRADE_COSTS: {
+                    base: [50, 100, 200],
+                    mining: [100, 200, 400],
+                    power: [100, 200, 400]
+                },
+                
+                UPGRADE_BONUSES: {
+                    base: [0.5, 1.0, 2.0],
+                    mining: [0.5, 1.0, 2.0],
+                    power: [2, 4, 8]
+                },
+                
+                UPGRADE_UPKEEP_MULTIPLIERS: {
+                    base: [1.5, 2.0, 2.5],
+                    mining: [1.5, 2.0, 2.5],
+                    power: [1.5, 2.0, 2.5]
+                },
+                
+                BUILDING_COSTS: {
+                    base: 100,
+                    mining: 400,
+                    power: 400
+                },
+                
+                ENERGY_CONSUMPTION: {
+                    base: 0,
+                    mining: 2,
+                    power: 0
+                },
+                
+                ENERGY_PRODUCTION: {
+                    base: 0,
+                    mining: 0,
+                    power: 5
+                },
+                
+                UPKEEP_COSTS: {
+                    base: 0.0002,
+                    mining: 0.0002,
+                    power: 0.0002
+                },
+                
+                WITHDRAWAL_MIN: 10,
+                WITHDRAWAL_COOLDOWN: 24 * 60 * 60 * 1000,
+                GAS_FEE: 0.001,
+                
+                // Реферальная система
+                REFERRAL_BONUS_PERCENT: 0.10, // 10% от добычи реферала
+                REFERRAL_BONUS_INTERVAL: 60000, // Обновление бонусов каждую минуту
+                REFERRAL_BONUS_LIMIT: 1000, // Максимальный бонус за одного реферала
+                REFERRAL_BONUS_MIN: 0.001 // Минимальный бонус для начисления
+            };
+
+            // Состояние игры
+            let gameState = {
+                balance: 0.0,
+                baseStorage: 0.0,
+                totalMinedAllTime: 0.0,
+                buildings: [],
+                placingBuilding: null,
+                nextId: 1,
+                hasBase: false,
+                energy: { production: 0, consumption: 0 },
+                lastUpdate: Date.now(),
+                selectedBuilding: null,
+                walletAddress: null,
+                gameBalance: 0.0,
+                lastWithdrawal: null,
+                miningActive: true,
+                storageFull: false,
+                gameStartTime: Date.now(),
+                playTime: 0,
+                baseCapacity: CONFIG.BASE_STORAGE_CAPACITY,
+                
+                freeBuildingsUsed: {
+                    base: false,
+                    mining: false,
+                    power: false
+                },
+                
+                statistics: {
+                    totalMined: 0,
+                    totalBuildings: 0,
+                    totalUpgrades: 0
+                },
+                
+                // Реферальная система
+                referral: {
+                    code: null,
+                    referrals: [],
+                    totalEarned: 0.0,
+                    lastBonusUpdate: Date.now()
+                }
+            };
+
+            // ============================
+            // РЕФЕРАЛЬНАЯ СИСТЕМА
+            // ============================
+            function updateReferralLink() {
+                if (!telegramUser) return;
+                
+                // Создаем уникальный реферальный код на основе ID пользователя
+                const referralCode = `ref_${telegramUser.id}`;
+                gameState.referral.code = referralCode;
+                
+                const referralLink = `https://t.me/MarsCC_Bot?start=${referralCode}`;
+                document.getElementById('referral-link-text').textContent = referralLink;
+                
+                // Загружаем тестовые данные рефералов
+                loadTestReferrals();
+            }
+            
+            function copyReferralLink() {
+                const linkText = document.getElementById('referral-link-text').textContent;
+                const copyBtn = document.getElementById('copy-referral-link');
+                
+                navigator.clipboard.writeText(linkText)
+                    .then(() => {
+                        copyBtn.innerHTML = '<span>✅</span><span>Скопировано!</span>';
+                        copyBtn.classList.add('copied');
+                        
+                        showMessage('✅ Реферальная ссылка скопирована в буфер обмена!', 'success');
+                        
+                        setTimeout(() => {
+                            copyBtn.innerHTML = '<span>📋</span><span>Копировать</span>';
+                            copyBtn.classList.remove('copied');
+                        }, 2000);
+                    })
+                    .catch(() => {
+                        showMessage('❌ Не удалось скопировать ссылку', 'error');
+                    });
+            }
+            
+            function loadTestReferrals() {
+                // Тестовые данные для демонстрации
+                const testReferrals = [
+                    {
+                        id: 1,
+                        name: "Александр К.",
+                        avatar: "👨‍🚀",
+                        date: "2024-03-15",
+                        earned: 45.75,
+                        level: 1
+                    },
+                    {
+                        id: 2,
+                        name: "Мария С.",
+                        avatar: "👩‍🚀",
+                        date: "2024-03-18",
+                        earned: 28.30,
+                        level: 1
+                    },
+                    {
+                        id: 3,
+                        name: "Дмитрий П.",
+                        avatar: "🧑‍💼",
+                        date: "2024-03-20",
+                        earned: 12.15,
+                        level: 1
+                    }
+                ];
+                
+                gameState.referral.referrals = testReferrals;
+                gameState.referral.totalEarned = testReferrals.reduce((sum, ref) => sum + ref.earned, 0);
+                
+                updateReferralTab();
+            }
+            
+            function updateReferralTab() {
+                const referralCount = gameState.referral.referrals.length;
+                const totalEarned = gameState.referral.totalEarned;
+                
+                document.getElementById('referral-count').textContent = referralCount;
+                document.getElementById('referral-earned').textContent = totalEarned.toFixed(2);
+                
+                const referralsBody = document.getElementById('referrals-body');
+                const noReferralsMsg = document.getElementById('no-referrals-message');
+                const referralsTable = document.getElementById('referrals-table');
+                
+                if (referralCount > 0) {
+                    noReferralsMsg.style.display = 'none';
+                    referralsTable.style.display = 'table';
                     
-                    // Форматируем дату
-                    const date = new Date(ref.date);
-                    const formattedDate = date.toLocaleDateString('ru-RU', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric'
+                    referralsBody.innerHTML = '';
+                    
+                    gameState.referral.referrals.forEach(ref => {
+                        const row = document.createElement('tr');
+                        
+                        // Форматируем дату
+                        const date = new Date(ref.date);
+                        const formattedDate = date.toLocaleDateString('ru-RU', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        });
+                        
+                        row.innerHTML = `
+                            <td>
+                                <div class="referral-user">
+                                    <div class="referral-avatar">${ref.avatar || '👤'}</div>
+                                    <div>
+                                        <div class="referral-name">${ref.name}</div>
+                                        <div class="referral-date">${formattedDate}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${formattedDate}</td>
+                            <td style="text-align: right; color: gold; font-weight: bold;">${ref.earned.toFixed(2)} MNRT</td>
+                        `;
+                        
+                        referralsBody.appendChild(row);
+                    });
+                } else {
+                    noReferralsMsg.style.display = 'block';
+                    referralsTable.style.display = 'none';
+                }
+            }
+            
+            function calculateReferralBonuses() {
+                const now = Date.now();
+                const elapsedMinutes = (now - gameState.referral.lastBonusUpdate) / 60000;
+                
+                if (elapsedMinutes < 1) return; // Обновляем раз в минуту
+                
+                let totalBonus = 0;
+                
+                // Симулируем начисление бонусов от рефералов
+                gameState.referral.referrals.forEach(ref => {
+                    // Бонус зависит от уровня реферала и времени
+                    const minuteBonus = 0.01 + (ref.level * 0.005);
+                    const bonus = minuteBonus * elapsedMinutes;
+                    
+                    if (bonus > CONFIG.REFERRAL_BONUS_MIN) {
+                        ref.earned += bonus;
+                        totalBonus += bonus;
+                    }
+                });
+                
+                if (totalBonus > 0) {
+                    gameState.referral.totalEarned += totalBonus;
+                    gameState.gameBalance += totalBonus;
+                    
+                    // Обновляем время последнего начисления
+                    gameState.referral.lastBonusUpdate = now;
+                    
+                    // Обновляем интерфейс
+                    updateReferralTab();
+                    updateUI();
+                    
+                    // Показываем сообщение о начислении
+                    if (totalBonus > 0.1) { // Показываем только значительные начисления
+                        showMessage(`💰 Получено ${totalBonus.toFixed(3)} MNRT от рефералов!`, 'success');
+                    }
+                }
+            }
+            
+            function startReferralBonusLoop() {
+                if (referralUpdateInterval) {
+                    clearInterval(referralUpdateInterval);
+                }
+                
+                referralUpdateInterval = setInterval(() => {
+                    calculateReferralBonuses();
+                }, CONFIG.REFERRAL_BONUS_INTERVAL);
+            }
+            
+            // ============================
+            // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+            // ============================
+            function getBuildingName(type) {
+                const names = {
+                    base: 'База',
+                    mining: 'Буровая',
+                    power: 'Электростанция'
+                };
+                return names[type] || type;
+            }
+
+            function getBuildingIcon(type) {
+                const icons = {
+                    base: '🏠',
+                    mining: '⛏️',
+                    power: '⚡'
+                };
+                return icons[type] || '🏗️';
+            }
+
+            function showMessage(text, type) {
+                const messageEl = document.getElementById('message');
+                messageEl.textContent = text;
+                messageEl.className = type === 'error' ? 'message-error' : 'message-success';
+                messageEl.style.display = 'block';
+                
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 3000);
+            }
+            
+            function createTapIndicator(x, y) {
+                const indicator = document.createElement('div');
+                indicator.className = 'tap-indicator';
+                indicator.style.left = x + 'px';
+                indicator.style.top = y + 'px';
+                
+                document.body.appendChild(indicator);
+                
+                setTimeout(() => {
+                    if (indicator.parentNode) {
+                        indicator.parentNode.removeChild(indicator);
+                    }
+                }, 500);
+            }
+
+            // ============================
+            // СИСТЕМА ВКЛАДОК
+            // ============================
+            function showTab(tabName) {
+                // Обновляем активные табы в меню
+                document.querySelectorAll('.menu-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // Скрываем все вкладки
+                document.getElementById('mars-surface').style.display = 'none';
+                document.getElementById('fullscreen-my-buildings').classList.remove('active');
+                document.getElementById('fullscreen-wallet').classList.remove('active');
+                document.getElementById('fullscreen-stats').classList.remove('active');
+                document.getElementById('fullscreen-referral').classList.remove('active');
+                
+                // Скрываем меню строительства
+                closeBuildMenu();
+                
+                // Показываем выбранную вкладку
+                if (tabName === 'mars') {
+                    document.getElementById('mars-tab').classList.add('active');
+                    document.getElementById('mars-surface').style.display = 'block';
+                    currentTab = 'mars';
+                } else if (tabName === 'my-buildings') {
+                    document.getElementById('my-buildings-tab-btn').classList.add('active');
+                    document.getElementById('fullscreen-my-buildings').classList.add('active');
+                    currentTab = 'my-buildings';
+                    updateMyBuildingsTab();
+                } else if (tabName === 'wallet') {
+                    document.getElementById('wallet-tab-btn').classList.add('active');
+                    document.getElementById('fullscreen-wallet').classList.add('active');
+                    currentTab = 'wallet';
+                    updateWalletTab();
+                } else if (tabName === 'stats') {
+                    document.getElementById('stats-tab-btn').classList.add('active');
+                    document.getElementById('fullscreen-stats').classList.add('active');
+                    currentTab = 'stats';
+                    updateStatsTab();
+                } else if (tabName === 'referral') {
+                    document.getElementById('referral-tab-btn').classList.add('active');
+                    document.getElementById('fullscreen-referral').classList.add('active');
+                    currentTab = 'referral';
+                    updateReferralTab();
+                }
+            }
+            
+            // ============================
+            // ФУНКЦИИ ДЛЯ МЕНЮ СТРОИТЕЛЬСТВА
+            // ============================
+            function showBuildMenu() {
+                const menu = document.getElementById('build-menu');
+                menu.style.display = 'flex';
+                menu.style.position = 'fixed';
+                menu.style.left = '50%';
+                menu.style.top = '50%';
+                menu.style.transform = 'translate(-50%, -50%)';
+                
+                // Обновляем список доступных зданий
+                updateBuildOptions();
+            }
+            
+            function closeBuildMenu() {
+                const menu = document.getElementById('build-menu');
+                menu.style.display = 'none';
+            }
+            
+            function showBuildMenuAtPosition(x, y) {
+                const menu = document.getElementById('build-menu');
+                
+                // Позиционируем меню рядом с местом нажатия
+                const menuWidth = Math.min(320, window.innerWidth * 0.9);
+                const menuHeight = Math.min(400, window.innerHeight * 0.7);
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+                
+                let finalX = x;
+                let finalY = y;
+                
+                // Проверяем границы экрана
+                if (finalX + menuWidth > screenWidth - 20) {
+                    finalX = screenWidth - menuWidth - 20;
+                }
+                
+                if (finalY + menuHeight > screenHeight - 80) {
+                    finalY = screenHeight - menuHeight - 80;
+                }
+                
+                if (finalX < 20) finalX = 20;
+                if (finalY < 80) finalY = 80;
+                
+                menu.style.position = 'fixed';
+                menu.style.left = finalX + 'px';
+                menu.style.top = finalY + 'px';
+                menu.style.transform = 'none';
+                
+                // Обновляем опции строительства
+                updateBuildOptions();
+                
+                // Показываем меню
+                menu.style.display = 'flex';
+                
+                // Создаем эффект тапа
+                createTapIndicator(x, y);
+            }
+            
+            function updateBuildOptions() {
+                const container = document.getElementById('build-options-container');
+                container.innerHTML = '';
+                
+                const buildingTypes = [
+                    { type: 'base', name: 'База', desc: 'Хранит добытые ресурсы. Нужна для строительства других зданий.', icon: '🏠', required: 'Нет базы' },
+                    { type: 'mining', name: 'Буровая', desc: 'Добывает MNRT. Требует электроэнергию.', icon: '⛏️', required: 'Нужна база' },
+                    { type: 'power', name: 'Электростанция', desc: 'Производит электроэнергию для буровых.', icon: '⚡', required: 'Нужна база' }
+                ];
+                
+                buildingTypes.forEach(building => {
+                    const isFirstFree = CONFIG.FREE_BUILDINGS[building.type] && !gameState.freeBuildingsUsed[building.type];
+                    const cost = isFirstFree ? 0 : CONFIG.BUILDING_COSTS[building.type];
+                    
+                    let isAvailable = true;
+                    let requirement = '';
+                    
+                    // Проверяем требования
+                    if (building.type === 'base' && gameState.hasBase) {
+                        isAvailable = false;
+                        requirement = 'Уже построена';
+                    } else if ((building.type === 'mining' || building.type === 'power') && !gameState.hasBase) {
+                        isAvailable = false;
+                        requirement = building.required;
+                    }
+                    
+                    const option = document.createElement('div');
+                    option.className = `build-option ${!isAvailable ? 'disabled' : ''}`;
+                    
+                    option.innerHTML = `
+                        <div class="build-option-icon">${building.icon}</div>
+                        <div class="build-option-name">${building.name}</div>
+                        <div class="build-option-desc">${building.desc}</div>
+                        <div class="build-option-cost ${isFirstFree ? 'build-option-free' : ''}">
+                            ${isFirstFree ? 'БЕСПЛАТНО!' : `Цена: ${cost} MNRT`}
+                        </div>
+                        ${!isAvailable ? `<div style="font-size: 10px; color: #FF5555; margin-top: 5px;">${requirement}</div>` : ''}
+                    `;
+                    
+                    // Добавляем обработчик клика
+                    option.addEventListener('click', () => {
+                        if (!isAvailable) {
+                            showMessage(`❌ Недоступно: ${requirement}`, 'error');
+                            return;
+                        }
+                        startBuilding(building.type);
+                        closeBuildMenu();
                     });
                     
-                    row.innerHTML = `
-                        <td>
-                            <div class="referral-user">
-                                <div class="referral-avatar">${ref.avatar || '👤'}</div>
-                                <div>
-                                    <div class="referral-name">${ref.name}</div>
-                                    <div class="referral-date">${formattedDate}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>${formattedDate}</td>
-                        <td style="text-align: right; color: gold; font-weight: bold;">${ref.earned.toFixed(2)} MNRT</td>
-                    `;
-                    
-                    referralsBody.appendChild(row);
+                    container.appendChild(option);
                 });
-            } else {
-                noReferralsMsg.style.display = 'block';
-                referralsTable.style.display = 'none';
-            }
-        }
-        
-        function calculateReferralBonuses() {
-            const now = Date.now();
-            const elapsedMinutes = (now - gameState.referral.lastBonusUpdate) / 60000;
-            
-            if (elapsedMinutes < 1) return; // Обновляем раз в минуту
-            
-            let totalBonus = 0;
-            
-            // Симулируем начисление бонусов от рефералов
-            gameState.referral.referrals.forEach(ref => {
-                // Бонус зависит от уровня реферала и времени
-                const minuteBonus = 0.01 + (ref.level * 0.005);
-                const bonus = minuteBonus * elapsedMinutes;
-                
-                if (bonus > CONFIG.REFERRAL_BONUS_MIN) {
-                    ref.earned += bonus;
-                    totalBonus += bonus;
-                }
-            });
-            
-            if (totalBonus > 0) {
-                gameState.referral.totalEarned += totalBonus;
-                gameState.gameBalance += totalBonus;
-                
-                // Обновляем время последнего начисления
-                gameState.referral.lastBonusUpdate = now;
-                
-                // Обновляем интерфейс
-                updateReferralTab();
-                updateUI();
-                
-                // Показываем сообщение о начислении
-                if (totalBonus > 0.1) { // Показываем только значительные начисления
-                    showMessage(`💰 Получено ${totalBonus.toFixed(3)} MNRT от рефералов!`, 'success');
-                }
-            }
-        }
-        
-        function startReferralBonusLoop() {
-            if (referralUpdateInterval) {
-                clearInterval(referralUpdateInterval);
             }
             
-            referralUpdateInterval = setInterval(() => {
-                calculateReferralBonuses();
-            }, CONFIG.REFERRAL_BONUS_INTERVAL);
-        }
-        
-        // ============================
-        // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-        // ============================
-        function getBuildingName(type) {
-            const names = {
-                base: 'База',
-                mining: 'Буровая',
-                power: 'Электростанция'
-            };
-            return names[type] || type;
-        }
-
-        function getBuildingIcon(type) {
-            const icons = {
-                base: '🏠',
-                mining: '⛏️',
-                power: '⚡'
-            };
-            return icons[type] || '🏗️';
-        }
-
-        function showMessage(text, type) {
-            const messageEl = document.getElementById('message');
-            messageEl.textContent = text;
-            messageEl.className = type === 'error' ? 'message-error' : 'message-success';
-            messageEl.style.display = 'block';
-            
-            setTimeout(() => {
-                messageEl.style.display = 'none';
-            }, 3000);
-        }
-        
-        function createTapIndicator(x, y) {
-            const indicator = document.createElement('div');
-            indicator.className = 'tap-indicator';
-            indicator.style.left = x + 'px';
-            indicator.style.top = y + 'px';
-            
-            document.body.appendChild(indicator);
-            
-            setTimeout(() => {
-                if (indicator.parentNode) {
-                    indicator.parentNode.removeChild(indicator);
-                }
-            }, 500);
-        }
-
-        // ============================
-        // СИСТЕМА ВКЛАДОК
-        // ============================
-        function showTab(tabName) {
-            // Обновляем активные табы в меню
-            document.querySelectorAll('.menu-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Скрываем все вкладки
-            document.getElementById('mars-surface').style.display = 'none';
-            document.getElementById('fullscreen-my-buildings').classList.remove('active');
-            document.getElementById('fullscreen-wallet').classList.remove('active');
-            document.getElementById('fullscreen-stats').classList.remove('active');
-            document.getElementById('fullscreen-referral').classList.remove('active');
-            
-            // Скрываем меню строительства
-            closeBuildMenu();
-            
-            // Показываем выбранную вкладку
-            if (tabName === 'mars') {
-                document.getElementById('mars-tab').classList.add('active');
-                document.getElementById('mars-surface').style.display = 'block';
-                currentTab = 'mars';
-            } else if (tabName === 'my-buildings') {
-                document.getElementById('my-buildings-tab-btn').classList.add('active');
-                document.getElementById('fullscreen-my-buildings').classList.add('active');
-                currentTab = 'my-buildings';
-                updateMyBuildingsTab();
-            } else if (tabName === 'wallet') {
-                document.getElementById('wallet-tab-btn').classList.add('active');
-                document.getElementById('fullscreen-wallet').classList.add('active');
-                currentTab = 'wallet';
-                updateWalletTab();
-            } else if (tabName === 'stats') {
-                document.getElementById('stats-tab-btn').classList.add('active');
-                document.getElementById('fullscreen-stats').classList.add('active');
-                currentTab = 'stats';
-                updateStatsTab();
-            } else if (tabName === 'referral') {
-                document.getElementById('referral-tab-btn').classList.add('active');
-                document.getElementById('fullscreen-referral').classList.add('active');
-                currentTab = 'referral';
-                updateReferralTab();
-            }
-        }
-        
-        // ============================
-        // ФУНКЦИИ ДЛЯ МЕНЮ СТРОИТЕЛЬСТВА
-        // ============================
-        function showBuildMenu() {
-            const menu = document.getElementById('build-menu');
-            menu.style.display = 'flex';
-            menu.style.position = 'fixed';
-            menu.style.left = '50%';
-            menu.style.top = '50%';
-            menu.style.transform = 'translate(-50%, -50%)';
-            
-            // Обновляем список доступных зданий
-            updateBuildOptions();
-        }
-        
-        function closeBuildMenu() {
-            const menu = document.getElementById('build-menu');
-            menu.style.display = 'none';
-        }
-        
-        function showBuildMenuAtPosition(x, y) {
-            const menu = document.getElementById('build-menu');
-            
-            // Позиционируем меню рядом с местом нажатия
-            const menuWidth = Math.min(320, window.innerWidth * 0.9);
-            const menuHeight = Math.min(400, window.innerHeight * 0.7);
-            const screenWidth = window.innerWidth;
-            const screenHeight = window.innerHeight;
-            
-            let finalX = x;
-            let finalY = y;
-            
-            // Проверяем границы экрана
-            if (finalX + menuWidth > screenWidth - 20) {
-                finalX = screenWidth - menuWidth - 20;
-            }
-            
-            if (finalY + menuHeight > screenHeight - 80) {
-                finalY = screenHeight - menuHeight - 80;
-            }
-            
-            if (finalX < 20) finalX = 20;
-            if (finalY < 80) finalY = 80;
-            
-            menu.style.position = 'fixed';
-            menu.style.left = finalX + 'px';
-            menu.style.top = finalY + 'px';
-            menu.style.transform = 'none';
-            
-            // Обновляем опции строительства
-            updateBuildOptions();
-            
-            // Показываем меню
-            menu.style.display = 'flex';
-            
-            // Создаем эффект тапа
-            createTapIndicator(x, y);
-        }
-        
-        function updateBuildOptions() {
-            const container = document.getElementById('build-options-container');
-            container.innerHTML = '';
-            
-            const buildingTypes = [
-                { type: 'base', name: 'База', desc: 'Хранит добытые ресурсы. Нужна для строительства других зданий.', icon: '🏠', required: 'Нет базы' },
-                { type: 'mining', name: 'Буровая', desc: 'Добывает MNRT. Требует электроэнергию.', icon: '⛏️', required: 'Нужна база' },
-                { type: 'power', name: 'Электростанция', desc: 'Производит электроэнергию для буровых.', icon: '⚡', required: 'Нужна база' }
-            ];
-            
-            buildingTypes.forEach(building => {
-                const isFirstFree = CONFIG.FREE_BUILDINGS[building.type] && !gameState.freeBuildingsUsed[building.type];
-                const cost = isFirstFree ? 0 : CONFIG.BUILDING_COSTS[building.type];
+            // ============================
+            // ОБРАБОТКА ДОЛГОГО НАЖАТИЯ
+            // ============================
+            function handleSurfaceTouchStart(e) {
+                const surface = document.getElementById('mars-surface');
+                const rect = surface.getBoundingClientRect();
                 
-                let isAvailable = true;
-                let requirement = '';
+                lastTapX = e.clientX || (e.touches && e.touches[0].clientX);
+                lastTapY = e.clientY || (e.touches && e.touches[0].clientY);
                 
-                // Проверяем требования
-                if (building.type === 'base' && gameState.hasBase) {
-                    isAvailable = false;
-                    requirement = 'Уже построена';
-                } else if ((building.type === 'mining' || building.type === 'power') && !gameState.hasBase) {
-                    isAvailable = false;
-                    requirement = building.required;
-                }
+                if (!lastTapX || !lastTapY) return;
                 
-                const option = document.createElement('div');
-                option.className = `build-option ${!isAvailable ? 'disabled' : ''}`;
+                // Проверяем, не попали ли в здание
+                const buildingElements = document.querySelectorAll('.building');
+                let clickedOnBuilding = false;
                 
-                option.innerHTML = `
-                    <div class="build-option-icon">${building.icon}</div>
-                    <div class="build-option-name">${building.name}</div>
-                    <div class="build-option-desc">${building.desc}</div>
-                    <div class="build-option-cost ${isFirstFree ? 'build-option-free' : ''}">
-                        ${isFirstFree ? 'БЕСПЛАТНО!' : `Цена: ${cost} MNRT`}
-                    </div>
-                    ${!isAvailable ? `<div style="font-size: 10px; color: #FF5555; margin-top: 5px;">${requirement}</div>` : ''}
-                `;
-                
-                // Добавляем обработчик клика
-                option.addEventListener('click', () => {
-                    if (!isAvailable) {
-                        showMessage(`❌ Недоступно: ${requirement}`, 'error');
-                        return;
+                buildingElements.forEach(building => {
+                    const buildingRect = building.getBoundingClientRect();
+                    if (
+                        lastTapX >= buildingRect.left && 
+                        lastTapX <= buildingRect.right &&
+                        lastTapY >= buildingRect.top && 
+                        lastTapY <= buildingRect.bottom
+                    ) {
+                        clickedOnBuilding = true;
                     }
-                    startBuilding(building.type);
-                    closeBuildMenu();
                 });
                 
-                container.appendChild(option);
-            });
-        }
-        
-        // ============================
-        // ОБРАБОТКА ДОЛГОГО НАЖАТИЯ
-        // ============================
-        function handleSurfaceTouchStart(e) {
-            const surface = document.getElementById('mars-surface');
-            const rect = surface.getBoundingClientRect();
-            
-            lastTapX = e.clientX || (e.touches && e.touches[0].clientX);
-            lastTapY = e.clientY || (e.touches && e.touches[0].clientY);
-            
-            if (!lastTapX || !lastTapY) return;
-            
-            // Проверяем, не попали ли в здание
-            const buildingElements = document.querySelectorAll('.building');
-            let clickedOnBuilding = false;
-            
-            buildingElements.forEach(building => {
-                const buildingRect = building.getBoundingClientRect();
-                if (
-                    lastTapX >= buildingRect.left && 
-                    lastTapX <= buildingRect.right &&
-                    lastTapY >= buildingRect.top && 
-                    lastTapY <= buildingRect.bottom
-                ) {
-                    clickedOnBuilding = true;
-                }
-            });
-            
-            // Если кликнули на пустое место - запускаем таймер для долгого нажатия
-            if (!clickedOnBuilding && currentTab === 'mars') {
-                isLongTap = false;
-                tapTimer = setTimeout(() => {
-                    isLongTap = true;
-                    showBuildMenuAtPosition(lastTapX, lastTapY);
-                }, 800); // 800ms для долгого нажатия
-            }
-        }
-        
-        function handleSurfaceTouchEnd(e) {
-            clearTimeout(tapTimer);
-            
-            // Если было долгое нажатие - отменяем обычный клик
-            if (isLongTap) {
-                e.preventDefault();
-                e.stopPropagation();
-                isLongTap = false;
-            }
-        }
-        
-        // ============================
-        // ОБНОВЛЕНИЕ ИНТЕРФЕЙСА
-        // ============================
-        function updateUI() {
-            // Обновляем верхнюю панель
-            document.getElementById('balance').textContent = gameState.gameBalance.toFixed(2);
-            
-            // Обновляем хранилище с правильной вместимостью
-            const currentCapacity = gameState.baseCapacity;
-            document.getElementById('storage').textContent = 
-                `${gameState.baseStorage.toFixed(1)}/${currentCapacity}`;
-            
-            const storageEl = document.getElementById('storage');
-            if (gameState.storageFull) {
-                storageEl.style.color = '#FF5555';
-            } else {
-                storageEl.style.color = 'gold';
-            }
-            
-            const energy = calculateEnergy();
-            document.getElementById('energy').textContent = `${energy.production}/${energy.consumption}`;
-            document.getElementById('energy').style.color = energy.production >= energy.consumption ? '#00FF00' : '#FF5555';
-            
-            document.getElementById('building-count').textContent = gameState.buildings.length;
-            
-            // Обновляем кнопку сбора
-            const collectBtn = document.getElementById('collect-btn');
-            collectBtn.disabled = gameState.baseStorage <= 0;
-            
-            // Обновляем время игры
-            gameState.playTime = Math.floor((Date.now() - gameState.gameStartTime) / 1000);
-        }
-
-        // ============================
-        // ФУНКЦИИ ДЛЯ ВКЛАДОК
-        // ============================
-        function updateMyBuildingsTab() {
-            const container = document.getElementById('my-buildings-container');
-            const countEl = document.getElementById('total-buildings-count');
-            
-            if (gameState.buildings.length === 0) {
-                container.innerHTML = '<div class="no-buildings">Нет построенных зданий</div>';
-                countEl.textContent = 'Всего: 0';
-                return;
-            }
-            
-            container.innerHTML = '<div class="buildings-grid" id="my-buildings-grid"></div>';
-            const grid = document.getElementById('my-buildings-grid');
-            
-            const buildingGroups = {};
-            gameState.buildings.forEach(building => {
-                if (!buildingGroups[building.type]) {
-                    buildingGroups[building.type] = [];
-                }
-                buildingGroups[building.type].push(building);
-            });
-            
-            Object.entries(buildingGroups).forEach(([type, buildings]) => {
-                const levelCounts = {0: 0, 1: 0, 2: 0, 3: 0};
-                buildings.forEach(b => levelCounts[b.level]++);
-                
-                let totalMining = 0;
-                let totalEnergy = 0;
-                let totalUpkeep = 0;
-                
-                buildings.forEach(building => {
-                    if (type === 'mining') {
-                        let miningRate = CONFIG.MINING_RATE;
-                        if (building.level > 0) {
-                            miningRate *= (1 + (CONFIG.UPGRADE_BONUSES.mining[building.level - 1] || 0));
-                        }
-                        totalMining += miningRate;
-                    } else if (type === 'power') {
-                        let energy = CONFIG.ENERGY_PRODUCTION.power;
-                        if (building.level > 0) {
-                            energy += CONFIG.UPGRADE_BONUSES.power[building.level - 1] || 0;
-                        }
-                        totalEnergy += energy;
-                    }
-                    
-                    let upkeep = CONFIG.UPKEEP_COSTS[type] || 0;
-                    if (building.level > 0) {
-                        upkeep *= CONFIG.UPGRADE_UPKEEP_MULTIPLIERS[type][building.level - 1] || 1;
-                    }
-                    totalUpkeep += upkeep;
-                });
-                
-                const card = document.createElement('div');
-                card.className = 'owned-building';
-                card.innerHTML = `
-                    <div class="owned-building-header">
-                        <div style="font-size: 24px;">${getBuildingIcon(type)}</div>
-                        <div>
-                            <div style="font-weight: bold; font-size: 16px;">${getBuildingName(type)}</div>
-                            <div style="font-size: 12px; color: gold;">Всего: ${buildings.length} шт.</div>
-                        </div>
-                    </div>
-                    <div class="building-stats">
-                        <div class="building-stat">
-                            <span class="building-stat-label">Уровень 1:</span>
-                            <span class="building-stat-value">${levelCounts[0]} шт.</span>
-                        </div>
-                        <div class="building-stat">
-                            <span class="building-stat-label">Уровень 2:</span>
-                            <span class="building-stat-value">${levelCounts[1]} шт.</span>
-                        </div>
-                        <div class="building-stat">
-                            <span class="building-stat-label">Уровень 3:</span>
-                            <span class="building-stat-value">${levelCounts[2]} шт.</span>
-                        </div>
-                        <div class="building-stat">
-                            <span class="building-stat-label">Уровень 4:</span>
-                            <span class="building-stat-value">${levelCounts[3]} шт.</span>
-                        </div>
-                        ${type === 'mining' ? `
-                            <div class="building-stat">
-                                <span class="building-stat-label">Общая добыча:</span>
-                                <span class="building-stat-value">${totalMining.toFixed(3)}/сек</span>
-                            </div>
-                        ` : ''}
-                        ${type === 'power' ? `
-                            <div class="building-stat">
-                                <span class="building-stat-label">Производство:</span>
-                                <span class="building-stat-value">+${totalEnergy}⚡</span>
-                            </div>
-                        ` : ''}
-                        ${totalUpkeep > 0 ? `
-                            <div class="building-stat">
-                                <span class="building-stat-label">Расходы:</span>
-                                <span class="building-stat-value">${totalUpkeep.toFixed(4)}/сек</span>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-                
-                grid.appendChild(card);
-            });
-            
-            countEl.textContent = `Всего: ${gameState.buildings.length}`;
-        }
-
-        function updateWalletTab() {
-            document.getElementById('wallet-game-balance').textContent = 
-                gameState.gameBalance.toFixed(2) + ' MNRT';
-            
-            document.getElementById('min-withdraw').textContent = CONFIG.WITHDRAWAL_MIN;
-            document.getElementById('gas-fee').textContent = CONFIG.GAS_FEE;
-            
-            updateWalletDisplay();
-            
-            const withdrawBtn = document.getElementById('withdraw-btn');
-            const withdrawAmount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
-            
-            withdrawBtn.disabled = !gameState.walletAddress || 
-                                 gameState.gameBalance < CONFIG.WITHDRAWAL_MIN ||
-                                 withdrawAmount < CONFIG.WITHDRAWAL_MIN ||
-                                 withdrawAmount > gameState.gameBalance;
-            
-            if (gameState.lastWithdrawal) {
-                const timeSinceLast = Date.now() - gameState.lastWithdrawal;
-                if (timeSinceLast < CONFIG.WITHDRAWAL_COOLDOWN) {
-                    const remaining = CONFIG.WITHDRAWAL_COOLDOWN - timeSinceLast;
-                    const hours = Math.floor(remaining / (1000 * 60 * 60));
-                    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-                    
-                    document.getElementById('withdraw-btn').innerHTML = `
-                        <span>⏰</span>
-                        <span>Следующий вывод через: ${hours}ч ${minutes}м</span>
-                    `;
-                    document.getElementById('withdraw-btn').disabled = true;
-                } else {
-                    document.getElementById('withdraw-btn').innerHTML = `
-                        <span>🔄</span>
-                        <span>Отправить ресурсы</span>
-                    `;
-                }
-            }
-        }
-
-        function updateWalletDisplay() {
-            const addressDisplay = document.getElementById('bsc-address-display');
-            if (gameState.walletAddress) {
-                const shortAddress = gameState.walletAddress.slice(0, 8) + '...' + gameState.walletAddress.slice(-6);
-                addressDisplay.innerHTML = `
-                    ${shortAddress}
-                    <button class="copy-btn" id="copy-address-btn">📋 Копировать</button>
-                `;
-                addressDisplay.style.color = '#4CAF50';
-                
-                // Добавляем обработчик для кнопки копирования
-                const copyBtn = document.getElementById('copy-address-btn');
-                if (copyBtn) {
-                    copyBtn.addEventListener('click', copyAddress);
-                }
-            } else {
-                addressDisplay.textContent = 'Адрес не указан';
-                addressDisplay.style.color = '#888';
-            }
-        }
-
-        function toggleAddressInput() {
-            const addressDisplay = document.getElementById('bsc-address-display');
-            const addressInput = document.getElementById('bsc-address-input');
-            const editBtn = document.getElementById('edit-address-btn');
-            
-            if (addressInput.style.display === 'none' || addressInput.style.display === '') {
-                addressDisplay.style.display = 'none';
-                addressInput.style.display = 'block';
-                addressInput.value = gameState.walletAddress || '';
-                addressInput.focus();
-                editBtn.innerHTML = '<span>💾</span><span>Сохранить адрес</span>';
-                editBtn.onclick = saveBSCAddress;
-            } else {
-                addressInput.style.display = 'none';
-                addressDisplay.style.display = 'block';
-                editBtn.innerHTML = '<span>✏️</span><span>Изменить адрес</span>';
-                editBtn.onclick = toggleAddressInput;
-            }
-        }
-
-        function saveBSCAddress() {
-            const addressInput = document.getElementById('bsc-address-input');
-            const address = addressInput.value.trim();
-            
-            // Валидация BSC адреса
-            if (!address.startsWith('0x') || address.length !== 42) {
-                showMessage('Неверный формат BSC адреса. Должен начинаться с 0x и быть 42 символа', 'error');
-                addressInput.focus();
-                return;
-            }
-            
-            const saveBtn = document.getElementById('edit-address-btn');
-            const originalText = saveBtn.innerHTML;
-            saveBtn.innerHTML = '<span>⏳</span><span>Сохранение...</span>';
-            saveBtn.disabled = true;
-            
-            setTimeout(() => {
-                gameState.walletAddress = address;
-                updateWalletDisplay();
-                showMessage('✅ BSC адрес сохранен!', 'success');
-                toggleAddressInput();
-                saveBtn.innerHTML = originalText;
-                saveBtn.disabled = false;
-            }, 1000);
-        }
-
-        function copyAddress() {
-            if (!gameState.walletAddress) return;
-            
-            navigator.clipboard.writeText(gameState.walletAddress)
-                .then(() => {
-                    showMessage('✅ Адрес скопирован в буфер обмена', 'success');
-                })
-                .catch(() => {
-                    showMessage('❌ Не удалось скопировать адрес', 'error');
-                });
-        }
-
-        function withdrawFunds() {
-            const amountInput = document.getElementById('withdraw-amount');
-            const amount = parseFloat(amountInput.value);
-            
-            // Валидация
-            if (!amount || amount <= 0) {
-                showMessage('Введите корректную сумму', 'error');
-                return;
-            }
-            
-            if (amount < CONFIG.WITHDRAWAL_MIN) {
-                showMessage(`Минимальная сумма вывода: ${CONFIG.WITHDRAWAL_MIN} MNRT`, 'error');
-                return;
-            }
-            
-            if (amount > gameState.gameBalance) {
-                showMessage('Недостаточно средств на балансе', 'error');
-                return;
-            }
-            
-            if (!gameState.walletAddress) {
-                showMessage('Сначала введите и сохраните BSC адрес', 'error');
-                return;
-            }
-            
-            const withdrawBtn = document.getElementById('withdraw-btn');
-            const originalText = withdrawBtn.innerHTML;
-            withdrawBtn.innerHTML = '<span>⏳</span><span>Обработка...</span>';
-            withdrawBtn.disabled = true;
-            
-            setTimeout(() => {
-                gameState.gameBalance -= amount;
-                gameState.lastWithdrawal = Date.now();
-                
-                showMessage(`✅ Вывод ${amount} MNRT инициирован! Средства будут отправлены на адрес ${gameState.walletAddress.slice(0, 10)}...`, 'success');
-                
-                updateUI();
-                amountInput.value = '';
-                updateWalletTab();
-                
-                withdrawBtn.innerHTML = originalText;
-                withdrawBtn.disabled = false;
-            }, 2000);
-        }
-
-        function updateStatsTab() {
-            updatePersonalStats();
-        }
-
-        function updatePersonalStats() {
-            document.getElementById('stat-total-mined').textContent = gameState.totalMinedAllTime.toFixed(2);
-            document.getElementById('stat-buildings-count').textContent = gameState.buildings.length;
-            
-            const playTimeHours = Math.floor(gameState.playTime / 3600);
-            document.getElementById('stat-play-time').textContent = playTimeHours + 'ч';
-            
-            const avgMining = playTimeHours > 0 ? gameState.totalMinedAllTime / playTimeHours : 0;
-            document.getElementById('stat-avg-mining').textContent = avgMining.toFixed(2);
-            
-            loadLeaderboard();
-        }
-
-        function loadLeaderboard() {
-            const tableBody = document.getElementById('leaderboard-body');
-            
-            const testData = [
-                { rank: 1, name: "Космический Магнат", coins: 12540.75, buildings: 24, avatar: "👑" },
-                { rank: 2, name: "Марсианский Барон", coins: 9870.25, buildings: 18, avatar: "🚀" },
-                { rank: 3, name: "Алексей В.", coins: 7540.50, buildings: 15, avatar: "👨‍🚀" },
-                { rank: 4, name: "Мария К.", coins: 6320.80, buildings: 14, avatar: "👩‍🚀" },
-                { rank: 5, name: "Иван П.", coins: 5210.30, buildings: 12, avatar: "👨" },
-                { rank: 6, name: "Ольга С.", coins: 4870.90, buildings: 11, avatar: "👩" },
-                { rank: 7, name: "Дмитрий Л.", coins: 4250.60, buildings: 10, avatar: "🧑‍💼" },
-                { rank: 8, name: "Екатерина М.", coins: 3980.40, buildings: 9, avatar: "👩‍💼" },
-                { rank: 9, name: "Сергей К.", coins: 3650.20, buildings: 8, avatar: "🧔" },
-                { rank: 10, name: "Анна В.", coins: 3420.10, buildings: 8, avatar: "👱‍♀️" }
-            ];
-            
-            const playerCoins = gameState.totalMinedAllTime;
-            let playerRank = '—';
-            let percentOfLeader = 0;
-            
-            if (testData.length > 0) {
-                const topPlayerCoins = testData[0].coins;
-                
-                if (playerCoins > 0) {
-                    percentOfLeader = Math.min(100, (playerCoins / topPlayerCoins) * 100);
-                    
-                    for (let i = 0; i < testData.length; i++) {
-                        if (playerCoins >= testData[i].coins) {
-                            playerRank = testData[i].rank;
-                            break;
-                        }
-                    }
-                    
-                    if (playerRank === '—' && playerCoins > 0) {
-                        playerRank = testData.length + 1;
-                    }
+                // Если кликнули на пустое место - запускаем таймер для долгого нажатия
+                if (!clickedOnBuilding && currentTab === 'mars') {
+                    isLongTap = false;
+                    tapTimer = setTimeout(() => {
+                        isLongTap = true;
+                        showBuildMenuAtPosition(lastTapX, lastTapY);
+                    }, 800); // 800ms для долгого нажатия
                 }
             }
             
-            document.getElementById('stat-player-rank').textContent = playerRank;
-            document.getElementById('stat-percent-of-leader').textContent = percentOfLeader.toFixed(1) + '%';
-            
-            tableBody.innerHTML = '';
-            testData.forEach(player => {
-                const row = document.createElement('tr');
-                
-                let rankClass = '';
-                let rankIcon = player.rank;
-                
-                if (player.rank === 1) {
-                    rankClass = 'medal-gold';
-                    rankIcon = '🥇';
-                } else if (player.rank === 2) {
-                    rankClass = 'medal-silver';
-                    rankIcon = '🥈';
-                } else if (player.rank === 3) {
-                    rankClass = 'medal-bronze';
-                    rankIcon = '🥉';
-                }
-                
-                row.innerHTML = `
-                    <td class="rank-cell ${rankClass}">${rankIcon}</td>
-                    <td>
-                        <div class="player-cell">
-                            <div class="player-avatar">${player.avatar || '👤'}</div>
-                            <div class="player-name">${player.name}</div>
-                        </div>
-                    </td>
-                    <td class="coins-cell">${player.coins.toFixed(2)}</td>
-                    <td style="text-align: right;">${player.buildings}</td>
-                `;
-                
-                tableBody.appendChild(row);
-            });
-        }
-
-        // ============================
-        // ИГРОВАЯ ЛОГИКА
-        // ============================
-        function getUpgradeCost(type, targetLevel) {
-            if (targetLevel >= 1 && targetLevel <= 3) {
-                return CONFIG.UPGRADE_COSTS[type][targetLevel - 1];
-            }
-            return 0;
-        }
-
-        function upgradeBuildingType(type) {
-            const buildingsOfType = gameState.buildings.filter(b => b.type === type);
-            if (buildingsOfType.length === 0) {
-                showMessage(`Нет построенных ${getBuildingName(type)} для улучшения`, 'error');
-                return;
-            }
-            
-            const minLevel = Math.min(...buildingsOfType.map(b => b.level));
-            if (minLevel >= 3) {
-                showMessage(`Все ${getBuildingName(type)} уже максимального уровня`, 'error');
-                return;
-            }
-            
-            const upgradeCost = getUpgradeCost(type, minLevel + 1);
-            if (gameState.gameBalance < upgradeCost) {
-                showMessage(`Недостаточно MNRT для улучшения. Нужно: ${upgradeCost}`, 'error');
-                return;
-            }
-            
-            let upgradedCount = 0;
-            gameState.buildings.forEach(building => {
-                if (building.type === type && building.level === minLevel) {
-                    building.level++;
-                    upgradedCount++;
-                    
-                    // Если улучшаем базу - увеличиваем вместимость
-                    if (building.type === 'base') {
-                        const bonus = CONFIG.UPGRADE_BONUSES.base[building.level - 1] || 0;
-                        const additionalCapacity = CONFIG.BASE_STORAGE_CAPACITY * bonus;
-                        gameState.baseCapacity += additionalCapacity;
-                    }
-                }
-            });
-            
-            gameState.gameBalance -= upgradeCost;
-            gameState.statistics.totalUpgrades++;
-            showMessage(`✅ Улучшено ${upgradedCount} ${getBuildingName(type)} до уровня ${minLevel + 2}`, 'success');
-            updateUI();
-            renderBuildings();
-        }
-
-        function startBuilding(type) {
-            const isFirstBuildingFree = CONFIG.FREE_BUILDINGS[type] && !gameState.freeBuildingsUsed[type];
-            const cost = isFirstBuildingFree ? 0 : CONFIG.BUILDING_COSTS[type];
-            
-            if (!isFirstBuildingFree && gameState.gameBalance < cost) {
-                showMessage(`❌ Недостаточно MNRT! Нужно: ${cost}`, 'error');
-                return;
-            }
-            
-            if ((type === 'mining' || type === 'power') && !gameState.hasBase) {
-                showMessage('❌ Сначала постройте базу!', 'error');
-                return;
-            }
-            
-            if (type === 'base' && gameState.hasBase) {
-                showMessage('❌ У вас уже есть база!', 'error');
-                return;
-            }
-            
-            gameState.placingBuilding = type;
-            
-            // Создаем эффект тапа в центре экрана
-            const surface = document.getElementById('mars-surface');
-            const rect = surface.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            createTapIndicator(centerX, centerY);
-            
-            const message = isFirstBuildingFree ? 
-                `🏗️ Выбрана ${getBuildingName(type)}. Кликните на карту для размещения (БЕСПЛАТНО!)` : 
-                `🏗️ Выбрана ${getBuildingName(type)}. Кликните на карту для размещения (${cost} MNRT)`;
-            
-            showMessage(message, 'success');
-            
-            // Если мы в режиме перемещения, выходим из него
-            if (movingBuildingId !== null) {
-                exitMoveMode();
-            }
-        }
-
-        function calculateEnergy() {
-            let production = 0;
-            let consumption = 0;
-            
-            gameState.buildings.forEach(building => {
-                if (CONFIG.ENERGY_PRODUCTION[building.type]) {
-                    let energy = CONFIG.ENERGY_PRODUCTION[building.type];
-                    if (building.level > 0 && building.type === 'power') {
-                        energy += CONFIG.UPGRADE_BONUSES.power[building.level - 1] || 0;
-                    }
-                    production += energy;
-                }
-                if (CONFIG.ENERGY_CONSUMPTION[building.type]) {
-                    consumption += CONFIG.ENERGY_CONSUMPTION[building.type];
-                }
-            });
-            
-            gameState.buildings.forEach(building => {
-                if (building.type === 'mining') {
-                    building.hasPower = (production >= consumption);
-                }
-            });
-            
-            gameState.energy = { production, consumption };
-            return { production, consumption };
-        }
-
-        function calculateMiningRate(building) {
-            let rate = CONFIG.MINING_RATE;
-            
-            if (building.level > 0) {
-                const bonus = CONFIG.UPGRADE_BONUSES.mining[building.level - 1] || 0;
-                rate *= (1 + bonus);
-            }
-            
-            return rate;
-        }
-
-        function calculateUpkeep() {
-            let totalUpkeep = 0;
-            gameState.buildings.forEach(building => {
-                let upkeep = CONFIG.UPKEEP_COSTS[building.type] || 0;
-                
-                if (building.level > 0) {
-                    const multiplier = CONFIG.UPGRADE_UPKEEP_MULTIPLIERS[building.type][building.level - 1] || 1;
-                    upkeep *= multiplier;
-                }
-                
-                totalUpkeep += upkeep;
-            });
-            return totalUpkeep;
-        }
-
-        function updateMining() {
-            const now = Date.now();
-            const elapsedSeconds = (now - gameState.lastUpdate) / 1000;
-            gameState.lastUpdate = now;
-            
-            if (!gameState.miningActive) {
-                updateUI();
-                return;
-            }
-            
-            const energy = calculateEnergy();
-            const upkeepPerSecond = calculateUpkeep();
-            const totalUpkeep = upkeepPerSecond * elapsedSeconds;
-            
-            const activeMiningBuildings = gameState.buildings.filter(b => 
-                b.type === 'mining' && b.hasPower
-            );
-            
-            if (activeMiningBuildings.length === 0) {
-                if (gameState.baseStorage > 0) {
-                    const upkeepFromStorage = Math.min(totalUpkeep, gameState.baseStorage);
-                    gameState.baseStorage -= upkeepFromStorage;
-                }
-                updateUI();
-                return;
-            }
-            
-            let totalMiningPerSecond = 0;
-            activeMiningBuildings.forEach(building => {
-                totalMiningPerSecond += calculateMiningRate(building);
-            });
-            
-            const netMiningPerSecond = totalMiningPerSecond - upkeepPerSecond;
-            
-            if (netMiningPerSecond > 0) {
-                // Есть положительная добыча
-                const minedThisTick = netMiningPerSecond * elapsedSeconds;
-                const availableStorage = gameState.baseCapacity - gameState.baseStorage;
-                const actualMined = Math.min(minedThisTick, availableStorage);
-                
-                if (actualMined > 0) {
-                    gameState.baseStorage += actualMined;
-                    gameState.totalMinedAllTime += actualMined;
-                    gameState.statistics.totalMined += actualMined;
-                    
-                    if (gameState.baseStorage >= gameState.baseCapacity) {
-                        gameState.storageFull = true;
-                        gameState.miningActive = false;
-                        showMessage('⚠️ Хранилище заполнено! Соберите ресурсы.', 'error');
-                    }
-                }
-            } else if (netMiningPerSecond < 0) {
-                // Расходы превышают добычу
-                const lossPerSecond = -netMiningPerSecond;
-                const lossThisTick = lossPerSecond * elapsedSeconds;
-                
-                if (gameState.baseStorage >= lossThisTick) {
-                    gameState.baseStorage -= lossThisTick;
-                } else {
-                    gameState.baseStorage = 0;
-                }
-            }
-            
-            updateUI();
-        }
-
-        function collectFromBase() {
-            if (gameState.baseStorage <= 0) {
-                showMessage('⛏️ Нет ресурсов в хранилище базы', 'error');
-                return;
-            }
-            
-            const collected = gameState.baseStorage;
-            gameState.gameBalance += collected;
-            gameState.totalMinedAllTime += collected;
-            gameState.statistics.totalMined += collected;
-            gameState.baseStorage = 0;
-            gameState.storageFull = false;
-            gameState.miningActive = true;
-            
-            const playerName = telegramUser ? 
-                (telegramUser.firstName + (telegramUser.lastName ? ' ' + telegramUser.lastName : '')) : 'Игрок';
-            const playerId = telegramUser ? telegramUser.id : '—';
-            
-            showMessage(`💰 ${playerName} (ID: ${playerId}) собрал ${collected.toFixed(4)} MNRT на баланс!`, 'success');
-            
-            updateUI();
-        }
-
-        function generateMarsSurface() {
-            const surface = document.getElementById('mars-surface');
-            surface.innerHTML = '';
-            
-            for (let i = 0; i < 20; i++) {
-                const rock = document.createElement('div');
-                rock.className = 'rock';
-                rock.style.left = Math.random() * 95 + '%';
-                rock.style.top = Math.random() * 95 + '%';
-                rock.style.width = Math.random() * 25 + 10 + 'px';
-                rock.style.height = Math.random() * 25 + 10 + 'px';
-                rock.style.background = `rgb(${80 + Math.random() * 40}, ${80 + Math.random() * 40}, ${80 + Math.random() * 40})`;
-                surface.appendChild(rock);
-            }
-            
-            renderBuildings();
-        }
-
-        function createBuildingElement(building) {
-            const div = document.createElement('div');
-            div.className = `building ${building.type}`;
-            div.id = `building-${building.id}`;
-            div.style.left = building.x + 'px';
-            div.style.top = building.y + 'px';
-            div.title = `${getBuildingName(building.type)} #${building.id} | Уровень ${building.level + 1}`;
-            
-            const icon = document.createElement('div');
-            icon.textContent = getBuildingIcon(building.type);
-            div.appendChild(icon);
-            
-            // Добавляем эффекты в зависимости от типа здания
-            if (building.type === 'mining' && building.hasPower) {
-                const miningEffect = document.createElement('div');
-                miningEffect.className = 'mining-effect';
-                div.appendChild(miningEffect);
-            }
-            
-            if (building.type === 'power') {
-                const powerEffect = document.createElement('div');
-                powerEffect.className = 'power-effect';
-                div.appendChild(powerEffect);
-            }
-            
-            if (building.level > 0) {
-                const levelBadge = document.createElement('div');
-                levelBadge.className = 'building-level-badge';
-                levelBadge.textContent = building.level + 1;
-                div.appendChild(levelBadge);
-            }
-            
-            // Добавляем обработчик клика для контекстного меню
-            div.addEventListener('click', function(e) {
-                e.stopPropagation();
-                showBuildingContextMenu(building.id, e.clientX, e.clientY);
-            });
-            
-            return div;
-        }
-
-        function renderBuildings() {
-            const surface = document.getElementById('mars-surface');
-            document.querySelectorAll('.building').forEach(el => el.remove());
-            
-            gameState.buildings.forEach(building => {
-                const buildingEl = createBuildingElement(building);
-                surface.appendChild(buildingEl);
-            });
-        }
-
-        // ============================
-        // УПРАВЛЕНИЕ ЗДАНИЯМИ
-        // ============================
-        function showBuildingContextMenu(buildingId, x, y) {
-            const building = gameState.buildings.find(b => b.id === buildingId);
-            if (!building) return;
-            
-            selectedBuildingId = buildingId;
-            
-            const menu = document.getElementById('building-context-menu');
-            const title = document.getElementById('context-menu-title');
-            
-            title.textContent = `${getBuildingName(building.type)} #${building.id}`;
-            
-            // Позиционируем меню с учетом границ экрана
-            const menuWidth = 140;
-            const menuHeight = 100;
-            const screenWidth = window.innerWidth;
-            const screenHeight = window.innerHeight;
-            
-            let finalX = x;
-            let finalY = y;
-            
-            // Проверяем, чтобы меню не выходило за правую границу
-            if (finalX + menuWidth > screenWidth - 10) {
-                finalX = screenWidth - menuWidth - 10;
-            }
-            
-            // Проверяем, чтобы меню не выходило за нижнюю границу
-            if (finalY + menuHeight > screenHeight - 70) {
-                finalY = screenHeight - menuHeight - 70;
-            }
-            
-            // Проверяем, чтобы меню не выходило за верхнюю границу
-            if (finalY < 10) {
-                finalY = 10;
-            }
-            
-            // Проверяем, чтобы меню не выходило за левую границу
-            if (finalX < 10) {
-                finalX = 10;
-            }
-            
-            menu.style.left = finalX + 'px';
-            menu.style.top = finalY + 'px';
-            menu.style.display = 'flex';
-            
-            // Если мы в режиме перемещения, выходим из него
-            if (movingBuildingId !== null) {
-                exitMoveMode();
-            }
-        }
-        
-        function closeContextMenu() {
-            const menu = document.getElementById('building-context-menu');
-            menu.style.display = 'none';
-            selectedBuildingId = null;
-        }
-        
-        function toggleMoveMode() {
-            if (movingBuildingId === selectedBuildingId) {
-                exitMoveMode();
-            } else {
-                enterMoveMode(selectedBuildingId);
-            }
-            closeContextMenu();
-        }
-        
-        function enterMoveMode(buildingId) {
-            movingBuildingId = buildingId;
-            const moveBtn = document.getElementById('move-building-btn');
-            moveBtn.classList.add('active');
-            moveBtn.innerHTML = '<span>📍</span><span>Режим перемещения активен</span>';
-            
-            const buildingEl = document.getElementById(`building-${buildingId}`);
-            if (buildingEl) {
-                buildingEl.style.cursor = 'move';
-                buildingEl.style.boxShadow = '0 0 15px #00FF00';
-                buildingEl.style.zIndex = '1000';
-            }
-            
-            showMessage('📍 Режим перемещения: кликните на новое место для здания', 'success');
-        }
-        
-        function exitMoveMode() {
-            if (movingBuildingId !== null) {
-                const buildingEl = document.getElementById(`building-${movingBuildingId}`);
-                if (buildingEl) {
-                    buildingEl.style.cursor = 'pointer';
-                    buildingEl.style.boxShadow = '';
-                    buildingEl.style.zIndex = '10';
-                }
-                
-                const moveBtn = document.getElementById('move-building-btn');
-                moveBtn.classList.remove('active');
-                moveBtn.innerHTML = '<span>📍</span><span>Переместить</span>';
-                
-                movingBuildingId = null;
-            }
-        }
-        
-        function confirmDeleteBuilding() {
-            const building = gameState.buildings.find(b => b.id === selectedBuildingId);
-            if (!building) return;
-            
-            buildingToDeleteId = selectedBuildingId;
-            
-            const confirmEl = document.getElementById('delete-confirm');
-            const messageEl = document.getElementById('delete-confirm-message');
-            
-            messageEl.textContent = `Вы уверены, что хотите удалить ${getBuildingName(building.type)} #${building.id}? Это действие нельзя отменить.`;
-            
-            confirmEl.style.display = 'flex';
-            closeContextMenu();
-        }
-        
-        function cancelDeleteBuilding() {
-            const confirmEl = document.getElementById('delete-confirm');
-            confirmEl.style.display = 'none';
-            buildingToDeleteId = null;
-        }
-        
-        function deleteBuildingConfirmed() {
-            if (buildingToDeleteId === null) return;
-            
-            const buildingIndex = gameState.buildings.findIndex(b => b.id === buildingToDeleteId);
-            if (buildingIndex === -1) return;
-            
-            const building = gameState.buildings[buildingIndex];
-            const buildingName = getBuildingName(building.type);
-            
-            // Если удаляем базу - сбрасываем вместимость
-            if (building.type === 'base') {
-                gameState.baseCapacity = CONFIG.BASE_STORAGE_CAPACITY;
-            }
-            
-            // Удаляем здание из массива
-            gameState.buildings.splice(buildingIndex, 1);
-            
-            // Проверяем, есть ли еще база
-            gameState.hasBase = gameState.buildings.some(b => b.type === 'base');
-            
-            // Обновляем статистику
-            gameState.statistics.totalBuildings = gameState.buildings.length;
-            
-            // Если удаляемое здание было в режиме перемещения - выходим из режима
-            if (movingBuildingId === buildingToDeleteId) {
-                exitMoveMode();
-            }
-            
-            // Обновляем интерфейс
-            updateUI();
-            renderBuildings();
-            updateMyBuildingsTab();
-            
-            // Закрываем подтверждение
-            const confirmEl = document.getElementById('delete-confirm');
-            confirmEl.style.display = 'none';
-            buildingToDeleteId = null;
-            
-            showMessage(`🗑️ ${buildingName} #${building.id} удалена`, 'success');
-        }
-        
-        function moveBuildingToPosition(buildingId, x, y) {
-            const building = gameState.buildings.find(b => b.id === buildingId);
-            if (!building) return false;
-            
-            // Проверяем, что новое место не слишком близко к другим зданиям
-            for (const otherBuilding of gameState.buildings) {
-                if (otherBuilding.id === buildingId) continue;
-                
-                const distance = Math.sqrt(
-                    Math.pow(x - otherBuilding.x, 2) + 
-                    Math.pow(y - otherBuilding.y, 2)
-                );
-                if (distance < 60) {
-                    showMessage('⚠️ Слишком близко к другому зданию!', 'error');
-                    return false;
-                }
-            }
-            
-            // Обновляем позицию здания
-            building.x = x;
-            building.y = y;
-            
-            // Обновляем отображение
-            renderBuildings();
-            
-            return true;
-        }
-
-        // ============================
-        // ОБРАБОТЧИКИ СОБЫТИЙ
-        // ============================
-        function initEventListeners() {
-            const surface = document.getElementById('mars-surface');
-            
-            // Обработчики для мыши
-            surface.addEventListener('mousedown', handleSurfaceTouchStart);
-            surface.addEventListener('mouseup', handleSurfaceTouchEnd);
-            surface.addEventListener('mouseleave', () => {
+            function handleSurfaceTouchEnd(e) {
                 clearTimeout(tapTimer);
-                isLongTap = false;
-            });
+                
+                // Если было долгое нажатие - отменяем обычный клик
+                if (isLongTap) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    isLongTap = false;
+                }
+            }
             
-            // Обработчики для тач-устройств
-            surface.addEventListener('touchstart', handleSurfaceTouchStart, { passive: false });
-            surface.addEventListener('touchend', handleSurfaceTouchEnd, { passive: false });
-            surface.addEventListener('touchcancel', () => {
-                clearTimeout(tapTimer);
-                isLongTap = false;
-            });
-            
-            // Клик по поверхности для размещения зданий
-            surface.addEventListener('click', function(e) {
-                // Если мы в режиме перемещения, перемещаем здание
-                if (movingBuildingId !== null) {
-                    const rect = this.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    
-                    if (moveBuildingToPosition(movingBuildingId, x, y)) {
-                        exitMoveMode();
-                        showMessage('✅ Здание успешно перемещено', 'success');
-                    }
+            // ============================
+            // ОБНОВЛЕНИЕ ИНТЕРФЕЙСА
+            // ============================
+            function updateUI() {
+                // Обновляем верхнюю панель
+                document.getElementById('balance').textContent = gameState.gameBalance.toFixed(2);
+                
+                // Обновляем хранилище с правильной вместимостью и показываем 3 знака после запятой
+                const currentCapacity = gameState.baseCapacity;
+                document.getElementById('storage').textContent = 
+                    `${gameState.baseStorage.toFixed(3)}/${currentCapacity}`;
+                
+                const storageEl = document.getElementById('storage');
+                if (gameState.storageFull) {
+                    storageEl.style.color = '#FF5555';
+                } else {
+                    storageEl.style.color = 'gold';
+                }
+                
+                const energy = calculateEnergy();
+                document.getElementById('energy').textContent = `${energy.production}/${energy.consumption}`;
+                document.getElementById('energy').style.color = energy.production >= energy.consumption ? '#00FF00' : '#FF5555';
+                
+                document.getElementById('building-count').textContent = gameState.buildings.length;
+                
+                // Обновляем кнопку сбора
+                const collectBtn = document.getElementById('collect-btn');
+                collectBtn.disabled = gameState.baseStorage <= 0;
+                
+                // Обновляем время игры
+                gameState.playTime = Math.floor((Date.now() - gameState.gameStartTime) / 1000);
+            }
+
+            // ============================
+            // ФУНКЦИИ ДЛЯ ВКЛАДОК
+            // ============================
+            function updateMyBuildingsTab() {
+                const container = document.getElementById('my-buildings-container');
+                const countEl = document.getElementById('total-buildings-count');
+                
+                if (gameState.buildings.length === 0) {
+                    container.innerHTML = '<div class="no-buildings">Нет построенных зданий</div>';
+                    countEl.textContent = 'Всего: 0';
                     return;
                 }
                 
-                // Если мы размещаем новое здание
-                if (!gameState.placingBuilding) return;
+                container.innerHTML = '<div class="buildings-grid" id="my-buildings-grid"></div>';
+                const grid = document.getElementById('my-buildings-grid');
                 
-                const rect = this.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+                const buildingGroups = {};
+                gameState.buildings.forEach(building => {
+                    if (!buildingGroups[building.type]) {
+                        buildingGroups[building.type] = [];
+                    }
+                    buildingGroups[building.type].push(building);
+                });
                 
-                for (const building of gameState.buildings) {
-                    const distance = Math.sqrt(
-                        Math.pow(x - building.x, 2) + 
-                        Math.pow(y - building.y, 2)
-                    );
-                    if (distance < 60) {
-                        showMessage('⚠️ Слишком близко к другому зданию!', 'error');
-                        return;
+                Object.entries(buildingGroups).forEach(([type, buildings]) => {
+                    const levelCounts = {0: 0, 1: 0, 2: 0, 3: 0};
+                    buildings.forEach(b => levelCounts[b.level]++);
+                    
+                    let totalMining = 0;
+                    let totalEnergy = 0;
+                    let totalUpkeep = 0;
+                    
+                    buildings.forEach(building => {
+                        if (type === 'mining') {
+                            let miningRate = CONFIG.MINING_RATE;
+                            if (building.level > 0) {
+                                miningRate *= (1 + (CONFIG.UPGRADE_BONUSES.mining[building.level - 1] || 0));
+                            }
+                            totalMining += miningRate;
+                        } else if (type === 'power') {
+                            let energy = CONFIG.ENERGY_PRODUCTION.power;
+                            if (building.level > 0) {
+                                energy += CONFIG.UPGRADE_BONUSES.power[building.level - 1] || 0;
+                            }
+                            totalEnergy += energy;
+                        }
+                        
+                        let upkeep = CONFIG.UPKEEP_COSTS[type] || 0;
+                        if (building.level > 0) {
+                            upkeep *= CONFIG.UPGRADE_UPKEEP_MULTIPLIERS[type][building.level - 1] || 1;
+                        }
+                        totalUpkeep += upkeep;
+                    });
+                    
+                    const card = document.createElement('div');
+                    card.className = 'owned-building';
+                    card.innerHTML = `
+                        <div class="owned-building-header">
+                            <div style="font-size: 24px;">${getBuildingIcon(type)}</div>
+                            <div>
+                                <div style="font-weight: bold; font-size: 16px;">${getBuildingName(type)}</div>
+                                <div style="font-size: 12px; color: gold;">Всего: ${buildings.length} шт.</div>
+                            </div>
+                        </div>
+                        <div class="building-stats">
+                            <div class="building-stat">
+                                <span class="building-stat-label">Уровень 1:</span>
+                                <span class="building-stat-value">${levelCounts[0]} шт.</span>
+                            </div>
+                            <div class="building-stat">
+                                <span class="building-stat-label">Уровень 2:</span>
+                                <span class="building-stat-value">${levelCounts[1]} шт.</span>
+                            </div>
+                            <div class="building-stat">
+                                <span class="building-stat-label">Уровень 3:</span>
+                                <span class="building-stat-value">${levelCounts[2]} шт.</span>
+                            </div>
+                            <div class="building-stat">
+                                <span class="building-stat-label">Уровень 4:</span>
+                                <span class="building-stat-value">${levelCounts[3]} шт.</span>
+                            </div>
+                            ${type === 'mining' ? `
+                                <div class="building-stat">
+                                    <span class="building-stat-label">Общая добыча:</span>
+                                    <span class="building-stat-value">${totalMining.toFixed(3)}/сек</span>
+                                </div>
+                            ` : ''}
+                            ${type === 'power' ? `
+                                <div class="building-stat">
+                                    <span class="building-stat-label">Производство:</span>
+                                    <span class="building-stat-value">+${totalEnergy}⚡</span>
+                                </div>
+                            ` : ''}
+                            ${totalUpkeep > 0 ? `
+                                <div class="building-stat">
+                                    <span class="building-stat-label">Расходы:</span>
+                                    <span class="building-stat-value">${totalUpkeep.toFixed(4)}/сек</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    
+                    grid.appendChild(card);
+                });
+                
+                countEl.textContent = `Всего: ${gameState.buildings.length}`;
+            }
+
+            function updateWalletTab() {
+                document.getElementById('wallet-game-balance').textContent = 
+                    gameState.gameBalance.toFixed(2) + ' MNRT';
+                
+                document.getElementById('min-withdraw').textContent = CONFIG.WITHDRAWAL_MIN;
+                document.getElementById('gas-fee').textContent = CONFIG.GAS_FEE;
+                
+                updateWalletDisplay();
+                
+                const withdrawBtn = document.getElementById('withdraw-btn');
+                const withdrawAmount = parseFloat(document.getElementById('withdraw-amount').value) || 0;
+                
+                withdrawBtn.disabled = !gameState.walletAddress || 
+                                     gameState.gameBalance < CONFIG.WITHDRAWAL_MIN ||
+                                     withdrawAmount < CONFIG.WITHDRAWAL_MIN ||
+                                     withdrawAmount > gameState.gameBalance;
+                
+                if (gameState.lastWithdrawal) {
+                    const timeSinceLast = Date.now() - gameState.lastWithdrawal;
+                    if (timeSinceLast < CONFIG.WITHDRAWAL_COOLDOWN) {
+                        const remaining = CONFIG.WITHDRAWAL_COOLDOWN - timeSinceLast;
+                        const hours = Math.floor(remaining / (1000 * 60 * 60));
+                        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                        
+                        document.getElementById('withdraw-btn').innerHTML = `
+                            <span>⏰</span>
+                            <span>Следующий вывод через: ${hours}ч ${minutes}м</span>
+                        `;
+                        document.getElementById('withdraw-btn').disabled = true;
+                    } else {
+                        document.getElementById('withdraw-btn').innerHTML = `
+                            <span>🔄</span>
+                            <span>Отправить ресурсы</span>
+                        `;
+                    }
+                }
+            }
+
+            function updateWalletDisplay() {
+                const addressDisplay = document.getElementById('bsc-address-display');
+                if (gameState.walletAddress) {
+                    const shortAddress = gameState.walletAddress.slice(0, 8) + '...' + gameState.walletAddress.slice(-6);
+                    addressDisplay.innerHTML = `
+                        ${shortAddress}
+                        <button class="copy-btn" id="copy-address-btn">📋 Копировать</button>
+                    `;
+                    addressDisplay.style.color = '#4CAF50';
+                    
+                    // Добавляем обработчик для кнопки копирования
+                    const copyBtn = document.getElementById('copy-address-btn');
+                    if (copyBtn) {
+                        copyBtn.addEventListener('click', copyAddress);
+                    }
+                } else {
+                    addressDisplay.textContent = 'Адрес не указан';
+                    addressDisplay.style.color = '#888';
+                }
+            }
+
+            function toggleAddressInput() {
+                const addressDisplay = document.getElementById('bsc-address-display');
+                const addressInput = document.getElementById('bsc-address-input');
+                const editBtn = document.getElementById('edit-address-btn');
+                
+                if (addressInput.style.display === 'none' || addressInput.style.display === '') {
+                    addressDisplay.style.display = 'none';
+                    addressInput.style.display = 'block';
+                    addressInput.value = gameState.walletAddress || '';
+                    addressInput.focus();
+                    editBtn.innerHTML = '<span>💾</span><span>Сохранить адрес</span>';
+                    editBtn.onclick = saveBSCAddress;
+                } else {
+                    addressInput.style.display = 'none';
+                    addressDisplay.style.display = 'block';
+                    editBtn.innerHTML = '<span>✏️</span><span>Изменить адрес</span>';
+                    editBtn.onclick = toggleAddressInput;
+                }
+            }
+
+            function saveBSCAddress() {
+                const addressInput = document.getElementById('bsc-address-input');
+                const address = addressInput.value.trim();
+                
+                // Валидация BSC адреса
+                if (!address.startsWith('0x') || address.length !== 42) {
+                    showMessage('Неверный формат BSC адреса. Должен начинаться с 0x и быть 42 символа', 'error');
+                    addressInput.focus();
+                    return;
+                }
+                
+                const saveBtn = document.getElementById('edit-address-btn');
+                const originalText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<span>⏳</span><span>Сохранение...</span>';
+                saveBtn.disabled = true;
+                
+                setTimeout(() => {
+                    gameState.walletAddress = address;
+                    updateWalletDisplay();
+                    showMessage('✅ BSC адрес сохранен!', 'success');
+                    toggleAddressInput();
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+                }, 1000);
+            }
+
+            function copyAddress() {
+                if (!gameState.walletAddress) return;
+                
+                navigator.clipboard.writeText(gameState.walletAddress)
+                    .then(() => {
+                        showMessage('✅ Адрес скопирован в буфер обмена', 'success');
+                    })
+                    .catch(() => {
+                        showMessage('❌ Не удалось скопировать адрес', 'error');
+                    });
+            }
+
+            function withdrawFunds() {
+                const amountInput = document.getElementById('withdraw-amount');
+                const amount = parseFloat(amountInput.value);
+                
+                // Валидация
+                if (!amount || amount <= 0) {
+                    showMessage('Введите корректную сумму', 'error');
+                    return;
+                }
+                
+                if (amount < CONFIG.WITHDRAWAL_MIN) {
+                    showMessage(`Минимальная сумма вывода: ${CONFIG.WITHDRAWAL_MIN} MNRT`, 'error');
+                    return;
+                }
+                
+                if (amount > gameState.gameBalance) {
+                    showMessage('Недостаточно средств на балансе', 'error');
+                    return;
+                }
+                
+                if (!gameState.walletAddress) {
+                    showMessage('Сначала введите и сохраните BSC адрес', 'error');
+                    return;
+                }
+                
+                const withdrawBtn = document.getElementById('withdraw-btn');
+                const originalText = withdrawBtn.innerHTML;
+                withdrawBtn.innerHTML = '<span>⏳</span><span>Обработка...</span>';
+                withdrawBtn.disabled = true;
+                
+                setTimeout(() => {
+                    gameState.gameBalance -= amount;
+                    gameState.lastWithdrawal = Date.now();
+                    
+                    showMessage(`✅ Вывод ${amount} MNRT инициирован! Средства будут отправлены на адрес ${gameState.walletAddress.slice(0, 10)}...`, 'success');
+                    
+                    updateUI();
+                    amountInput.value = '';
+                    updateWalletTab();
+                    
+                    withdrawBtn.innerHTML = originalText;
+                    withdrawBtn.disabled = false;
+                }, 2000);
+            }
+
+            function updateStatsTab() {
+                updatePersonalStats();
+            }
+
+            function updatePersonalStats() {
+                document.getElementById('stat-total-mined').textContent = gameState.totalMinedAllTime.toFixed(2);
+                document.getElementById('stat-buildings-count').textContent = gameState.buildings.length;
+                
+                const playTimeHours = Math.floor(gameState.playTime / 3600);
+                document.getElementById('stat-play-time').textContent = playTimeHours + 'ч';
+                
+                const avgMining = playTimeHours > 0 ? gameState.totalMinedAllTime / playTimeHours : 0;
+                document.getElementById('stat-avg-mining').textContent = avgMining.toFixed(2);
+                
+                loadLeaderboard();
+            }
+
+            function loadLeaderboard() {
+                const tableBody = document.getElementById('leaderboard-body');
+                
+                const testData = [
+                    { rank: 1, name: "Космический Магнат", coins: 12540.75, buildings: 24, avatar: "👑" },
+                    { rank: 2, name: "Марсианский Барон", coins: 9870.25, buildings: 18, avatar: "🚀" },
+                    { rank: 3, name: "Алексей В.", coins: 7540.50, buildings: 15, avatar: "👨‍🚀" },
+                    { rank: 4, name: "Мария К.", coins: 6320.80, buildings: 14, avatar: "👩‍🚀" },
+                    { rank: 5, name: "Иван П.", coins: 5210.30, buildings: 12, avatar: "👨" },
+                    { rank: 6, name: "Ольга С.", coins: 4870.90, buildings: 11, avatar: "👩" },
+                    { rank: 7, name: "Дмитрий Л.", coins: 4250.60, buildings: 10, avatar: "🧑‍💼" },
+                    { rank: 8, name: "Екатерина М.", coins: 3980.40, buildings: 9, avatar: "👩‍💼" },
+                    { rank: 9, name: "Сергей К.", coins: 3650.20, buildings: 8, avatar: "🧔" },
+                    { rank: 10, name: "Анна В.", coins: 3420.10, buildings: 8, avatar: "👱‍♀️" }
+                ];
+                
+                const playerCoins = gameState.totalMinedAllTime;
+                let playerRank = '—';
+                let percentOfLeader = 0;
+                
+                if (testData.length > 0) {
+                    const topPlayerCoins = testData[0].coins;
+                    
+                    if (playerCoins > 0) {
+                        percentOfLeader = Math.min(100, (playerCoins / topPlayerCoins) * 100);
+                        
+                        for (let i = 0; i < testData.length; i++) {
+                            if (playerCoins >= testData[i].coins) {
+                                playerRank = testData[i].rank;
+                                break;
+                            }
+                        }
+                        
+                        if (playerRank === '—' && playerCoins > 0) {
+                            playerRank = testData.length + 1;
+                        }
                     }
                 }
                 
-                const type = gameState.placingBuilding;
+                document.getElementById('stat-player-rank').textContent = playerRank;
+                document.getElementById('stat-percent-of-leader').textContent = percentOfLeader.toFixed(1) + '%';
+                
+                tableBody.innerHTML = '';
+                testData.forEach(player => {
+                    const row = document.createElement('tr');
+                    
+                    let rankClass = '';
+                    let rankIcon = player.rank;
+                    
+                    if (player.rank === 1) {
+                        rankClass = 'medal-gold';
+                        rankIcon = '🥇';
+                    } else if (player.rank === 2) {
+                        rankClass = 'medal-silver';
+                        rankIcon = '🥈';
+                    } else if (player.rank === 3) {
+                        rankClass = 'medal-bronze';
+                        rankIcon = '🥉';
+                    }
+                    
+                    row.innerHTML = `
+                        <td class="rank-cell ${rankClass}">${rankIcon}</td>
+                        <td>
+                            <div class="player-cell">
+                                <div class="player-avatar">${player.avatar || '👤'}</div>
+                                <div class="player-name">${player.name}</div>
+                            </div>
+                        </td>
+                        <td class="coins-cell">${player.coins.toFixed(2)}</td>
+                        <td style="text-align: right;">${player.buildings}</td>
+                    `;
+                    
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // ============================
+            // ИГРОВАЯ ЛОГИКА
+            // ============================
+            function getUpgradeCost(type, targetLevel) {
+                if (targetLevel >= 1 && targetLevel <= 3) {
+                    return CONFIG.UPGRADE_COSTS[type][targetLevel - 1];
+                }
+                return 0;
+            }
+
+            function upgradeBuildingType(type) {
+                const buildingsOfType = gameState.buildings.filter(b => b.type === type);
+                if (buildingsOfType.length === 0) {
+                    showMessage(`Нет построенных ${getBuildingName(type)} для улучшения`, 'error');
+                    return;
+                }
+                
+                const minLevel = Math.min(...buildingsOfType.map(b => b.level));
+                if (minLevel >= 3) {
+                    showMessage(`Все ${getBuildingName(type)} уже максимального уровня`, 'error');
+                    return;
+                }
+                
+                const upgradeCost = getUpgradeCost(type, minLevel + 1);
+                if (gameState.gameBalance < upgradeCost) {
+                    showMessage(`Недостаточно MNRT для улучшения. Нужно: ${upgradeCost}`, 'error');
+                    return;
+                }
+                
+                let upgradedCount = 0;
+                gameState.buildings.forEach(building => {
+                    if (building.type === type && building.level === minLevel) {
+                        building.level++;
+                        upgradedCount++;
+                        
+                        // Если улучшаем базу - увеличиваем вместимость
+                        if (building.type === 'base') {
+                            const bonus = CONFIG.UPGRADE_BONUSES.base[building.level - 1] || 0;
+                            const additionalCapacity = CONFIG.BASE_STORAGE_CAPACITY * bonus;
+                            gameState.baseCapacity += additionalCapacity;
+                        }
+                    }
+                });
+                
+                gameState.gameBalance -= upgradeCost;
+                gameState.statistics.totalUpgrades++;
+                showMessage(`✅ Улучшено ${upgradedCount} ${getBuildingName(type)} до уровня ${minLevel + 2}`, 'success');
+                updateUI();
+                renderBuildings();
+            }
+
+            function startBuilding(type) {
                 const isFirstBuildingFree = CONFIG.FREE_BUILDINGS[type] && !gameState.freeBuildingsUsed[type];
                 const cost = isFirstBuildingFree ? 0 : CONFIG.BUILDING_COSTS[type];
                 
@@ -3578,192 +3081,692 @@
                     return;
                 }
                 
-                if (!isFirstBuildingFree) {
-                    gameState.gameBalance -= cost;
+                if ((type === 'mining' || type === 'power') && !gameState.hasBase) {
+                    showMessage('❌ Сначала постройте базу!', 'error');
+                    return;
                 }
                 
-                if (isFirstBuildingFree) {
-                    gameState.freeBuildingsUsed[type] = true;
+                if (type === 'base' && gameState.hasBase) {
+                    showMessage('❌ У вас уже есть база!', 'error');
+                    return;
                 }
                 
-                const building = {
-                    id: gameState.nextId++,
-                    type: type,
-                    x: x,
-                    y: y,
-                    level: 0,
-                    hasPower: true
-                };
+                gameState.placingBuilding = type;
                 
-                gameState.buildings.push(building);
-                gameState.statistics.totalBuildings++;
-                
-                if (type === 'base') {
-                    gameState.hasBase = true;
-                }
-                
-                gameState.placingBuilding = null;
-                updateUI();
-                renderBuildings();
+                // Создаем эффект тапа в центре экрана
+                const surface = document.getElementById('mars-surface');
+                const rect = surface.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                createTapIndicator(centerX, centerY);
                 
                 const message = isFirstBuildingFree ? 
-                    `✅ ${getBuildingName(type)} построена БЕСПЛАТНО!` : 
-                    `✅ ${getBuildingName(type)} построена!`;
+                    `🏗️ Выбрана ${getBuildingName(type)}. Кликните на карту для размещения (БЕСПЛАТНО!)` : 
+                    `🏗️ Выбрана ${getBuildingName(type)}. Кликните на карту для размещения (${cost} MNRT)`;
+                
                 showMessage(message, 'success');
-            });
+                
+                // Если мы в режиме перемещения, выходим из него
+                if (movingBuildingId !== null) {
+                    exitMoveMode();
+                }
+            }
 
-            // Закрытие меню строительства при клике вне его
-            document.addEventListener('click', function(e) {
-                const buildMenu = document.getElementById('build-menu');
-                const buildBtn = document.getElementById('build-btn');
+            function calculateEnergy() {
+                let production = 0;
+                let consumption = 0;
                 
-                if (buildMenu.style.display === 'flex' && 
-                    !buildMenu.contains(e.target) && 
-                    e.target !== buildBtn && 
-                    !buildBtn.contains(e.target)) {
-                    closeBuildMenu();
-                }
-            });
-            
-            // Добавляем обработчики для кнопок
-            document.getElementById('build-btn').addEventListener('click', showBuildMenu);
-            document.getElementById('close-build-menu').addEventListener('click', closeBuildMenu);
-            document.getElementById('collect-btn').addEventListener('click', collectFromBase);
-            
-            // Вкладки
-            document.getElementById('mars-tab').addEventListener('click', () => showTab('mars'));
-            document.getElementById('my-buildings-tab-btn').addEventListener('click', () => showTab('my-buildings'));
-            document.getElementById('wallet-tab-btn').addEventListener('click', () => showTab('wallet'));
-            document.getElementById('stats-tab-btn').addEventListener('click', () => showTab('stats'));
-            document.getElementById('referral-tab-btn').addEventListener('click', () => showTab('referral'));
-            
-            // Закрытие вкладок
-            document.getElementById('close-my-buildings').addEventListener('click', () => showTab('mars'));
-            document.getElementById('close-wallet').addEventListener('click', () => showTab('mars'));
-            document.getElementById('close-stats').addEventListener('click', () => showTab('mars'));
-            document.getElementById('close-referral').addEventListener('click', () => showTab('mars'));
-            
-            // Статистика
-            document.getElementById('leaderboard-tab').addEventListener('click', () => switchStatsTab('leaderboard'));
-            document.getElementById('personal-tab').addEventListener('click', () => switchStatsTab('personal'));
-            
-            // Контекстное меню зданий
-            document.getElementById('close-context-menu').addEventListener('click', closeContextMenu);
-            document.getElementById('move-building-btn').addEventListener('click', toggleMoveMode);
-            document.getElementById('delete-building-btn').addEventListener('click', confirmDeleteBuilding);
-            
-            // Удаление зданий
-            document.getElementById('confirm-delete-btn').addEventListener('click', deleteBuildingConfirmed);
-            document.getElementById('cancel-delete-btn').addEventListener('click', cancelDeleteBuilding);
-            
-            // Кошелек
-            document.getElementById('edit-address-btn').addEventListener('click', toggleAddressInput);
-            document.getElementById('withdraw-btn').addEventListener('click', withdrawFunds);
-            document.getElementById('withdraw-amount').addEventListener('input', updateWalletTab);
-            
-            // Реферальная система
-            document.getElementById('copy-referral-link').addEventListener('click', copyReferralLink);
-            
-            // Закрытие меню при клике вне
-            document.addEventListener('click', function(e) {
-                const menu = document.getElementById('building-context-menu');
-                const deleteConfirm = document.getElementById('delete-confirm');
+                gameState.buildings.forEach(building => {
+                    if (CONFIG.ENERGY_PRODUCTION[building.type]) {
+                        let energy = CONFIG.ENERGY_PRODUCTION[building.type];
+                        if (building.level > 0 && building.type === 'power') {
+                            energy += CONFIG.UPGRADE_BONUSES.power[building.level - 1] || 0;
+                        }
+                        production += energy;
+                    }
+                    if (CONFIG.ENERGY_CONSUMPTION[building.type]) {
+                        consumption += CONFIG.ENERGY_CONSUMPTION[building.type];
+                    }
+                });
                 
-                if (menu.style.display === 'flex' && !menu.contains(e.target)) {
-                    closeContextMenu();
+                gameState.buildings.forEach(building => {
+                    if (building.type === 'mining') {
+                        building.hasPower = (production >= consumption);
+                    }
+                });
+                
+                gameState.energy = { production, consumption };
+                return { production, consumption };
+            }
+
+            function calculateMiningRate(building) {
+                let rate = CONFIG.MINING_RATE;
+                
+                if (building.level > 0) {
+                    const bonus = CONFIG.UPGRADE_BONUSES.mining[building.level - 1] || 0;
+                    rate *= (1 + bonus);
                 }
                 
-                if (deleteConfirm.style.display === 'flex' && !deleteConfirm.contains(e.target)) {
-                    cancelDeleteBuilding();
+                return rate;
+            }
+
+            function calculateUpkeep() {
+                let totalUpkeep = 0;
+                gameState.buildings.forEach(building => {
+                    let upkeep = CONFIG.UPKEEP_COSTS[building.type] || 0;
+                    
+                    if (building.level > 0) {
+                        const multiplier = CONFIG.UPGRADE_UPKEEP_MULTIPLIERS[building.type][building.level - 1] || 1;
+                        upkeep *= multiplier;
+                    }
+                    
+                    totalUpkeep += upkeep;
+                });
+                return totalUpkeep;
+            }
+
+            function updateMining() {
+                const now = Date.now();
+                const elapsedSeconds = (now - gameState.lastUpdate) / 1000;
+                gameState.lastUpdate = now;
+                
+                if (!gameState.miningActive) {
+                    updateUI();
+                    return;
                 }
                 
-                if (e.target.id === 'mars-surface') {
-                    closeContextMenu();
-                    if (movingBuildingId !== null) {
-                        exitMoveMode();
-                        showMessage('📍 Режим перемещения отменен', 'success');
+                const energy = calculateEnergy();
+                const upkeepPerSecond = calculateUpkeep();
+                const totalUpkeep = upkeepPerSecond * elapsedSeconds;
+                
+                const activeMiningBuildings = gameState.buildings.filter(b => 
+                    b.type === 'mining' && b.hasPower
+                );
+                
+                if (activeMiningBuildings.length === 0) {
+                    if (gameState.baseStorage > 0) {
+                        const upkeepFromStorage = Math.min(totalUpkeep, gameState.baseStorage);
+                        gameState.baseStorage -= upkeepFromStorage;
+                    }
+                    updateUI();
+                    return;
+                }
+                
+                // 1. Рассчитываем общую добычу от всех активных буровых
+                let totalMiningPerSecond = 0;
+                activeMiningBuildings.forEach(building => {
+                    totalMiningPerSecond += calculateMiningRate(building);
+                });
+                
+                // 2. Чистая добыча = добыча - расходы на содержание
+                const netMiningPerSecond = totalMiningPerSecond - upkeepPerSecond;
+                
+                // 3. Если чистая добыча положительная
+                if (netMiningPerSecond > 0) {
+                    const minedThisTick = netMiningPerSecond * elapsedSeconds;
+                    const availableStorage = gameState.baseCapacity - gameState.baseStorage;
+                    const actualMined = Math.min(minedThisTick, availableStorage);
+                    
+                    if (actualMined > 0) {
+                        gameState.baseStorage += actualMined;
+                        gameState.totalMinedAllTime += actualMined;
+                        gameState.statistics.totalMined += actualMined;
+                        
+                        if (gameState.baseStorage >= gameState.baseCapacity) {
+                            gameState.storageFull = true;
+                            gameState.miningActive = false;
+                            showMessage('⚠️ Хранилище заполнено! Соберите ресурсы.', 'error');
+                        }
+                    }
+                } 
+                // 4. Если расходы превышают добычу - расходуем из хранилища
+                else if (netMiningPerSecond < 0) {
+                    const lossPerSecond = -netMiningPerSecond;
+                    const lossThisTick = lossPerSecond * elapsedSeconds;
+                    
+                    if (gameState.baseStorage >= lossThisTick) {
+                        gameState.baseStorage -= lossThisTick;
+                    } else {
+                        gameState.baseStorage = 0;
                     }
                 }
-            });
-        }
-        
-        function switchStatsTab(tabName) {
-            document.querySelectorAll('.stats-tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            document.getElementById('leaderboard-content').style.display = 'none';
-            document.getElementById('personal-stats-content').style.display = 'none';
-            
-            if (tabName === 'leaderboard') {
-                document.getElementById('leaderboard-tab').classList.add('active');
-                document.getElementById('leaderboard-content').style.display = 'block';
-                loadLeaderboard();
-            } else {
-                document.getElementById('personal-tab').classList.add('active');
-                document.getElementById('personal-stats-content').style.display = 'block';
-                updatePersonalStats();
-            }
-        }
-
-        // ============================
-        // ЗАПУСК ЦИКЛОВ ОБНОВЛЕНИЯ
-        // ============================
-        function startMiningUpdateLoop() {
-            // Убеждаемся, что gameState.lastUpdate инициализирован
-            if (!gameState.lastUpdate) {
-                gameState.lastUpdate = Date.now();
-            }
-            
-            // Останавливаем предыдущий интервал, если он есть
-            if (miningUpdateInterval) {
-                clearInterval(miningUpdateInterval);
-            }
-            
-            // Устанавливаем интервал для обновления добычи
-            miningUpdateInterval = setInterval(() => {
-                updateMining();
-            }, 100); // Обновляем каждые 100 мс для плавности
-            
-            // Также обновляем UI каждую секунду
-            setInterval(() => {
+                
                 updateUI();
-            }, 1000);
-        }
+            }
 
-        // ============================
-        // ИНИЦИАЛИЗАЦИЯ ИГРЫ
-        // ============================
-        function initGame() {
-            // Создаем поверхность Марса
-            generateMarsSurface();
-            
-            // Инициализируем обработчики событий
-            initEventListeners();
-            
-            // Обновляем интерфейс
-            updateUI();
-            
-            // Запускаем игровой цикл
-            gameState.lastUpdate = Date.now();
-            gameState.gameStartTime = Date.now();
-            
-            // Запускаем цикл обновления добычи
-            startMiningUpdateLoop();
-            
-            // Запускаем цикл обновления реферальных бонусов
-            startReferralBonusLoop();
-            
-            // Приветственное сообщение
-            setTimeout(() => {
-                showMessage('🎉 Добро пожаловать в Mars Crypto Conflict! Первая постройка каждого типа зданий - БЕСПЛАТНО!', 'success');
-            }, 1000);
-        }
+            function collectFromBase() {
+                if (gameState.baseStorage <= 0) {
+                    showMessage('⛏️ Нет ресурсов в хранилище базы', 'error');
+                    return;
+                }
+                
+                const collected = gameState.baseStorage;
+                gameState.gameBalance += collected;
+                gameState.totalMinedAllTime += collected;
+                gameState.statistics.totalMined += collected;
+                gameState.baseStorage = 0;
+                gameState.storageFull = false;
+                gameState.miningActive = true;
+                
+                const playerName = telegramUser ? 
+                    (telegramUser.firstName + (telegramUser.lastName ? ' ' + telegramUser.lastName : '')) : 'Игрок';
+                const playerId = telegramUser ? telegramUser.id : '—';
+                
+                showMessage(`💰 ${playerName} (ID: ${playerId}) собрал ${collected.toFixed(4)} MNRT на баланс!`, 'success');
+                
+                updateUI();
+            }
 
-        // Запуск игры после загрузки DOM
-        window.addEventListener('DOMContentLoaded', function() {
-            initTelegramWebApp();
-        });
-    </script>
-</body>
+            function generateMarsSurface() {
+                const surface = document.getElementById('mars-surface');
+                surface.innerHTML = '';
+                
+                for (let i = 0; i < 20; i++) {
+                    const rock = document.createElement('div');
+                    rock.className = 'rock';
+                    rock.style.left = Math.random() * 95 + '%';
+                    rock.style.top = Math.random() * 95 + '%';
+                    rock.style.width = Math.random() * 25 + 10 + 'px';
+                    rock.style.height = Math.random() * 25 + 10 + 'px';
+                    rock.style.background = `rgb(${80 + Math.random() * 40}, ${80 + Math.random() * 40}, ${80 + Math.random() * 40})`;
+                    surface.appendChild(rock);
+                }
+                
+                renderBuildings();
+            }
+
+            function createBuildingElement(building) {
+                const div = document.createElement('div');
+                div.className = `building ${building.type}`;
+                div.id = `building-${building.id}`;
+                div.style.left = building.x + 'px';
+                div.style.top = building.y + 'px';
+                div.title = `${getBuildingName(building.type)} #${building.id} | Уровень ${building.level + 1}`;
+                
+                const icon = document.createElement('div');
+                icon.textContent = getBuildingIcon(building.type);
+                div.appendChild(icon);
+                
+                // Добавляем эффекты в зависимости от типа здания
+                if (building.type === 'mining' && building.hasPower) {
+                    const miningEffect = document.createElement('div');
+                    miningEffect.className = 'mining-effect';
+                    div.appendChild(miningEffect);
+                }
+                
+                if (building.type === 'power') {
+                    const powerEffect = document.createElement('div');
+                    powerEffect.className = 'power-effect';
+                    div.appendChild(powerEffect);
+                }
+                
+                if (building.level > 0) {
+                    const levelBadge = document.createElement('div');
+                    levelBadge.className = 'building-level-badge';
+                    levelBadge.textContent = building.level + 1;
+                    div.appendChild(levelBadge);
+                }
+                
+                // Добавляем обработчик клика для контекстного меню
+                div.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showBuildingContextMenu(building.id, e.clientX, e.clientY);
+                });
+                
+                return div;
+            }
+
+            function renderBuildings() {
+                const surface = document.getElementById('mars-surface');
+                document.querySelectorAll('.building').forEach(el => el.remove());
+                
+                gameState.buildings.forEach(building => {
+                    const buildingEl = createBuildingElement(building);
+                    surface.appendChild(buildingEl);
+                });
+            }
+
+            // ============================
+            // УПРАВЛЕНИЕ ЗДАНИЯМИ
+            // ============================
+            function showBuildingContextMenu(buildingId, x, y) {
+                const building = gameState.buildings.find(b => b.id === buildingId);
+                if (!building) return;
+                
+                selectedBuildingId = buildingId;
+                
+                const menu = document.getElementById('building-context-menu');
+                const title = document.getElementById('context-menu-title');
+                
+                title.textContent = `${getBuildingName(building.type)} #${building.id}`;
+                
+                // Позиционируем меню с учетом границ экрана
+                const menuWidth = 140;
+                const menuHeight = 100;
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+                
+                let finalX = x;
+                let finalY = y;
+                
+                // Проверяем, чтобы меню не выходило за правую границу
+                if (finalX + menuWidth > screenWidth - 10) {
+                    finalX = screenWidth - menuWidth - 10;
+                }
+                
+                // Проверяем, чтобы меню не выходило за нижнюю границу
+                if (finalY + menuHeight > screenHeight - 70) {
+                    finalY = screenHeight - menuHeight - 70;
+                }
+                
+                // Проверяем, чтобы меню не выходило за верхнюю границу
+                if (finalY < 10) {
+                    finalY = 10;
+                }
+                
+                // Проверяем, чтобы меню не выходило за левую границу
+                if (finalX < 10) {
+                    finalX = 10;
+                }
+                
+                menu.style.left = finalX + 'px';
+                menu.style.top = finalY + 'px';
+                menu.style.display = 'flex';
+                
+                // Если мы в режиме перемещения, выходим из него
+                if (movingBuildingId !== null) {
+                    exitMoveMode();
+                }
+            }
+            
+            function closeContextMenu() {
+                const menu = document.getElementById('building-context-menu');
+                menu.style.display = 'none';
+                selectedBuildingId = null;
+            }
+            
+            function toggleMoveMode() {
+                if (movingBuildingId === selectedBuildingId) {
+                    exitMoveMode();
+                } else {
+                    enterMoveMode(selectedBuildingId);
+                }
+                closeContextMenu();
+            }
+            
+            function enterMoveMode(buildingId) {
+                movingBuildingId = buildingId;
+                const moveBtn = document.getElementById('move-building-btn');
+                moveBtn.classList.add('active');
+                moveBtn.innerHTML = '<span>📍</span><span>Режим перемещения активен</span>';
+                
+                const buildingEl = document.getElementById(`building-${buildingId}`);
+                if (buildingEl) {
+                    buildingEl.style.cursor = 'move';
+                    buildingEl.style.boxShadow = '0 0 15px #00FF00';
+                    buildingEl.style.zIndex = '1000';
+                }
+                
+                showMessage('📍 Режим перемещения: кликните на новое место для здания', 'success');
+            }
+            
+            function exitMoveMode() {
+                if (movingBuildingId !== null) {
+                    const buildingEl = document.getElementById(`building-${movingBuildingId}`);
+                    if (buildingEl) {
+                        buildingEl.style.cursor = 'pointer';
+                        buildingEl.style.boxShadow = '';
+                        buildingEl.style.zIndex = '10';
+                    }
+                    
+                    const moveBtn = document.getElementById('move-building-btn');
+                    moveBtn.classList.remove('active');
+                    moveBtn.innerHTML = '<span>📍</span><span>Переместить</span>';
+                    
+                    movingBuildingId = null;
+                }
+            }
+            
+            function confirmDeleteBuilding() {
+                const building = gameState.buildings.find(b => b.id === selectedBuildingId);
+                if (!building) return;
+                
+                buildingToDeleteId = selectedBuildingId;
+                
+                const confirmEl = document.getElementById('delete-confirm');
+                const messageEl = document.getElementById('delete-confirm-message');
+                
+                messageEl.textContent = `Вы уверены, что хотите удалить ${getBuildingName(building.type)} #${building.id}? Это действие нельзя отменить.`;
+                
+                confirmEl.style.display = 'flex';
+                closeContextMenu();
+            }
+            
+            function cancelDeleteBuilding() {
+                const confirmEl = document.getElementById('delete-confirm');
+                confirmEl.style.display = 'none';
+                buildingToDeleteId = null;
+            }
+            
+            function deleteBuildingConfirmed() {
+                if (buildingToDeleteId === null) return;
+                
+                const buildingIndex = gameState.buildings.findIndex(b => b.id === buildingToDeleteId);
+                if (buildingIndex === -1) return;
+                
+                const building = gameState.buildings[buildingIndex];
+                const buildingName = getBuildingName(building.type);
+                
+                // Если удаляем базу - сбрасываем вместимость
+                if (building.type === 'base') {
+                    gameState.baseCapacity = CONFIG.BASE_STORAGE_CAPACITY;
+                }
+                
+                // Удаляем здание из массива
+                gameState.buildings.splice(buildingIndex, 1);
+                
+                // Проверяем, есть ли еще база
+                gameState.hasBase = gameState.buildings.some(b => b.type === 'base');
+                
+                // Обновляем статистику
+                gameState.statistics.totalBuildings = gameState.buildings.length;
+                
+                // Если удаляемое здание было в режиме перемещения - выходим из режима
+                if (movingBuildingId === buildingToDeleteId) {
+                    exitMoveMode();
+                }
+                
+                // Обновляем интерфейс
+                updateUI();
+                renderBuildings();
+                updateMyBuildingsTab();
+                
+                // Закрываем подтверждение
+                const confirmEl = document.getElementById('delete-confirm');
+                confirmEl.style.display = 'none';
+                buildingToDeleteId = null;
+                
+                showMessage(`🗑️ ${buildingName} #${building.id} удалена`, 'success');
+            }
+            
+            function moveBuildingToPosition(buildingId, x, y) {
+                const building = gameState.buildings.find(b => b.id === buildingId);
+                if (!building) return false;
+                
+                // Проверяем, что новое место не слишком близко к другим зданиям
+                for (const otherBuilding of gameState.buildings) {
+                    if (otherBuilding.id === buildingId) continue;
+                    
+                    const distance = Math.sqrt(
+                        Math.pow(x - otherBuilding.x, 2) + 
+                        Math.pow(y - otherBuilding.y, 2)
+                    );
+                    if (distance < 60) {
+                        showMessage('⚠️ Слишком близко к другому зданию!', 'error');
+                        return false;
+                    }
+                }
+                
+                // Обновляем позицию здания
+                building.x = x;
+                building.y = y;
+                
+                // Обновляем отображение
+                renderBuildings();
+                
+                return true;
+            }
+
+            // ============================
+            // ОБРАБОТЧИКИ СОБЫТИЙ
+            // ============================
+            function initEventListeners() {
+                const surface = document.getElementById('mars-surface');
+                
+                // Обработчики для мыши
+                surface.addEventListener('mousedown', handleSurfaceTouchStart);
+                surface.addEventListener('mouseup', handleSurfaceTouchEnd);
+                surface.addEventListener('mouseleave', () => {
+                    clearTimeout(tapTimer);
+                    isLongTap = false;
+                });
+                
+                // Обработчики для тач-устройств
+                surface.addEventListener('touchstart', handleSurfaceTouchStart, { passive: false });
+                surface.addEventListener('touchend', handleSurfaceTouchEnd, { passive: false });
+                surface.addEventListener('touchcancel', () => {
+                    clearTimeout(tapTimer);
+                    isLongTap = false;
+                });
+                
+                // Клик по поверхности для размещения зданий
+                surface.addEventListener('click', function(e) {
+                    // Если мы в режиме перемещения, перемещаем здание
+                    if (movingBuildingId !== null) {
+                        const rect = this.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+                        
+                        if (moveBuildingToPosition(movingBuildingId, x, y)) {
+                            exitMoveMode();
+                            showMessage('✅ Здание успешно перемещено', 'success');
+                        }
+                        return;
+                    }
+                    
+                    // Если мы размещаем новое здание
+                    if (!gameState.placingBuilding) return;
+                    
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    for (const building of gameState.buildings) {
+                        const distance = Math.sqrt(
+                            Math.pow(x - building.x, 2) + 
+                            Math.pow(y - building.y, 2)
+                        );
+                        if (distance < 60) {
+                            showMessage('⚠️ Слишком близко к другому зданию!', 'error');
+                            return;
+                        }
+                    }
+                    
+                    const type = gameState.placingBuilding;
+                    const isFirstBuildingFree = CONFIG.FREE_BUILDINGS[type] && !gameState.freeBuildingsUsed[type];
+                    const cost = isFirstBuildingFree ? 0 : CONFIG.BUILDING_COSTS[type];
+                    
+                    if (!isFirstBuildingFree && gameState.gameBalance < cost) {
+                        showMessage(`❌ Недостаточно MNRT! Нужно: ${cost}`, 'error');
+                        return;
+                    }
+                    
+                    if (!isFirstBuildingFree) {
+                        gameState.gameBalance -= cost;
+                    }
+                    
+                    if (isFirstBuildingFree) {
+                        gameState.freeBuildingsUsed[type] = true;
+                    }
+                    
+                    const building = {
+                        id: gameState.nextId++,
+                        type: type,
+                        x: x,
+                        y: y,
+                        level: 0,
+                        hasPower: true
+                    };
+                    
+                    gameState.buildings.push(building);
+                    gameState.statistics.totalBuildings++;
+                    
+                    if (type === 'base') {
+                        gameState.hasBase = true;
+                    }
+                    
+                    gameState.placingBuilding = null;
+                    updateUI();
+                    renderBuildings();
+                    
+                    const message = isFirstBuildingFree ? 
+                        `✅ ${getBuildingName(type)} построена БЕСПЛАТНО!` : 
+                        `✅ ${getBuildingName(type)} построена!`;
+                    showMessage(message, 'success');
+                });
+
+                // Закрытие меню строительства при клике вне его
+                document.addEventListener('click', function(e) {
+                    const buildMenu = document.getElementById('build-menu');
+                    const buildBtn = document.getElementById('build-btn');
+                    
+                    if (buildMenu.style.display === 'flex' && 
+                        !buildMenu.contains(e.target) && 
+                        e.target !== buildBtn && 
+                        !buildBtn.contains(e.target)) {
+                        closeBuildMenu();
+                    }
+                });
+                
+                // Добавляем обработчики для кнопок
+                document.getElementById('build-btn').addEventListener('click', showBuildMenu);
+                document.getElementById('close-build-menu').addEventListener('click', closeBuildMenu);
+                document.getElementById('collect-btn').addEventListener('click', collectFromBase);
+                
+                // Вкладки
+                document.getElementById('mars-tab').addEventListener('click', () => showTab('mars'));
+                document.getElementById('my-buildings-tab-btn').addEventListener('click', () => showTab('my-buildings'));
+                document.getElementById('wallet-tab-btn').addEventListener('click', () => showTab('wallet'));
+                document.getElementById('stats-tab-btn').addEventListener('click', () => showTab('stats'));
+                document.getElementById('referral-tab-btn').addEventListener('click', () => showTab('referral'));
+                
+                // Закрытие вкладок
+                document.getElementById('close-my-buildings').addEventListener('click', () => showTab('mars'));
+                document.getElementById('close-wallet').addEventListener('click', () => showTab('mars'));
+                document.getElementById('close-stats').addEventListener('click', () => showTab('mars'));
+                document.getElementById('close-referral').addEventListener('click', () => showTab('mars'));
+                
+                // Статистика
+                document.getElementById('leaderboard-tab').addEventListener('click', () => switchStatsTab('leaderboard'));
+                document.getElementById('personal-tab').addEventListener('click', () => switchStatsTab('personal'));
+                
+                // Контекстное меню зданий
+                document.getElementById('close-context-menu').addEventListener('click', closeContextMenu);
+                document.getElementById('move-building-btn').addEventListener('click', toggleMoveMode);
+                document.getElementById('delete-building-btn').addEventListener('click', confirmDeleteBuilding);
+                
+                // Удаление зданий
+                document.getElementById('confirm-delete-btn').addEventListener('click', deleteBuildingConfirmed);
+                document.getElementById('cancel-delete-btn').addEventListener('click', cancelDeleteBuilding);
+                
+                // Кошелек
+                document.getElementById('edit-address-btn').addEventListener('click', toggleAddressInput);
+                document.getElementById('withdraw-btn').addEventListener('click', withdrawFunds);
+                document.getElementById('withdraw-amount').addEventListener('input', updateWalletTab);
+                
+                // Реферальная система
+                document.getElementById('copy-referral-link').addEventListener('click', copyReferralLink);
+                
+                // Закрытие меню при клике вне
+                document.addEventListener('click', function(e) {
+                    const menu = document.getElementById('building-context-menu');
+                    const deleteConfirm = document.getElementById('delete-confirm');
+                    
+                    if (menu.style.display === 'flex' && !menu.contains(e.target)) {
+                        closeContextMenu();
+                    }
+                    
+                    if (deleteConfirm.style.display === 'flex' && !deleteConfirm.contains(e.target)) {
+                        cancelDeleteBuilding();
+                    }
+                    
+                    if (e.target.id === 'mars-surface') {
+                        closeContextMenu();
+                        if (movingBuildingId !== null) {
+                            exitMoveMode();
+                            showMessage('📍 Режим перемещения отменен', 'success');
+                        }
+                    }
+                });
+            }
+            
+            function switchStatsTab(tabName) {
+                document.querySelectorAll('.stats-tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                document.getElementById('leaderboard-content').style.display = 'none';
+                document.getElementById('personal-stats-content').style.display = 'none';
+                
+                if (tabName === 'leaderboard') {
+                    document.getElementById('leaderboard-tab').classList.add('active');
+                    document.getElementById('leaderboard-content').style.display = 'block';
+                    loadLeaderboard();
+                } else {
+                    document.getElementById('personal-tab').classList.add('active');
+                    document.getElementById('personal-stats-content').style.display = 'block';
+                    updatePersonalStats();
+                }
+            }
+
+            // ============================
+            // ЗАПУСК ЦИКЛОВ ОБНОВЛЕНИЯ
+            // ============================
+            function startMiningUpdateLoop() {
+                // Убеждаемся, что gameState.lastUpdate инициализирован
+                if (!gameState.lastUpdate) {
+                    gameState.lastUpdate = Date.now();
+                }
+                
+                // Останавливаем предыдущий интервал, если он есть
+                if (miningUpdateInterval) {
+                    clearInterval(miningUpdateInterval);
+                }
+                
+                // Устанавливаем интервал для обновления добычи
+                miningUpdateInterval = setInterval(() => {
+                    updateMining();
+                }, 100); // Обновляем каждые 100 мс для плавности
+                
+                // Также обновляем UI каждую секунду
+                setInterval(() => {
+                    updateUI();
+                }, 1000);
+            }
+
+            // ============================
+            // ИНИЦИАЛИЗАЦИЯ ИГРЫ
+            // ============================
+            function initGame() {
+                // Создаем поверхность Марса
+                generateMarsSurface();
+                
+                // Инициализируем обработчики событий
+                initEventListeners();
+                
+                // Обновляем интерфейс
+                updateUI();
+                
+                // Запускаем игровой цикл
+                gameState.lastUpdate = Date.now();
+                gameState.gameStartTime = Date.now();
+                
+                // Запускаем цикл обновления добычи
+                startMiningUpdateLoop();
+                
+                // Запускаем цикл обновления реферальных бонусов
+                startReferralBonusLoop();
+                
+                // Приветственное сообщение
+                setTimeout(() => {
+                    showMessage('🎉 Добро пожаловать в Mars Crypto Conflict! Первая постройка каждого типа зданий - БЕСПЛАТНО!', 'success');
+                }, 1000);
+            }
+
+            // Запуск игры после загрузки DOM
+            window.addEventListener('DOMContentLoaded', function() {
+                initTelegramWebApp();
+            });
+        </script>
+    </body>
 </html>
