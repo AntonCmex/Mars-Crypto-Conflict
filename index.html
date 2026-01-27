@@ -2635,10 +2635,10 @@
                 // Обновляем верхнюю панель
                 document.getElementById('balance').textContent = gameState.gameBalance.toFixed(2);
                 
-                // Обновляем хранилище с правильной вместимостью и показываем 3 знака после запятой
+                // Обновляем хранилище с правильной вместимостью и показываем 4 знака после запятой
                 const currentCapacity = gameState.baseCapacity;
                 document.getElementById('storage').textContent = 
-                    `${gameState.baseStorage.toFixed(3)}/${currentCapacity}`;
+                    `${gameState.baseStorage.toFixed(4)}/${currentCapacity}`;
                 
                 const storageEl = document.getElementById('storage');
                 if (gameState.storageFull) {
@@ -3792,3 +3792,4 @@
         </script>
     </body>
 </html>
+
