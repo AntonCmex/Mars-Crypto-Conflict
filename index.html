@@ -486,6 +486,64 @@
             margin: 20px 0;
         }
         
+        /* КНОПКА УЛУЧШЕНИЯ ЗДАНИЙ */
+        .building-upgrade-btn {
+            background: linear-gradient(135deg, #9C27B0, #673AB7);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .building-upgrade-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #673AB7, #5E35B1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(156, 39, 176, 0.3);
+        }
+        
+        .building-upgrade-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .upgrade-cost {
+            font-size: 11px;
+            color: #FFD700;
+            text-align: center;
+            margin-top: 6px;
+            font-weight: bold;
+        }
+        
+        .upgrade-bonus {
+            font-size: 10px;
+            color: #4CAF50;
+            text-align: center;
+            margin-top: 4px;
+            font-style: italic;
+        }
+        
+        .level-indicator {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.2);
+            color: gold;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
         /* ВКЛАДКА 3: КОШЕЛЕК */
         #wallet-tab {
             display: flex;
@@ -2775,13 +2833,31 @@
                         totalUpkeep += upkeep;
                     });
                     
+                    const minLevel = Math.min(...buildings.map(b => b.level));
+                    const canUpgrade = minLevel < 3;
+                    const nextLevel = minLevel + 1;
+                    const upgradeCost = getUpgradeCost(type, nextLevel);
+                    const bonus = CONFIG.UPGRADE_BONUSES[type][nextLevel - 1] || 0;
+                    
                     const card = document.createElement('div');
                     card.className = 'owned-building';
+                    
+                    let bonusText = '';
+                    if (type === 'base') {
+                        bonusText = `+${(bonus * 100).toFixed(0)}% вместимости`;
+                    } else if (type === 'mining') {
+                        bonusText = `+${(bonus * 100).toFixed(0)}% добычи`;
+                    } else if (type === 'power') {
+                        bonusText = `+${bonus} энергии`;
+                    }
+                    
                     card.innerHTML = `
                         <div class="owned-building-header">
                             <div style="font-size: 24px;">${getBuildingIcon(type)}</div>
                             <div>
-                                <div style="font-weight: bold; font-size: 16px;">${getBuildingName(type)}</div>
+                                <div style="font-weight: bold; font-size: 16px;">${getBuildingName(type)}
+                                    <span class="level-indicator">Ур. ${minLevel + 1}</span>
+                                </div>
                                 <div style="font-size: 12px; color: gold;">Всего: ${buildings.length} шт.</div>
                             </div>
                         </div>
@@ -2822,6 +2898,34 @@
                             ` : ''}
                         </div>
                     `;
+                    
+                    // Добавляем кнопку улучшения если есть возможность
+                    if (canUpgrade) {
+                        const upgradeBtn = document.createElement('button');
+                        upgradeBtn.className = 'building-upgrade-btn';
+                        upgradeBtn.innerHTML = `
+                            <span>⬆️</span>
+                            <span>Улучшить до ур. ${nextLevel + 1}</span>
+                        `;
+                        upgradeBtn.disabled = gameState.gameBalance < upgradeCost;
+                        
+                        upgradeBtn.addEventListener('click', () => {
+                            upgradeBuildingType(type);
+                            updateMyBuildingsTab();
+                        });
+                        
+                        card.appendChild(upgradeBtn);
+                        
+                        const costInfo = document.createElement('div');
+                        costInfo.className = 'upgrade-cost';
+                        costInfo.textContent = `Стоимость: ${upgradeCost} MNRT`;
+                        card.appendChild(costInfo);
+                        
+                        const bonusInfo = document.createElement('div');
+                        bonusInfo.className = 'upgrade-bonus';
+                        bonusInfo.textContent = `Бонус: ${bonusText}`;
+                        card.appendChild(bonusInfo);
+                    }
                     
                     grid.appendChild(card);
                 });
@@ -3130,7 +3234,20 @@
                 
                 gameState.gameBalance -= upgradeCost;
                 gameState.statistics.totalUpgrades++;
-                showMessage(`✅ Улучшено ${upgradedCount} ${getBuildingName(type)} до уровня ${minLevel + 2}`, 'success');
+                
+                // Показываем сообщение об успешном улучшении
+                const bonus = CONFIG.UPGRADE_BONUSES[type][minLevel] || 0;
+                let bonusText = '';
+                if (type === 'base') {
+                    bonusText = `Вместимость базы увеличена на ${(bonus * 100).toFixed(0)}%`;
+                } else if (type === 'mining') {
+                    bonusText = `Добыча увеличена на ${(bonus * 100).toFixed(0)}%`;
+                } else if (type === 'power') {
+                    bonusText = `Производство энергии увеличено на ${bonus}`;
+                }
+                
+                showMessage(`✅ Улучшено ${upgradedCount} ${getBuildingName(type)} до уровня ${minLevel + 2}. ${bonusText}`, 'success');
+                
                 updateUI();
                 renderBuildings();
             }
