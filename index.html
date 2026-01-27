@@ -2344,7 +2344,10 @@
                 
                 if (totalBonus > 0) {
                     gameState.referral.totalEarned += totalBonus;
-                    gameState.gameBalance += totalBonus;
+                    
+                    // ВАЖНОЕ ИЗМЕНЕНИЕ: НЕ добавляем бонусы напрямую на баланс!
+                    // Вместо этого, будем накапливать их в отдельном поле
+                    // gameState.referral.pendingBonuses += totalBonus;
                     
                     // Обновляем время последнего начисления
                     gameState.referral.lastBonusUpdate = now;
@@ -2355,7 +2358,7 @@
                     
                     // Показываем сообщение о начислении
                     if (totalBonus > 0.1) { // Показываем только значительные начисления
-                        showMessage(`💰 Получено ${totalBonus.toFixed(3)} MNRT от рефералов!`, 'success');
+                        showMessage(`💰 Начислено ${totalBonus.toFixed(3)} MNRT от рефералов! Нажмите "Собрать" для получения.`, 'success');
                     }
                 }
             }
@@ -2632,10 +2635,10 @@
                 // Обновляем верхнюю панель
                 document.getElementById('balance').textContent = gameState.gameBalance.toFixed(2);
                 
-                // Обновляем хранилище с правильной вместимостью и показываем 4 знака после запятой
+                // Обновляем хранилище с правильной вместимостью и показываем 3 знака после запятой
                 const currentCapacity = gameState.baseCapacity;
                 document.getElementById('storage').textContent = 
-                    `${gameState.baseStorage.toFixed(4)}/${currentCapacity}`;
+                    `${gameState.baseStorage.toFixed(3)}/${currentCapacity}`;
                 
                 const storageEl = document.getElementById('storage');
                 if (gameState.storageFull) {
@@ -2652,7 +2655,7 @@
                 
                 // Обновляем кнопку сбора
                 const collectBtn = document.getElementById('collect-btn');
-                collectBtn.disabled = gameState.baseStorage <= 0;
+                collectBtn.disabled = gameState.baseStorage <= 0 && gameState.referral.totalEarned <= 0;
                 
                 // Обновляем время игры
                 gameState.playTime = Math.floor((Date.now() - gameState.gameStartTime) / 1000);
@@ -3235,26 +3238,45 @@
             }
 
             function collectFromBase() {
-                if (gameState.baseStorage <= 0) {
-                    showMessage('⛏️ Нет ресурсов в хранилище базы', 'error');
+                let totalCollected = 0;
+                
+                // Собираем из хранилища базы
+                if (gameState.baseStorage > 0) {
+                    totalCollected += gameState.baseStorage;
+                    gameState.baseStorage = 0;
+                    gameState.storageFull = false;
+                    gameState.miningActive = true;
+                }
+                
+                // Собираем реферальные бонусы
+                if (gameState.referral.totalEarned > 0) {
+                    totalCollected += gameState.referral.totalEarned;
+                    gameState.referral.totalEarned = 0;
+                    
+                    // Сбрасываем заработанные бонусы у каждого реферала
+                    gameState.referral.referrals.forEach(ref => {
+                        ref.earned = 0;
+                    });
+                }
+                
+                if (totalCollected <= 0) {
+                    showMessage('⛏️ Нет ресурсов для сбора', 'error');
                     return;
                 }
                 
-                const collected = gameState.baseStorage;
-                gameState.gameBalance += collected;
-                gameState.totalMinedAllTime += collected;
-                gameState.statistics.totalMined += collected;
-                gameState.baseStorage = 0;
-                gameState.storageFull = false;
-                gameState.miningActive = true;
+                // ВАЖНОЕ ИЗМЕНЕНИЕ: Баланс пополняется ТОЛЬКО здесь
+                gameState.gameBalance += totalCollected;
+                gameState.totalMinedAllTime += totalCollected;
+                gameState.statistics.totalMined += totalCollected;
                 
                 const playerName = telegramUser ? 
                     (telegramUser.firstName + (telegramUser.lastName ? ' ' + telegramUser.lastName : '')) : 'Игрок';
                 const playerId = telegramUser ? telegramUser.id : '—';
                 
-                showMessage(`💰 ${playerName} (ID: ${playerId}) собрал ${collected.toFixed(4)} MNRT на баланс!`, 'success');
+                showMessage(`💰 ${playerName} (ID: ${playerId}) собрал ${totalCollected.toFixed(4)} MNRT на баланс!`, 'success');
                 
                 updateUI();
+                updateReferralTab();
             }
 
             function generateMarsSurface() {
@@ -3770,4 +3792,3 @@
         </script>
     </body>
 </html>
-
