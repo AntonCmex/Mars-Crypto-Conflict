@@ -2083,6 +2083,9 @@
     <!-- TELEGRAM WEB APP SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
+    <!-- НАШ API МОДУЛЬ -->
+    <script src="api.js"></script>
+    
     <script>
         // ============================
         // ТЕЛЕГРАМ WEB APP ИНИЦИАЛИЗАЦИЯ
@@ -2780,6 +2783,93 @@
             }
 
             // ============================
+            // ЗАГРУЗКА ДАННЫХ С СЕРВЕРА
+            // ============================
+            async function loadGameData() {
+                showMessage('🔄 Загрузка данных с сервера...', 'success');
+                
+                try {
+                    const data = await window.gameAPI.initializeGame();
+                    
+                    if (data) {
+                        // Обновляем данные пользователя
+                        if (data.user) {
+                            // Показываем информацию о пользователе
+                            document.getElementById('telegram-user-info').style.display = 'flex';
+                            document.getElementById('user-name').textContent = 
+                                data.user.first_name + (data.user.last_name ? ' ' + data.user.last_name : '') || 'Игрок';
+                            document.getElementById('user-id').textContent = `ID: ${data.user.telegram_id || data.user.id}`;
+                            
+                            // Обновляем аватар
+                            const avatarEl = document.getElementById('user-avatar');
+                            if (data.user.photo_url) {
+                                avatarEl.style.backgroundImage = `url(${data.user.photo_url})`;
+                                avatarEl.style.backgroundSize = 'cover';
+                                avatarEl.style.backgroundPosition = 'center';
+                                avatarEl.textContent = '';
+                            } else {
+                                const firstName = data.user.first_name || 'И';
+                                avatarEl.textContent = firstName.charAt(0).toUpperCase();
+                            }
+                        }
+                        
+                        // Обновляем игровое состояние
+                        if (data.game) {
+                            gameState.gameBalance = parseFloat(data.game.game_balance) || 0;
+                            gameState.baseStorage = parseFloat(data.game.base_storage) || 0;
+                            gameState.baseCapacity = parseFloat(data.game.base_capacity) || CONFIG.BASE_STORAGE_CAPACITY;
+                            gameState.totalMinedAllTime = parseFloat(data.game.total_mined) || 0;
+                        }
+                        
+                        // Обновляем здания
+                        if (data.buildings && Array.isArray(data.buildings)) {
+                            gameState.buildings = data.buildings.map(b => ({
+                                id: b.id,
+                                type: b.type,
+                                x: b.x,
+                                y: b.y,
+                                level: b.level || 0,
+                                hasPower: true
+                            }));
+                            
+                            gameState.statistics.totalBuildings = gameState.buildings.length;
+                            gameState.hasBase = gameState.buildings.some(b => b.type === 'base');
+                            
+                            // Проверяем бесплатные здания
+                            gameState.freeBuildingsUsed.base = gameState.buildings.some(b => b.type === 'base');
+                            gameState.freeBuildingsUsed.mining = gameState.buildings.some(b => b.type === 'mining');
+                            gameState.freeBuildingsUsed.power = gameState.buildings.some(b => b.type === 'power');
+                            
+                            // Обновляем nextId
+                            if (gameState.buildings.length > 0) {
+                                const maxId = Math.max(...gameState.buildings.map(b => b.id));
+                                gameState.nextId = maxId + 1;
+                            }
+                            
+                            // Рендерим здания
+                            renderBuildings();
+                        }
+                        
+                        // Обновляем кошелек
+                        if (data.wallet) {
+                            gameState.walletAddress = data.wallet.bsc_address || null;
+                            gameState.lastWithdrawal = data.wallet.last_withdrawal ? 
+                                new Date(data.wallet.last_withdrawal).getTime() : null;
+                            
+                            updateWalletDisplay();
+                        }
+                        
+                        showMessage('✅ Данные успешно загружены с сервера!', 'success');
+                    } else {
+                        showMessage('⚠️ Не удалось загрузить данные. Используем локальное состояние.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки данных:', error);
+                    showMessage('❌ Ошибка подключения к серверу. Используем локальное состояние.', 'error');
+                }
+            }
+            
+            // ============================
             // ФУНКЦИИ ДЛЯ ВКЛАДОК
             // ============================
             function updateMyBuildingsTab() {
@@ -3414,7 +3504,7 @@
                 updateUI();
             }
 
-            function collectFromBase() {
+            async function collectFromBase() {
                 const collected = gameState.baseStorage;
                 
                 if (collected <= 0) {
@@ -3422,27 +3512,48 @@
                     return;
                 }
                 
-                // Добавляем на баланс
-                gameState.gameBalance += collected;
-                gameState.totalMinedAllTime += collected;
-                gameState.statistics.totalMined += collected;
-                
-                // Полностью очищаем хранилище
-                gameState.baseStorage = 0;
-                gameState.storageFull = false;
-                gameState.miningActive = true;
-                
-                const playerName = telegramUser ? 
-                    (telegramUser.firstName + (telegramUser.lastName ? ' ' + telegramUser.lastName : '')) : 'Игрок';
-                const playerId = telegramUser ? telegramUser.id : '—';
-                
-                showMessage(`💰 ${playerName} (ID: ${playerId}) собрал ${collected.toFixed(4)} MNRT из базы!`, 'success');
-                
-                updateUI();
-                
-                // Обновляем отображение баланса в кошельке
-                if (currentTab === 'wallet') {
-                    updateWalletTab();
+                try {
+                    // Используем API для сбора
+                    const result = await window.gameAPI.collectResources();
+                    
+                    if (result.success) {
+                        // Обновляем состояние на основе ответа API
+                        gameState.gameBalance += result.collected || collected;
+                        gameState.totalMinedAllTime += result.collected || collected;
+                        gameState.statistics.totalMined += result.collected || collected;
+                        
+                        // Полностью очищаем хранилище
+                        gameState.baseStorage = 0;
+                        gameState.storageFull = false;
+                        gameState.miningActive = true;
+                        
+                        const playerName = telegramUser ? 
+                            (telegramUser.firstName + (telegramUser.lastName ? ' ' + telegramUser.lastName : '')) : 'Игрок';
+                        const playerId = telegramUser ? telegramUser.id : '—';
+                        
+                        showMessage(`💰 ${playerName} (ID: ${playerId}) собрал ${collected.toFixed(4)} MNRT из базы!`, 'success');
+                        
+                        updateUI();
+                        
+                        // Обновляем отображение баланса в кошельке
+                        if (currentTab === 'wallet') {
+                            updateWalletTab();
+                        }
+                    } else {
+                        showMessage('❌ Ошибка при сборе ресурсов через API', 'error');
+                    }
+                } catch (error) {
+                    console.error('Ошибка API при сборе:', error);
+                    // Fallback на локальную логику
+                    gameState.gameBalance += collected;
+                    gameState.totalMinedAllTime += collected;
+                    gameState.statistics.totalMined += collected;
+                    gameState.baseStorage = 0;
+                    gameState.storageFull = false;
+                    gameState.miningActive = true;
+                    
+                    showMessage(`💰 Собрано ${collected.toFixed(4)} MNRT из базы!`, 'success');
+                    updateUI();
                 }
             }
 
@@ -3637,7 +3748,7 @@
                 buildingToDeleteId = null;
             }
             
-            function deleteBuildingConfirmed() {
+            async function deleteBuildingConfirmed() {
                 if (buildingToDeleteId === null) return;
                 
                 const buildingIndex = gameState.buildings.findIndex(b => b.id === buildingToDeleteId);
@@ -3665,6 +3776,13 @@
                     exitMoveMode();
                 }
                 
+                // Сохраняем изменения на сервере
+                try {
+                    await window.gameAPI.saveBuildings(gameState.buildings);
+                } catch (error) {
+                    console.error('Ошибка сохранения после удаления:', error);
+                }
+                
                 // Обновляем интерфейс
                 updateUI();
                 renderBuildings();
@@ -3678,7 +3796,7 @@
                 showMessage(`🗑️ ${buildingName} #${building.id} удалена`, 'success');
             }
             
-            function moveBuildingToPosition(buildingId, x, y) {
+            async function moveBuildingToPosition(buildingId, x, y) {
                 const building = gameState.buildings.find(b => b.id === buildingId);
                 if (!building) return false;
                 
@@ -3702,6 +3820,15 @@
                 
                 // Обновляем отображение
                 renderBuildings();
+                
+                // Сохраняем изменения на сервере
+                try {
+                    await window.gameAPI.moveBuilding(buildingId, x, y);
+                } catch (error) {
+                    console.error('Ошибка сохранения перемещения:', error);
+                    // Показываем сообщение, но не отменяем перемещение
+                    showMessage('⚠️ Перемещение сохранено локально, но сервер недоступен', 'error');
+                }
                 
                 return true;
             }
@@ -3729,14 +3856,14 @@
                 });
                 
                 // Клик по поверхности для размещения зданий
-                surface.addEventListener('click', function(e) {
+                surface.addEventListener('click', async function(e) {
                     // Если мы в режиме перемещения, перемещаем здание
                     if (movingBuildingId !== null) {
                         const rect = this.getBoundingClientRect();
                         const x = e.clientX - rect.left;
                         const y = e.clientY - rect.top;
                         
-                        if (moveBuildingToPosition(movingBuildingId, x, y)) {
+                        if (await moveBuildingToPosition(movingBuildingId, x, y)) {
                             exitMoveMode();
                             showMessage('✅ Здание успешно перемещено', 'success');
                         }
@@ -3797,6 +3924,14 @@
                     gameState.placingBuilding = null;
                     updateUI();
                     renderBuildings();
+                    
+                    // Сохраняем здания на сервере
+                    try {
+                        await window.gameAPI.saveBuildings(gameState.buildings);
+                    } catch (error) {
+                        console.error('Ошибка сохранения зданий:', error);
+                        showMessage('⚠️ Здание построено, но сервер недоступен', 'error');
+                    }
                     
                     const message = isFirstBuildingFree ? 
                         `✅ ${getBuildingName(type)} построена БЕСПЛАТНО!` : 
@@ -3929,12 +4064,15 @@
             // ============================
             // ИНИЦИАЛИЗАЦИЯ ИГРЫ
             // ============================
-            function initGame() {
+            async function initGame() {
                 // Создаем поверхность Марса
                 generateMarsSurface();
                 
                 // Инициализируем обработчики событий
                 initEventListeners();
+                
+                // Загружаем данные с сервера
+                await loadGameData();
                 
                 // Обновляем интерфейс
                 updateUI();
@@ -3951,7 +4089,7 @@
                 
                 // Приветственное сообщение
                 setTimeout(() => {
-                    showMessage('🎉 Добро пожаловать в Mars Crypto Conflict! Первая постройка каждого типа зданий - БЕСПЛАТНО!', 'success');
+                    showMessage('🎉 Добро пожаловать в Mars Crypto Conflict! Данные загружены с сервера.', 'success');
                 }, 1000);
             }
 
