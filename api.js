@@ -230,14 +230,30 @@ class MarsGameAPI {
     async collectResources() {
         try {
             console.log('💰 Сбор ресурсов...');
+            
+            // Получаем Telegram ID пользователя
+            const telegramId = this.telegramUser?.id?.toString() || 'test123';
+            console.log('👤 Отправляем telegram_id:', telegramId);
+            
             const response = await fetch(`${this.baseURL}/game/collect`, {
                 method: 'POST',
-                headers: this.getHeaders()
+                headers: this.getHeaders(),
+                body: JSON.stringify({ 
+                    telegram_id: telegramId  // ← ИСПРАВЛЕНИЕ ЗДЕСЬ!
+                })
             });
-            return await this.handleResponse(response);
+            
+            const result = await this.handleResponse(response);
+            console.log('✅ Ресурсы собраны:', result);
+            return result;
+            
         } catch (error) {
             console.error('❌ Ошибка сбора ресурсов:', error.message);
-            return { success: false, collected: 0, error: error.message };
+            return { 
+                success: false, 
+                collected: 0, 
+                error: error.message 
+            };
         }
     }
 
