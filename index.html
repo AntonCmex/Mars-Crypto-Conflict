@@ -3506,54 +3506,63 @@
 
             async function collectFromBase() {
                 const collected = gameState.baseStorage;
-                
+    
                 if (collected <= 0) {
                     showMessage('⛏️ Нет ресурсов в хранилище базы', 'error');
                     return;
                 }
-                
+    
                 try {
                     // Используем API для сбора
                     const result = await window.gameAPI.collectResources();
-                    
+        
                     if (result.success) {
-                        // Обновляем состояние на основе ответа API
-                        gameState.gameBalance += result.collected || collected;
-                        gameState.totalMinedAllTime += result.collected || collected;
-                        gameState.statistics.totalMined += result.collected || collected;
-                        
-                        // Полностью очищаем хранилище
-                        gameState.baseStorage = 0;
-                        gameState.storageFull = false;
-                        gameState.miningActive = true;
-                        
-                        const playerName = telegramUser ? 
-                            (telegramUser.firstName + (telegramUser.lastName ? ' ' + telegramUser.lastName : '')) : 'Игрок';
-                        const playerId = telegramUser ? telegramUser.id : '—';
-                        
-                        showMessage(`💰 ${playerName} (ID: ${playerId}) собрал ${collected.toFixed(4)} MNRT из базы!`, 'success');
-                        
-                        updateUI();
-                        
-                        // Обновляем отображение баланса в кошельке
-                        if (currentTab === 'wallet') {
-                            updateWalletTab();
-                        }
-                    } else {
-                        showMessage('❌ Ошибка при сборе ресурсов через API', 'error');
-                    }
-                } catch (error) {
-                    console.error('Ошибка API при сборе:', error);
-                    // Fallback на локальную логику
-                    gameState.gameBalance += collected;
-                    gameState.totalMinedAllTime += collected;
-                    gameState.statistics.totalMined += collected;
-                    gameState.baseStorage = 0;
-                    gameState.storageFull = false;
-                    gameState.miningActive = true;
-                    
-                    showMessage(`💰 Собрано ${collected.toFixed(4)} MNRT из базы!`, 'success');
-                    updateUI();
+                       // Обновляем состояние на основе ответа API
+                       gameState.gameBalance += result.collected || collected;
+                       gameState.totalMinedAllTime += result.collected || collected;
+                       gameState.statistics.totalMined += result.collected || collected;
+            
+                       // Полностью очищаем хранилище
+                       gameState.baseStorage = 0;
+                       gameState.storageFull = false;
+                       gameState.miningActive = true;
+            
+                       const playerName = telegramUser ? 
+                           (telegramUser.firstName + (telegramUser.lastName ? ' ' + telegramUser.lastName : '')) : 'Игрок';
+                       const playerId = telegramUser ? telegramUser.id : '—';
+            
+                       showMessage(`💰 ${playerName} (ID: ${playerId}) собрал ${collected.toFixed(4)} MNRT из базы!`, 'success');
+            
+                       updateUI();
+            
+                       // Обновляем отображение баланса в кошельке
+                       if (currentTab === 'wallet') {
+                           updateWalletTab();
+                       }
+                   } else {
+                       // FALLBACK: если API вернул success: false
+                       gameState.gameBalance += collected;
+                       gameState.totalMinedAllTime += collected;
+                       gameState.statistics.totalMined += collected;
+                       gameState.baseStorage = 0;
+                       gameState.storageFull = false;
+                       gameState.miningActive = true;
+            
+                       showMessage(`💰 Собрано ${collected.toFixed(4)} MNRT из базы (локально)!`, 'success');
+                       updateUI();
+                   }
+               } catch (error) {
+                   console.error('❌ Ошибка API при сборе:', error);
+                   // FALLBACK на локальную логику
+                   gameState.gameBalance += collected;
+                   gameState.totalMinedAllTime += collected;
+                   gameState.statistics.totalMined += collected;
+                   gameState.baseStorage = 0;
+                   gameState.storageFull = false;
+                   gameState.miningActive = true;
+        
+                   showMessage(`💰 Собрано ${collected.toFixed(4)} MNRT из базы (локально)!`, 'success');
+                   updateUI();
                 }
             }
 
@@ -4100,3 +4109,4 @@
         </script>
     </body>
 </html>
+
