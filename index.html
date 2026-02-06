@@ -3511,8 +3511,12 @@
                     showMessage('⛏️ Нет ресурсов в хранилище базы', 'error');
                     return;
                 }
-    
+                // ✅ ДОБАВЬ ЭТИ ДВЕ СТРОКИ:
+                console.log('🔍 DEBUG: Количество ресурсов для сбора:', collected);
+                console.log('🔍 DEBUG: Telegram ID пользователя:', telegramUser ? telegramUser.id : 'не найден');    
+                
                 try {
+                    
                     // Используем API для сбора
                     const result = await window.gameAPI.collectResources();
         
@@ -4109,5 +4113,6 @@
         </script>
     </body>
 </html>
+
 
 
