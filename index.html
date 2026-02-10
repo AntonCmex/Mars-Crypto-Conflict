@@ -3592,8 +3592,8 @@
                 const div = document.createElement('div');
                 div.className = `building ${building.type}`;
                 div.id = `building-${building.id}`;
-                div.style.left = building.x + 'px';
-                div.style.top = building.y + 'px';
+                div.style.left = building.x_coordinate + 'px';
+                div.style.top = building.y_coordinate + 'px';
                 div.title = `${getBuildingName(building.type)} #${building.id} | Уровень ${building.level + 1}`;
                 
                 const icon = document.createElement('div');
@@ -3818,8 +3818,8 @@
                     if (otherBuilding.id === buildingId) continue;
                     
                     const distance = Math.sqrt(
-                        Math.pow(x - otherBuilding.x, 2) + 
-                        Math.pow(y - otherBuilding.y, 2)
+                        Math.pow(x - (otherBuilding.x_coordinate || otherBuilding.x), 2) + 
+                        Math.pow(y - (otherBuilding.y_coordinate || otherBuilding.y), 2)
                     );
                     if (distance < 60) {
                         showMessage('⚠️ Слишком близко к другому зданию!', 'error');
@@ -3828,8 +3828,8 @@
                 }
                 
                 // Обновляем позицию здания
-                building.x = x;
-                building.y = y;
+                building.x_coordinate = x;
+                building.y_coordinate = y;
                 
                 // Обновляем отображение
                 renderBuildings();
@@ -3921,9 +3921,9 @@
                     const building = {
                         id: gameState.nextId++,
                         type: type,
-                        x: x,
-                        y: y,
-                        level: 0,
+                        x_coordinate: x,
+                        y_coordinate: y,
+                        level: 1,
                         hasPower: true
                     };
                     
@@ -4113,6 +4113,7 @@
         </script>
     </body>
 </html>
+
 
 
 
