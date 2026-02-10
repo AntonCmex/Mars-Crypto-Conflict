@@ -192,18 +192,27 @@ class MarsGameAPI {
 
     // Сохранить здания
     async saveBuildings(buildings) {
-        try {
-            console.log('💾 Сохранение зданий:', buildings.length, 'шт.');
-            const response = await fetch(`${this.baseURL}/game/buildings/save`, {
-                method: 'POST',
-                headers: this.getHeaders(),
-                body: JSON.stringify({ buildings })
-            });
-            return await this.handleResponse(response);
-        } catch (error) {
-            console.error('❌ Ошибка сохранения зданий:', error.message);
-            return { success: false, error: error.message };
-        }
+      try {
+        console.log('💾 Сохранение зданий:', buildings.length, 'шт.');
+    
+        // ✅ ДОБАВЛЯЕМ telegram_id (получаем из this.telegramUser)
+        const telegramId = this.telegramUser?.id?.toString() || 'test123';
+        console.log('👤 Отправляем telegram_id:', telegramId);
+    
+        const response = await fetch(`${this.baseURL}/game/buildings/save`, {
+          method: 'POST',
+          headers: this.getHeaders(),
+          body: JSON.stringify({ 
+            telegram_id: telegramId, // ← ДОБАВЛЕНО!
+            buildings: buildings 
+          })
+        });
+    
+        return await this.handleResponse(response);
+      } catch (error) {
+        console.error('❌ Ошибка сохранения зданий:', error.message);
+        return { success: false, error: error.message };
+      }
     }
 
     // Переместить здание
