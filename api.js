@@ -55,29 +55,39 @@ class MarsGameAPI {
 
     // Формирует заголовки с авторизацией
     getHeaders() {
-        const headers = {
-            'Content-Type': 'application/json',
-            'X-Client': 'MarsCryptoConflict-WebApp'
-        };
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Client': 'MarsCryptoConflict-WebApp'
+      };
 
-        // Добавляем Telegram данные если они есть
-        if (typeof window.Telegram?.WebApp !== 'undefined') {
-            const tg = window.Telegram.WebApp;
-            if (tg.initData) {
-                headers['Authorization'] = `tma ${tg.initData}`;
-                console.log('🔐 Используем Telegram авторизацию');
-            }
+      // 1. Пробуем получить данные из Telegram Web App
+      if (typeof window.Telegram?.WebApp !== 'undefined') {
+        const tg = window.Telegram.WebApp;
+    
+        // Если есть initData - используем Telegram авторизацию
+        if (tg.initData) {
+          headers['Authorization'] = `tma ${tg.initData}`;
+          console.log('🔐 Используем Telegram авторизацию');
         }
-
-        // В тестовом режиме или при отсутствии Telegram данных
-        if (!headers['Authorization'] && this.telegramUser?.id) {
-            headers['X-Telegram-User-ID'] = this.telegramUser.id.toString();
-            headers['X-Test-Mode'] = 'true';
-            console.log('🎭 Тестовый режим, Telegram ID:', this.telegramUser.id);
+    
+        // Всегда отправляем Telegram ID если он известен
+        const user = tg.initDataUnsafe?.user;
+        if (user?.id) {
+          headers['X-Telegram-User-ID'] = user.id.toString();
+          console.log('👤 Telegram ID из WebApp:', user.id);
         }
+      }
 
-        return headers;
-    }
+      // 2. Если нет Telegram Web App или данных - используем тестовый режим
+      if (!headers['X-Telegram-User-ID'] && this.telegramUser?.id) {
+        headers['X-Telegram-User-ID'] = this.telegramUser.id.toString();
+        headers['X-Test-Mode'] = 'true';
+        console.log('🎭 Тестовый режим, Telegram ID:', this.telegramUser.id);
+      }
+
+       console.log('📤 Отправляем заголовки:', headers);
+       return headers;
+     }
 
     // Обработка ошибок
     async handleResponse(response) {
@@ -195,16 +205,11 @@ class MarsGameAPI {
       try {
         console.log('💾 Сохранение зданий:', buildings.length, 'шт.');
     
-        // ✅ ДОБАВЛЯЕМ telegram_id (получаем из this.telegramUser)
-        const telegramId = this.telegramUser?.id?.toString() || 'test123';
-        console.log('👤 Отправляем telegram_id:', telegramId);
-    
         const response = await fetch(`${this.baseURL}/game/buildings/save`, {
           method: 'POST',
           headers: this.getHeaders(),
           body: JSON.stringify({ 
-            telegram_id: telegramId, // ← ДОБАВЛЕНО!
-            buildings: buildings 
+            buildings: buildings  // ← ТОЛЬКО buildings
           })
         });
     
@@ -247,9 +252,7 @@ class MarsGameAPI {
             const response = await fetch(`${this.baseURL}/game/collect`, {
                 method: 'POST',
                 headers: this.getHeaders(),
-                body: JSON.stringify({ 
-                    telegram_id: telegramId  // ← ИСПРАВЛЕНИЕ ЗДЕСЬ!
-                })
+                body: JSON.stringify({})                  
             });
             
             const result = await this.handleResponse(response);
