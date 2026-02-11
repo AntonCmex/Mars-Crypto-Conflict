@@ -213,13 +213,17 @@ class MarsGameAPI {
     // Сохранить здания
     async saveBuildings(buildings) {
       try {
-        console.log('💾 Сохранение зданий:', buildings.length, 'шт.');
+        // Получаем Telegram ID пользователя
+        const telegramId = this.telegramUser?.id?.toString() || 'test123';
+        console.log('💾 Сохранение зданий для пользователя:', telegramId);
+        console.log('🏗️ Количество зданий:', buildings.length, 'шт.');
     
         const response = await fetch(`${this.baseURL}/game/buildings/save`, {
           method: 'POST',
           headers: this.getHeaders(),
           body: JSON.stringify({ 
-            buildings: buildings  // ← ТОЛЬКО buildings
+            telegram_id: telegramId,  // ← ДОБАВЛЯЕМ ЭТУ СТРОКУ!
+            buildings: buildings 
           })
         });
     
@@ -252,32 +256,34 @@ class MarsGameAPI {
 
     // Собрать ресурсы из базы
     async collectResources() {
-        try {
-            console.log('💰 Сбор ресурсов...');
-            
-            // Получаем Telegram ID пользователя
-            const telegramId = this.telegramUser?.id?.toString() || 'test123';
-            console.log('👤 Отправляем telegram_id:', telegramId);
-            
-            const response = await fetch(`${this.baseURL}/game/collect`, {
-                method: 'POST',
-                headers: this.getHeaders(),
-                body: JSON.stringify({})                  
-            });
-            
-            const result = await this.handleResponse(response);
-            console.log('✅ Ресурсы собраны:', result);
-            return result;
-            
-        } catch (error) {
-            console.error('❌ Ошибка сбора ресурсов:', error.message);
-            return { 
-                success: false, 
-                collected: 0, 
-                error: error.message 
-            };
-        }
+    try {
+        console.log('💰 Сбор ресурсов...');
+        
+        // Получаем Telegram ID пользователя
+        const telegramId = this.telegramUser?.id?.toString() || 'test123';
+        console.log('👤 Сбор ресурсов для пользователя:', telegramId);
+        
+        const response = await fetch(`${this.baseURL}/game/collect`, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ 
+                telegram_id: telegramId  // ← ДОБАВЛЯЕМ ЭТУ СТРОКУ!
+            })
+        });
+        
+        const result = await this.handleResponse(response);
+        console.log('✅ Ресурсы собраны:', result);
+        return result;
+        
+    } catch (error) {
+        console.error('❌ Ошибка сбора ресурсов:', error.message);
+        return { 
+            success: false, 
+            collected: 0, 
+            error: error.message 
+        };
     }
+}
 
     // ============================
     // API ДЛЯ КОШЕЛЬКА
