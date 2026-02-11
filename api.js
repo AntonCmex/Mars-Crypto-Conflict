@@ -173,10 +173,15 @@ class MarsGameAPI {
     // Получить состояние игры
     async getGameState() {
         try {
-            console.log('🎮 Запрос состояния игры...');
-            const response = await fetch(`${this.baseURL}/game/state`, {
+            // Получаем Telegram ID пользователя
+            const telegramId = this.telegramUser?.id?.toString() || 'test123';
+            console.log('🎮 Запрос состояния игры для пользователя:', telegramId);
+        
+            // Добавляем telegram_id в URL как параметр
+            const response = await fetch(`${this.baseURL}/game/state?telegram_id=${telegramId}`, {
                 headers: this.getHeaders()
             });
+        
             return await this.handleResponse(response);
         } catch (error) {
             console.error('❌ Ошибка получения состояния игры:', error.message);
@@ -187,10 +192,15 @@ class MarsGameAPI {
     // Получить здания пользователя
     async getBuildings() {
         try {
-            console.log('🏗️ Запрос зданий...');
-            const response = await fetch(`${this.baseURL}/game/buildings`, {
+            // Получаем Telegram ID пользователя
+            const telegramId = this.telegramUser?.id?.toString() || 'test123';
+            console.log('🏗️ Запрос зданий для пользователя:', telegramId);
+        
+            // Добавляем telegram_id в URL как параметр
+            const response = await fetch(`${this.baseURL}/game/buildings?telegram_id=${telegramId}`, {
                 headers: this.getHeaders()
             });
+        
             const result = await this.handleResponse(response);
             console.log('✅ Получены здания:', result.length || 0, 'шт.');
             return Array.isArray(result) ? result : [];
@@ -321,10 +331,15 @@ class MarsGameAPI {
     // Получить информацию о кошельке
     async getWalletInfo() {
         try {
-            console.log('👛 Запрос информации о кошельке...');
-            const response = await fetch(`${this.baseURL}/wallet/info`, {
+            // Получаем Telegram ID пользователя
+            const telegramId = this.telegramUser?.id?.toString() || 'test123';
+            console.log('👛 Запрос информации о кошельке для пользователя:', telegramId);
+        
+            // Добавляем telegram_id в URL как параметр
+            const response = await fetch(`${this.baseURL}/wallet/info?telegram_id=${telegramId}`, {
                 headers: this.getHeaders()
             });
+        
             return await this.handleResponse(response);
         } catch (error) {
             console.error('❌ Ошибка получения информации о кошельке:', error.message);
